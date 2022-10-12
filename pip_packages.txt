@@ -1,0 +1,10 @@
+jupyterlab-pygments==0.2.2
+prometheus-client==0.14.1
+fastjsonschema==2.16.2
+jupyter-client==7.3.5
+pure-eval==0.2.2
+importlib-metadata==5.0.0
+stack-data==0.5.1
+jupyter-core==4.11.1
+notebookjs==0.1.4
+ipython-genutils==0.2.0

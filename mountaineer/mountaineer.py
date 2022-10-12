@@ -25,18 +25,19 @@ class Mountaineer:
             self.visapp = f.read()
 
 
-    def visualize(self):
+    def visualize(self, input_data):
 
         ## setting callbacks
         callbacks = {
             'callback_test': self.test
         }
 
+        
         ## setting input data
-        input_data = {
-            'data': [1,2,3,4,5]
-        }
-
+        #input_data = {
+         #   'data': [1,2,3,4,5]
+        #}
+        
         # Plotting the Radial Bar Chart
         execute_js(
             library_list=[self.visapp],
