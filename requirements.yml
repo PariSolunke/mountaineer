@@ -38,16 +38,20 @@ dependencies:
     - entrypoints==0.4
     - executing==1.1.0
     - fastjsonschema==2.16.2
+    - gale-topo==0.0.3
+    - gudhi==3.6.0
     - importlib-metadata==5.0.0
     - ipykernel==6.16.0
     - ipython==8.5.0
     - ipython-genutils==0.2.0
     - jedi==0.18.1
     - jinja2==3.1.2
+    - joblib==1.2.0
     - jsonschema==4.16.0
     - jupyter-client==7.3.5
     - jupyter-core==4.11.1
     - jupyterlab-pygments==0.2.2
+    - kmapper==2.0.1
     - markupsafe==2.1.1
     - matplotlib-inline==0.1.6
     - mistune==2.0.4
@@ -55,8 +59,10 @@ dependencies:
     - nbconvert==7.1.0
     - nbformat==5.6.1
     - nest-asyncio==1.5.6
+    - networkx==2.8.7
     - notebook==6.4.12
     - notebookjs==0.1.4
+    - numpy==1.23.4
     - packaging==21.3
     - pandocfilters==1.5.0
     - parso==0.8.3
@@ -73,15 +79,18 @@ dependencies:
     - pyrsistent==0.18.1
     - python-dateutil==2.8.2
     - pyzmq==24.0.1
+    - scikit-learn==1.1.2
+    - scipy==1.9.2
     - send2trash==1.8.0
     - six==1.16.0
     - soupsieve==2.3.2.post1
     - stack-data==0.5.1
     - terminado==0.16.0
+    - threadpoolctl==3.1.0
     - tinycss2==1.1.1
     - tornado==6.2
     - traitlets==5.4.0
     - wcwidth==0.2.5
     - webencodings==0.5.1
     - zipp==3.8.1
-prefix: /home/joaorulff/miniconda3/envs/mountaineer
+prefix: /home/parisol/anaconda3/envs/mountaineer
