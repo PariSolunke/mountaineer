@@ -10,7 +10,6 @@ export function renderMountaineer(divName, data){
 	
 	// DATA PASSING EXAMPLE
 	console.log('DATA: ', data);
-
 	ReactDOM.render( <Mountaineer/>, select(divName).node() );
 }
 
