@@ -1,17 +1,20 @@
 // react
 import React from 'react';
 
+//components
+import DataProjection from './components/DataProjection.js';
+
 // styles
 import './Mountaineer.css'
 
 
-const Mountaineer = () => {
+const Mountaineer = ({data}) => {
 
     // CALLBACK EXAMPLE
     const callback_example = () => {
         console.log('clicking...');
-        const callback_function = ( data ) => {
-            console.log('CALLBACK DATA: ', data);
+        const callback_function = ( callback_data ) => {
+            console.log('CALLBACK DATA: ', callback_data);
         }
         let comm_callback_example = new CommAPI('callback_test', callback_function);
         comm_callback_example.call();
@@ -23,7 +26,8 @@ const Mountaineer = () => {
     return (
         <div className='main-wrapper'>
             <div className='viz-wrapper'>
-                <div>Data projection</div>
+                <div className='data-projection-container'>
+                    <DataProjection input_projection={data.input_projection}/></div>
                 <div>Mapper output</div>
             </div>
             <div className='datatable-wrapper'>

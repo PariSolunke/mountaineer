@@ -9,10 +9,10 @@ import { select } from 'd3-selection'
 export function renderMountaineer(divName, data){
 	
 	// DATA PASSING EXAMPLE
-	console.log('DATA: ', data);
-	ReactDOM.render( <Mountaineer/>, select(divName).node() );
+	//console.log('DATA: ', data);
+	ReactDOM.render( <Mountaineer data={data}/>, select(divName).node() );
 }
 
 //** BROWSER TESTING **//
-// ReactDOM.render(<Mountaineer/>, document.querySelector("#root") );
+//ReactDOM.render(<Mountaineer/>, document.querySelector("#root") );
 //** ************** **//
