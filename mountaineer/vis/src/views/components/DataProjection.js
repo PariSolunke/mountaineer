@@ -68,7 +68,9 @@ const DataProjection = ({input_projection}) => {
         // svg dimensions
         const svgWidthRange = [0, d3.selectAll('.data-projection-container').node().getBoundingClientRect().width - margins.left - margins.right];
         const svgHeightRange = [0, d3.selectAll('.data-projection-container').node().getBoundingClientRect().height - margins.top - margins.bottom];
-        
+        svgref.node().style.width=d3.selectAll('.data-projection-container').node().getBoundingClientRect().width;
+        svgref.node().style.height=d3.selectAll('.data-projection-container').node().getBoundingClientRect().height;
+
         //finding the data domain and the scale
         const dataRange = calculate_data_range(input_projection);
         const xDomain = [ dataRange[0], dataRange[1] ];
