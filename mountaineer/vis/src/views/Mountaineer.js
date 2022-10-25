@@ -3,7 +3,7 @@ import React from 'react';
 
 //components
 import DataProjection from './components/DataProjection.js';
-
+import MapperGraph from './components/MapperGraph.js';
 // styles
 import './Mountaineer.css'
 
@@ -20,15 +20,38 @@ const Mountaineer = ({data}) => {
         comm_callback_example.call();
     }
 
+    //calculate the range for the data
+    const calculate_data_range = (inputData) => {
+        let xmin = inputData[0][0]; 
+        let xmax = inputData[0][0];
+        let ymin = inputData[0][1]; 
+        let ymax = inputData[0][1];
+        
+        for( let i=1;i<inputData.length;i++){
+     
+          xmin=Math.min(xmin,inputData[i][0]);      
+          xmax=Math.max(xmax,inputData[i][0]);
+          ymin=Math.min(ymin,inputData[i][1]);      
+          ymax=Math.max(ymax,inputData[i][1]);   
+        }
+        return([xmin,xmax,ymin,ymax]);
+      }
+    
+
     /*<button onClick={callback_example}>Callback</button>
             <h1>Mountaineer</h1>*/
-
+    
+    const dataRange = calculate_data_range(data.input_projection);
+ 
     return (
         <div className='main-wrapper'>
             <div className='viz-wrapper'>
                 <div className='data-projection-container'>
-                    <DataProjection input_projection={data.input_projection}/></div>
-                <div>Mapper output</div>
+                    <DataProjection input_projection={data.input_projection} dataRange={dataRange}/>
+                </div>
+                <div className='mapper-graph-container'>
+                    <MapperGraph input_projection={data.input_projection} mapper_output={data.mapper_output} dataRange={dataRange}/> 
+                </div>
             </div>
             <div className='datatable-wrapper'>
                 <div> datatable</div>

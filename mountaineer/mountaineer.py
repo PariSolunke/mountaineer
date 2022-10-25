@@ -2,7 +2,7 @@ import glob
 from notebookjs import execute_js
 from sklearn.manifold import TSNE
 from gale import create_mapper
-
+from .util import remove_duplicated_links, remove_graph_duplicates
 
 import os
 
@@ -40,13 +40,20 @@ class Mountaineer:
         if(projection_method=='TSNE'):
             self.input_projection=TSNE(n_components=2,random_state=42).fit_transform(X).tolist()
 
+        #Gale to get the mapper output
         self.mapper_output = create_mapper(X, preds, resolution=10, gain=0.2, dist_thresh=0.5)
-
+        #remove duplicated nodes from the mapper output
+        self.mapper_output=remove_graph_duplicates(self.mapper_output)
+        #remove duplicated links
+        self.mapper_output=remove_duplicated_links(self.mapper_output)
+        
+        #setting the input data dictionary for the frontend
         input_data = {
             'input_projection': self.input_projection,
             'mapper_output': self.mapper_output
         }
-        # Plotting the Radial Bar Chart
+
+        #Execute and send data to the frontend
         execute_js(
             library_list=[self.visapp],
             main_function="mountaineer.renderMountaineer", 
