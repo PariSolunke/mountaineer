@@ -1,5 +1,7 @@
-//react and react hooks
+//react
 import React from 'react';
+
+//reference to renderD3 hook
 import { renderD3 } from '../../hooks/render.hook';
 
 //styles
@@ -22,14 +24,15 @@ const DataProjection = ({input_projection, dataRange}) => {
   const render_scatterplot = ( chartGroup, xScale, yScale, data, filter={} ) => {
 
     chartGroup
-        .selectAll('.nodes-input-projection')
+        .selectAll('node')
         .data( data )
         .enter()
         .append("circle")
+          .attr("class","nodes-input-projection")
           .attr("cx", function (d) { return xScale(d[0]); } )
           .attr("cy", function (d) { return yScale(d[1]); } )
           .attr("r", 2)
-          .style("fill", "#69b3a2")           
+     
   }
 
   const ref = renderD3( 
