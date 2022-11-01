@@ -36,18 +36,31 @@ const Mountaineer = ({data}) => {
         }
         return([xmin,xmax,ymin,ymax]);
       }
-    
 
-    /*<button onClick={callback_example}>Callback</button>
-            <h1>Mountaineer</h1>*/
+    const onBrush = (selectedIndices,source) => {
+        console.log("Parent");
+        console.log(selectedIndices);
+        console.log(source);
+        let message="Does this go to the child?";
+        birefDataProj.child.otherBrushed(message);
+    }
+
+    var birefDataProj = {
+        parent: {
+            onBrush: onBrush
+        }
+     }  
+
+
     
     const dataRange = calculate_data_range(data.input_projection);
  
+
     return (
         <div className='main-wrapper'>
             <div className='viz-wrapper'>
                 <div className='data-projection-container'>
-                    <DataProjection input_projection={data.input_projection} dataRange={dataRange}/>
+                    <DataProjection input_projection={data.input_projection} dataRange={dataRange} birefDataProj={birefDataProj}/>
                 </div>
                 <div className='mapper-graph-container'>
                     <MapperGraph input_projection={data.input_projection} mapper_output={data.mapper_output} dataRange={dataRange}/> 

@@ -1,3 +1,8 @@
-.nodes-input-projection{
+.nodes-input-projection-unselected{
     fill:#69b3a2;
+}
+
+.nodes-input-projection-selected{
+    fill:red;
+
 }
