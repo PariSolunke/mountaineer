@@ -1,5 +1,5 @@
 //react and react hooks
-import React from 'react';
+import React,{useState} from 'react';
 import { renderD3 } from '../../hooks/render.hook';
 
 //styles
@@ -9,7 +9,34 @@ import './styles/MapperGraph.css'
 import * as d3 from 'd3';
 
 
-const MapperGraph = ({input_projection, mapper_output, dataRange}) => {
+const MapperGraph = ({input_projection, mapper_output, dataRange, birefMapperGraph}) => {
+
+  //state to check filtered data
+  const [filters,setFilter]=useState({filteredIndices: new Set(), filterStatus: false });
+
+  //Update state when the other component is brushed
+  function otherBrushed(selectedIndices, filterStatus){
+    let tempObj={filteredIndices:new Set(selectedIndices),filterStatus: filterStatus}
+    setFilter(tempObj);
+  } 
+  
+  //Bidirectional reference object to enable two way communication between parent and child component
+  birefMapperGraph.child={
+      otherBrushed: otherBrushed
+  };
+  
+  //selected indices for brushing
+  let selectedIndices=new Set();
+
+  //Brushing helper
+  function isBrushed(brush_coords, cx, cy) {
+    let x0 = brush_coords[0][0],
+        x1 = brush_coords[1][0],
+        y0 = brush_coords[0][1],
+        y1 = brush_coords[1][1];
+   return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;    
+  }
+
 
   //clear plot
   const clear_plot = (svgref) => {
@@ -17,7 +44,7 @@ const MapperGraph = ({input_projection, mapper_output, dataRange}) => {
   }  
   //render the mapper output plot
 
-  const render_graph = ( chartGroup, xScale, yScale, radiusScale, data, svgWidthRange, svgHeightRange, filter={} ) => {
+  const render_graph = ( chartGroup, xScale, yScale, radiusScale, data, svgWidthRange, svgHeightRange) => {
     //creating copies of the data 
     let nodes = JSON.parse(JSON.stringify(data.nodes));
     let links = JSON.parse(JSON.stringify(data.links));
@@ -31,7 +58,6 @@ const MapperGraph = ({input_projection, mapper_output, dataRange}) => {
         .distance(250))
       .force("x", d3.forceX(function(d){return xScale(d.xAvg)}))
       .force("y", d3.forceY(function(d){return yScale(d.yAvg)}))
-     // .force("center", d3.forceCenter(svgWidthRange[1]/2,svgHeightRange[1]/2))
       .force("collide", d3.forceCollide().radius(40).iterations(1));
      
     //nodes in graph
@@ -40,7 +66,17 @@ const MapperGraph = ({input_projection, mapper_output, dataRange}) => {
       .data(nodes)
       .enter()
       .append("circle")
-      .attr("class", "node-mapper-graph")
+      .attr("class", function(d){
+        if (filters.filterStatus){
+          if (d.indices.some((element) => {return filters.filteredIndices.has(element)}))
+            return "node-mapper-graph";
+          else
+            return "node-mapper-graph node-mapper-graph-selected";
+        }
+        else
+          return "node-mapper-graph";
+        
+      })
       .attr("r", d=>{return radiusScale(d.numElements);})
 
   
@@ -74,16 +110,20 @@ const MapperGraph = ({input_projection, mapper_output, dataRange}) => {
 
         // margins
         const margins = {
-            top: 20,
-            left:20,
-            right: 20,
-            bottom: 20
+            top: 15,
+            left:15,
+            right: 15,
+            bottom: 15
         }
 
         //appending group to svgref
         const chartGroup = svgref
             .append("g")
             .attr("transform", `translate(${margins.left},${margins.top})`);
+
+        //group for brushing
+        const brushGroup=chartGroup.append("g");
+
 
         // svg dimensions
         const svgWidthRange = [0, d3.selectAll('.mapper-graph-container').node().getBoundingClientRect().width - margins.left - margins.right];
@@ -142,6 +182,37 @@ const MapperGraph = ({input_projection, mapper_output, dataRange}) => {
      
         //render the graph
         render_graph( chartGroup, xScale, yScale, radiusScale, graphData, svgWidthRange, svgHeightRange);
+
+        //add brush
+        let brush=d3.brush()
+          .extent( [ [0,0], [svgWidthRange[1],svgHeightRange[1]]])
+          .on('end', handleBrush);
+        
+        brushGroup.call(brush);
+
+        //handle Brushing
+        function handleBrush(e) {
+          let nodes=chartGroup.selectAll('.node-mapper-graph');
+          nodes.classed("node-mapper-graph-selected", false);
+          selectedIndices.clear();
+          let extent = e.selection;
+          nodes.attr("class", function(d,i){
+                                                    if(extent && isBrushed(extent, d.x, d.y )){
+                                                      for(let i=0;i<d.indices.length;i++){
+                                                        selectedIndices.add(d.indices[i]);
+                                                      }
+                                                      return "node-mapper-graph";
+                                                    }
+                                                    if(!extent)
+                                                      return "node-mapper-graph";
+                                                    else  
+                                                      return "node-mapper-graph node-mapper-graph-unselected"; } );
+        console.log(selectedIndices);
+          if(extent)
+            birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph", true);
+          else
+            birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph", false);    
+        }
 
     });
   return (

@@ -5,6 +5,15 @@
   padding: 2%;
 }
 
+.data-projection-container{
+  height: 400px;
+}
+
+.mapper-graph-container{
+  height: 400px;
+
+}
+
 .viz-wrapper{
   height: 400px;
   display: grid;

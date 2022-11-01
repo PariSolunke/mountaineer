@@ -2,7 +2,11 @@
     fill:#69b3a2;
 }
 
-.nodes-input-projection-selected{
-    fill:red;
-
+.nodes-input-projection-transparent{
+    opacity:0.2;
 }
+
+.nodes-input-projection-selected{
+    fill: #eb710d;
+}
+
