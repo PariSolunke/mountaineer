@@ -26,7 +26,7 @@ const DataTable = ({dataframe, birefDataTable}) => {
     tableData=dataframe.filter((e,i)=>{return filters.filteredIndices.has(i);})
   }
 
-  console.log(tableData);
+  //console.log(tableData);
   return (
     <PaginatedTable tableData={tableData}/>
   )

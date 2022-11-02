@@ -207,7 +207,7 @@ const MapperGraph = ({input_projection, mapper_output, dataRange, birefMapperGra
                                                       return "node-mapper-graph";
                                                     else  
                                                       return "node-mapper-graph node-mapper-graph-unselected"; } );
-        console.log(selectedIndices);
+        //console.log(selectedIndices);
           if(extent)
             birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph", true);
           else
