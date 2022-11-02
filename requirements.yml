@@ -1,25 +1,43 @@
 name: mountaineer
 channels:
+  - conda-forge
   - defaults
 dependencies:
   - _libgcc_mutex=0.1=main
   - _openmp_mutex=5.1=1_gnu
-  - ca-certificates=2022.07.19=h06a4308_0
-  - certifi=2022.9.14=py39h06a4308_0
+  - ca-certificates=2022.9.24=ha878542_0
+  - certifi=2022.9.24=pyhd8ed1ab_0
+  - colorama=0.4.6=pyhd8ed1ab_0
+  - joblib=1.2.0=pyhd8ed1ab_0
   - ld_impl_linux-64=2.38=h1181459_1
+  - libblas=3.9.0=15_linux64_openblas
+  - libcblas=3.9.0=15_linux64_openblas
   - libffi=3.3=he6710b0_2
   - libgcc-ng=11.2.0=h1234567_1
+  - libgfortran-ng=12.2.0=h69a702a_19
+  - libgfortran5=12.2.0=h337968e_19
   - libgomp=11.2.0=h1234567_1
+  - liblapack=3.9.0=15_linux64_openblas
+  - libllvm11=11.1.0=hf817b99_2
+  - libopenblas=0.3.20=pthreads_h78a6416_0
   - libstdcxx-ng=11.2.0=h1234567_1
+  - llvmlite=0.39.1=py39he621ea3_0
   - ncurses=6.3=h5eee18b_3
+  - numba=0.56.3=py39h417a72b_0
   - openssl=1.1.1q=h7f8727e_0
   - pip=22.2.2=py39h06a4308_0
+  - pynndescent=0.5.8=pyh1a96a4e_0
   - python=3.9.13=haa1d7c7_1
+  - python_abi=3.9=2_cp39
   - readline=8.1.2=h7f8727e_1
   - setuptools=63.4.1=py39h06a4308_0
   - sqlite=3.39.3=h5082296_0
+  - tbb=2021.6.0=hdb19cb5_0
+  - threadpoolctl=3.1.0=pyh8a188c0_0
   - tk=8.6.12=h1ccaba5_0
+  - tqdm=4.64.1=pyhd8ed1ab_0
   - tzdata=2022c=h04d1e81_0
+  - umap-learn=0.5.3=py39hf3d152e_0
   - wheel=0.37.1=pyhd3eb1b0_0
   - xz=5.2.6=h5eee18b_0
   - zlib=1.2.12=h5eee18b_3
@@ -46,7 +64,6 @@ dependencies:
     - ipython-genutils==0.2.0
     - jedi==0.18.1
     - jinja2==3.1.2
-    - joblib==1.2.0
     - jsonschema==4.16.0
     - jupyter-client==7.3.5
     - jupyter-core==4.11.1
@@ -86,7 +103,6 @@ dependencies:
     - soupsieve==2.3.2.post1
     - stack-data==0.5.1
     - terminado==0.16.0
-    - threadpoolctl==3.1.0
     - tinycss2==1.1.1
     - tornado==6.2
     - traitlets==5.4.0

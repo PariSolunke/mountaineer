@@ -3,7 +3,7 @@ from notebookjs import execute_js
 from sklearn.manifold import TSNE
 from gale import create_mapper
 from .util import remove_duplicated_links, remove_graph_duplicates
-
+import umap
 import os
 
 try:
@@ -37,7 +37,11 @@ class Mountaineer:
         }
 
         #Use TSNE to get a 2d projection of the input data (Extend support for others later)
-        if(projection_method=='TSNE'):
+
+        if(projection_method=='UMAP'):
+            self.input_projection=umap.UMAP().fit_transform(X).tolist()
+
+        else:
             self.input_projection=TSNE(n_components=2,random_state=42).fit_transform(X).tolist()
 
         #Gale to get the mapper output
