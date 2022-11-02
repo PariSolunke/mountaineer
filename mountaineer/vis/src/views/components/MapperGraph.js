@@ -9,7 +9,7 @@ import './styles/MapperGraph.css'
 import * as d3 from 'd3';
 
 
-const MapperGraph = ({input_projection, mapper_output, dataRange, birefMapperGraph}) => {
+const MapperGraph = ({input_projection, lens, mapper_output, dataRange, birefMapperGraph}) => {
 
   //state to check filtered data
   const [filters,setFilter]=useState({filteredIndices: new Set(), filterStatus: false });
@@ -44,7 +44,7 @@ const MapperGraph = ({input_projection, mapper_output, dataRange, birefMapperGra
   }  
   //render the mapper output plot
 
-  const render_graph = ( chartGroup, xScale, yScale, radiusScale, data, svgWidthRange, svgHeightRange) => {
+  const render_graph = ( chartGroup, xScale, yScale, radiusScale, colorScale, data, svgWidthRange, svgHeightRange) => {
     //creating copies of the data 
     let nodes = JSON.parse(JSON.stringify(data.nodes));
     let links = JSON.parse(JSON.stringify(data.links));
@@ -60,12 +60,24 @@ const MapperGraph = ({input_projection, mapper_output, dataRange, birefMapperGra
       .force("y", d3.forceY(function(d){return yScale(d.yAvg)}))
       .force("collide", d3.forceCollide().radius(40).iterations(1));
      
+    //links
+    let link=chartGroup
+      .selectAll(".link-mapper-graph")
+      .data(links)
+      .enter()
+      .append("line")
+      .attr("class","link-mapper-graph")  
+
     //nodes in graph
     let n=chartGroup
       .selectAll('node')
       .data(nodes)
       .enter()
       .append("circle")
+      .attr("fill",function(d){
+        console.log(d);
+        return colorScale(d.lensAvg);
+      })
       .attr("class", function(d){
         if (filters.filterStatus){
           if (d.indices.some((element) => {return filters.filteredIndices.has(element)}))
@@ -78,15 +90,6 @@ const MapperGraph = ({input_projection, mapper_output, dataRange, birefMapperGra
         
       })
       .attr("r", d=>{return radiusScale(d.numElements);})
-
-  
-    //links
-    let link=chartGroup
-      .selectAll(".link-mapper-graph")
-      .data(links)
-      .enter()
-      .append("line")
-      .attr("class","link-mapper-graph")
       
     function onTick() {
       //update the node positions
@@ -146,20 +149,21 @@ const MapperGraph = ({input_projection, mapper_output, dataRange, birefMapperGra
           let nodeName=nodeNames[i];
           
           let numElements=mapper_output.nodes[nodeName].length;
-          let xAvg=0, yAvg=0;
+          let xAvg=0, yAvg=0, lensAvg=0;
           minElements=Math.min(minElements,numElements);
           maxElements=Math.max(maxElements,numElements);
           
           for (let j in mapper_output.nodes[nodeName]){
             xAvg+=input_projection[j][0];
             yAvg+=input_projection[j][1];
+            lensAvg+=lens[j];
           }
           
           xAvg=xAvg/numElements;
           yAvg=yAvg/numElements;
-
+          lensAvg=lensAvg/numElements;
           //update the node data
-          graphData.nodes.push({id:nodeName, xAvg:xAvg, yAvg:yAvg, numElements:numElements, indices:mapper_output.nodes[nodeName]})
+          graphData.nodes.push({id:nodeName, xAvg:xAvg, yAvg:yAvg, lensAvg:lensAvg, numElements:numElements, indices:mapper_output.nodes[nodeName]})
 
           if (nodeName in mapper_output.links){
             for (let target in mapper_output.links[nodeName]){
@@ -173,15 +177,13 @@ const MapperGraph = ({input_projection, mapper_output, dataRange, birefMapperGra
         const xDomain = [ dataRange[0], dataRange[1] ];
         const yDomain = [ dataRange[2], dataRange[3] ] ;
 
-        //scales for x and y positions of the nodes
+        //scales for x and y positions, color, and radii of the nodes
         const xScale = d3.scaleLinear().domain(xDomain).range(svgWidthRange);
         const yScale = d3.scaleLinear().domain(yDomain).range([svgHeightRange[1], svgHeightRange[0]]);
-        
-        //scale for radius
         const radiusScale = d3.scaleLinear().domain([minElements,maxElements]).range([10,20]);
-     
+        const colorScale=d3.scaleLinear().domain([Math.min(lens),Math.max(lens)]).range(['#fee9d4','#7f2704']);
         //render the graph
-        render_graph( chartGroup, xScale, yScale, radiusScale, graphData, svgWidthRange, svgHeightRange);
+        render_graph( chartGroup, xScale, yScale, radiusScale, colorScale, graphData, svgWidthRange, svgHeightRange);
 
         //add brush
         let brush=d3.brush()

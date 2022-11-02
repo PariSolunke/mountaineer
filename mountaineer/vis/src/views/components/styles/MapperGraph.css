@@ -3,9 +3,6 @@
     stroke-width: 1;
 }
 
-.node-mapper-graph{
-    fill: #eb710d;
-}
 
 .node-mapper-graph-unselected{
     opacity: 0.1;

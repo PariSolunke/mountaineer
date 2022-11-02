@@ -80,7 +80,7 @@ const Mountaineer = ({data}) => {
                     <DataProjection input_projection={data.input_projection} dataRange={dataRange} birefDataProj={birefDataProj}/>
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph input_projection={data.input_projection} mapper_output={data.mapper_output} dataRange={dataRange} birefMapperGraph={birefMapperGraph}/> 
+                    <MapperGraph input_projection={data.input_projection} lens={data.y_pred} mapper_output={data.mapper_output} dataRange={dataRange} birefMapperGraph={birefMapperGraph}/> 
                 </div>
             </div>
             <div className='datatable-wrapper'>
