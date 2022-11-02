@@ -1,0 +1,9 @@
+td, th {
+    width: 80px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+td,th :hover {
+    overflow: visible;
+  }

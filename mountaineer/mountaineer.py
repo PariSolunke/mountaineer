@@ -50,7 +50,10 @@ class Mountaineer:
         #setting the input data dictionary for the frontend
         input_data = {
             'input_projection': self.input_projection,
-            'mapper_output': self.mapper_output
+            'mapper_output': self.mapper_output,
+            'dataframe':X.tolist(),
+            'y_pred': preds.tolist(),
+            'y_actual': y.tolist()
         }
 
         #Execute and send data to the frontend

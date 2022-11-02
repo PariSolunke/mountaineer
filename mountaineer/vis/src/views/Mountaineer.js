@@ -4,6 +4,7 @@ import React from 'react';
 //components
 import DataProjection from './components/DataProjection.js';
 import MapperGraph from './components/MapperGraph.js';
+import DataTable from './components/DataTable.js';
 // styles
 import './Mountaineer.css'
 
@@ -40,10 +41,15 @@ const Mountaineer = ({data}) => {
 
     //Whenever brushing interaction occurs in any child component
     const onBrush = (selectedIndices,source, filterStatus) => {
-        if (source=="DataProjection")
+        if (source=="DataProjection"){
             birefMapperGraph.child.otherBrushed(selectedIndices, filterStatus);
-        if (source=="MapperGraph")
+            birefDataTable.child.otherBrushed(selectedIndices, filterStatus);
+
+        }
+        else if (source=="MapperGraph"){
             birefDataProj.child.otherBrushed(selectedIndices, filterStatus);
+            birefDataTable.child.otherBrushed(selectedIndices, filterStatus);
+        }
     }
 
     //Bidirectional reference object for Data Projection component
@@ -54,14 +60,18 @@ const Mountaineer = ({data}) => {
      }
      
      //Bidirectional reference object for Mapper Graph component
-     var birefMapperGraph = {
+    var birefMapperGraph = {
         parent: {
             onBrush: onBrush
         }
-     }  
+    }
+     
+    var birefDataTable = {};
 
     //range of the input data projection
     const dataRange = calculate_data_range(data.input_projection);
+
+    let dataframe=data.dataframe.map((obj,i) =>{ return { ...obj, y_pred: data.y_pred[i], y_actual: data.y_actual[i]  }})
 
     return (
         <div className='main-wrapper'>
@@ -74,7 +84,7 @@ const Mountaineer = ({data}) => {
                 </div>
             </div>
             <div className='datatable-wrapper'>
-                <div> datatable</div>
+                <DataTable dataframe={dataframe} birefDataTable={birefDataTable} />
             
             </div>
             

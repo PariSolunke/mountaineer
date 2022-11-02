@@ -27,10 +27,11 @@
 
 }
 
-.datatable-wrapper div {
+.datatable-wrapper{
   height: 400px;
   border: solid #a2a2a2 1px;
   border-radius: 5px;
   text-align: center;
+  overflow-y: scroll;
   
 }
