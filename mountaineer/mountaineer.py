@@ -29,7 +29,7 @@ class Mountaineer:
         with open('./mountaineer/vis/dist/mountaineer.js') as f:
             self.visapp = f.read()
 
-    def visualize(self, X, y, preds, projection_method='TSNE'):
+    def visualize(self, X, y, lens, column_names=None, projection_method='TSNE'):
 
         ## setting callbacks
         callbacks = {
@@ -45,7 +45,7 @@ class Mountaineer:
             self.input_projection=TSNE(n_components=2,random_state=42).fit_transform(X).tolist()
 
         #Gale to get the mapper output
-        self.mapper_output = create_mapper(X, preds, resolution=10, gain=0.2, dist_thresh=0.5)
+        self.mapper_output = create_mapper(X, lens, resolution=10, gain=0.2, dist_thresh=0.5)
         #remove duplicated nodes from the mapper output
         self.mapper_output=remove_graph_duplicates(self.mapper_output)
         #remove duplicated links
@@ -56,8 +56,9 @@ class Mountaineer:
             'input_projection': self.input_projection,
             'mapper_output': self.mapper_output,
             'dataframe':X.tolist(),
-            'y_pred': preds.tolist(),
-            'y_actual': y.tolist()
+            'lens': lens.tolist(),
+            'y': y.tolist(),
+            'column_names': column_names.tolist()
         }
 
         #Execute and send data to the frontend

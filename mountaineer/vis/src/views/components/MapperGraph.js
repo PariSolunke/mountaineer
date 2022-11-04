@@ -55,10 +55,11 @@ const MapperGraph = ({input_projection, lens, mapper_output, dataRange, birefMap
       .force("link", d3.forceLink()                              
         .id(function(d) { return d.id; })                     
         .links(links)
-        .distance(250))
-      .force("x", d3.forceX(function(d){return xScale(d.xAvg)}))
-      .force("y", d3.forceY(function(d){return yScale(d.yAvg)}))
-      .force("collide", d3.forceCollide().radius(40).iterations(1));
+        .distance(300))
+        .force("center", d3.forceCenter(svgWidthRange[1]/2,svgHeightRange[1]/2))
+      //.force("x", d3.forceX(function(d){return xScale(d.xAvg)}))
+      //.force("y", d3.forceY(function(d){return yScale(d.yAvg)}))
+        .force("collide", d3.forceCollide().radius(40).iterations(1));
      
     //links
     let link=chartGroup
@@ -75,7 +76,6 @@ const MapperGraph = ({input_projection, lens, mapper_output, dataRange, birefMap
       .enter()
       .append("circle")
       .attr("fill",function(d){
-        console.log(d);
         return colorScale(d.lensAvg);
       })
       .attr("class", function(d){
@@ -143,7 +143,7 @@ const MapperGraph = ({input_projection, lens, mapper_output, dataRange, birefMap
         //To be used to determine scale for the node radius- minimum and max number of elements in a node in the graph
         let minElements= mapper_output.nodes[nodeNames[0]].length;
         let maxElements=minElements;
-
+        let lensMinAvg,lensMaxAvg;
         //iterate through every node in the graph
         for(let i=0; i<nodeNames.length;i++){
           let nodeName=nodeNames[i];
@@ -162,6 +162,12 @@ const MapperGraph = ({input_projection, lens, mapper_output, dataRange, birefMap
           xAvg=xAvg/numElements;
           yAvg=yAvg/numElements;
           lensAvg=lensAvg/numElements;
+          if (!lensMinAvg){
+            lensMinAvg = lensAvg;
+            lensMaxAvg = lensAvg;  
+          }
+          lensMinAvg= Math.min(lensMinAvg, lensAvg);
+          lensMaxAvg= Math.max(lensMaxAvg, lensAvg);
           //update the node data
           graphData.nodes.push({id:nodeName, xAvg:xAvg, yAvg:yAvg, lensAvg:lensAvg, numElements:numElements, indices:mapper_output.nodes[nodeName]})
 
@@ -181,7 +187,8 @@ const MapperGraph = ({input_projection, lens, mapper_output, dataRange, birefMap
         const xScale = d3.scaleLinear().domain(xDomain).range(svgWidthRange);
         const yScale = d3.scaleLinear().domain(yDomain).range([svgHeightRange[1], svgHeightRange[0]]);
         const radiusScale = d3.scaleLinear().domain([minElements,maxElements]).range([10,20]);
-        const colorScale=d3.scaleLinear().domain([Math.min(lens),Math.max(lens)]).range(['#fee9d4','#7f2704']);
+        const colorScale=d3.scaleLinear().domain([lensMinAvg,lensMaxAvg]).range(['#FFE0B2','#FB8C00']);
+         
         //render the graph
         render_graph( chartGroup, xScale, yScale, radiusScale, colorScale, graphData, svgWidthRange, svgHeightRange);
 

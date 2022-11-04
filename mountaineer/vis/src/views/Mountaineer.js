@@ -67,11 +67,21 @@ const Mountaineer = ({data}) => {
     }
      
     var birefDataTable = {};
+    
+    //combining data, y and lens for datatable
+    let dataframe=data.dataframe.map((obj,i) =>{ return { ...obj, y: data.y[i], lens: data.lens[i]}})
+
+    //generating column names if not provided
+    let columns=[]
+    if (!data.column_names)
+      columns=Array.from({length: Object.keys(dataframe[0]).length-2}, (_, i) => {return "Feature"+(i + 1)});
+    else
+      columns=data.column_names
+    columns.push("y","lens");
 
     //range of the input data projection
     const dataRange = calculate_data_range(data.input_projection);
 
-    let dataframe=data.dataframe.map((obj,i) =>{ return { ...obj, y_pred: data.y_pred[i], y_actual: data.y_actual[i]  }})
 
     return (
         <div className='main-wrapper'>
@@ -80,11 +90,11 @@ const Mountaineer = ({data}) => {
                     <DataProjection input_projection={data.input_projection} dataRange={dataRange} birefDataProj={birefDataProj}/>
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph input_projection={data.input_projection} lens={data.y_pred} mapper_output={data.mapper_output} dataRange={dataRange} birefMapperGraph={birefMapperGraph}/> 
+                    <MapperGraph input_projection={data.input_projection} lens={data.lens} mapper_output={data.mapper_output} dataRange={dataRange} birefMapperGraph={birefMapperGraph}/> 
                 </div>
             </div>
             <div className='datatable-wrapper'>
-                <DataTable dataframe={dataframe} birefDataTable={birefDataTable} />
+               <DataTable dataframe={dataframe} birefDataTable={birefDataTable} columns={columns} />
             
             </div>
             

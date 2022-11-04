@@ -1,10 +1,13 @@
 import React, {useState} from 'react';
 import PaginatedTable from './PaginatedTable';
 
-const DataTable = ({dataframe, birefDataTable}) => {
+const DataTable = ({dataframe, birefDataTable, columns}) => {
 
   //state to check filtered data
   const [filters,setFilter]=useState({filteredIndices: new Set(), filterStatus: false });
+
+
+
 
   //Update state when the other component is brushed
   function otherBrushed(selectedIndices,filterStatus){
@@ -27,7 +30,7 @@ const DataTable = ({dataframe, birefDataTable}) => {
   }
 
   return (
-    <PaginatedTable tableData={tableData}/>
+    <PaginatedTable tableData={tableData} columns={columns}/>
   )
 }
 

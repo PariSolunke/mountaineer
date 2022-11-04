@@ -3,11 +3,11 @@ import { Table } from 'react-bootstrap';
 import './styles/PaginatedTable.css'
 import Pagination from './Pagination.js';
 
-const PaginatedTable = ({tableData}) => {
-
+const PaginatedTable = ({tableData, columns}) => {
+    
+    
     const [state,setState]=useState({currentPage:1, sort:"none"})
-    let columns=Array.from({length: 20}, (_, i) => {return "Feature"+(i + 1)});
-    columns.push("y_pred","y_actual");
+
     let pageSize=8;
     let startIndex=(state.currentPage-1)*pageSize;
     let displayData=tableData.slice(startIndex,startIndex+pageSize);
@@ -30,11 +30,11 @@ const PaginatedTable = ({tableData}) => {
               return (
                 <tr>
                   <td>{startIndex+i+1}</td>
-                  {columns.map((column,i)=>{
+                  {columns.map((column,j)=>{
                     return(
                       <td>
-                        { i<20 
-                            ? row[i].toFixed(4)
+                        { j<columns.length-2
+                            ? row[j].toFixed(4)
                             : row[column].toFixed(4)
                         }
                       </td>
