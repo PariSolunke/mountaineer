@@ -1,9 +1,10 @@
 .link-mapper-graph{
-    stroke:#212328;
-    stroke-width: 1;
+    stroke:#2b2f38;
+    stroke-width: 2;
 }
 
 
 .node-mapper-graph-unselected{
-    opacity: 0.1;
+    opacity: 0.2;
+    fill:#69b3a2;
 }

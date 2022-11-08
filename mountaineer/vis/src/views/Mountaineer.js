@@ -90,7 +90,7 @@ const Mountaineer = ({data}) => {
                     <DataProjection input_projection={data.input_projection} dataRange={dataRange} birefDataProj={birefDataProj}/>
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph input_projection={data.input_projection} lens={data.lens} mapper_output={data.mapper_output} dataRange={dataRange} birefMapperGraph={birefMapperGraph}/> 
+                    <MapperGraph input_projection={data.input_projection} lens={data.lens} mapper_output={data.mapper_output} overlap={data.overlap} dataRange={dataRange} birefMapperGraph={birefMapperGraph} dataframe={dataframe} columns={columns}/> 
                 </div>
             </div>
             <div className='datatable-wrapper'>

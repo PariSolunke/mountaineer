@@ -9,15 +9,14 @@ import './styles/MapperGraph.css'
 import * as d3 from 'd3';
 
 
-const MapperGraph = ({input_projection, lens, mapper_output, dataRange, birefMapperGraph}) => {
+const MapperGraph = ({input_projection, lens, mapper_output, overlap, dataRange, birefMapperGraph, dataframe, columns}) => {
 
   //state to check filtered data
-  const [filters,setFilter]=useState({filteredIndices: new Set(), filterStatus: false });
-
+  const [state,setState]=useState({filteredIndices: new Set(), filterStatus: false, nodeColorBy:"lens", nodeColorAgg:"mean"});
+  console.log(dataframe);
   //Update state when the other component is brushed
   function otherBrushed(selectedIndices, filterStatus){
-    let tempObj={filteredIndices:new Set(selectedIndices),filterStatus: filterStatus}
-    setFilter(tempObj);
+    setState((prevState)=>({...prevState, filteredIndices :new Set(selectedIndices), filterStatus: filterStatus}));
   } 
   
   //Bidirectional reference object to enable two way communication between parent and child component
@@ -44,7 +43,7 @@ const MapperGraph = ({input_projection, lens, mapper_output, dataRange, birefMap
   }  
   //render the mapper output plot
 
-  const render_graph = ( chartGroup, xScale, yScale, radiusScale, colorScale, data, svgWidthRange, svgHeightRange) => {
+  const render_graph = ( chartGroup, xScale, yScale, radiusScale, colorScale, opacityScale, data, svgWidthRange, svgHeightRange) => {
     //creating copies of the data 
     let nodes = JSON.parse(JSON.stringify(data.nodes));
     let links = JSON.parse(JSON.stringify(data.links));
@@ -55,11 +54,9 @@ const MapperGraph = ({input_projection, lens, mapper_output, dataRange, birefMap
       .force("link", d3.forceLink()                              
         .id(function(d) { return d.id; })                     
         .links(links)
-        .distance(300))
+        .distance(250))
         .force("center", d3.forceCenter(svgWidthRange[1]/2,svgHeightRange[1]/2))
-      //.force("x", d3.forceX(function(d){return xScale(d.xAvg)}))
-      //.force("y", d3.forceY(function(d){return yScale(d.yAvg)}))
-        .force("collide", d3.forceCollide().radius(40).iterations(1));
+        .force("collide", d3.forceCollide().radius(35).iterations(1));
      
     //links
     let link=chartGroup
@@ -67,6 +64,10 @@ const MapperGraph = ({input_projection, lens, mapper_output, dataRange, birefMap
       .data(links)
       .enter()
       .append("line")
+      .attr("stroke-opacity", function(d){
+        return (opacityScale(overlap[d.source.id]));
+    
+      })
       .attr("class","link-mapper-graph")  
 
     //nodes in graph
@@ -79,11 +80,11 @@ const MapperGraph = ({input_projection, lens, mapper_output, dataRange, birefMap
         return colorScale(d.lensAvg);
       })
       .attr("class", function(d){
-        if (filters.filterStatus){
-          if (d.indices.some((element) => {return filters.filteredIndices.has(element)}))
-            return "node-mapper-graph";
-          else
+        if (state.filterStatus){
+          if (d.indices.some((element) => {return state.filteredIndices.has(element)}))
             return "node-mapper-graph node-mapper-graph-selected";
+          else
+            return "node-mapper-graph node-mapper-graph-unselected";
         }
         else
           return "node-mapper-graph";
@@ -144,23 +145,21 @@ const MapperGraph = ({input_projection, lens, mapper_output, dataRange, birefMap
         let minElements= mapper_output.nodes[nodeNames[0]].length;
         let maxElements=minElements;
         let lensMinAvg,lensMaxAvg;
+        let opacityExtent=[];
         //iterate through every node in the graph
         for(let i=0; i<nodeNames.length;i++){
           let nodeName=nodeNames[i];
-          
+
           let numElements=mapper_output.nodes[nodeName].length;
-          let xAvg=0, yAvg=0, lensAvg=0;
+          let lensAvg=0;
           minElements=Math.min(minElements,numElements);
           maxElements=Math.max(maxElements,numElements);
           
           for (let j in mapper_output.nodes[nodeName]){
-            xAvg+=input_projection[j][0];
-            yAvg+=input_projection[j][1];
             lensAvg+=lens[j];
           }
           
-          xAvg=xAvg/numElements;
-          yAvg=yAvg/numElements;
+
           lensAvg=lensAvg/numElements;
           if (!lensMinAvg){
             lensMinAvg = lensAvg;
@@ -169,11 +168,19 @@ const MapperGraph = ({input_projection, lens, mapper_output, dataRange, birefMap
           lensMinAvg= Math.min(lensMinAvg, lensAvg);
           lensMaxAvg= Math.max(lensMaxAvg, lensAvg);
           //update the node data
-          graphData.nodes.push({id:nodeName, xAvg:xAvg, yAvg:yAvg, lensAvg:lensAvg, numElements:numElements, indices:mapper_output.nodes[nodeName]})
-
+          graphData.nodes.push({id:nodeName, lensAvg:lensAvg, numElements:numElements, indices:mapper_output.nodes[nodeName]})
           if (nodeName in mapper_output.links){
+            if(opacityExtent.length==0){
+              opacityExtent=d3.extent(overlap[nodeName]);
+            }
+            else{
+              let curExtent=d3.extent(overlap[nodeName]);
+              opacityExtent[0]=Math.min(opacityExtent[0],curExtent[0]);
+              opacityExtent[1]=Math.max(opacityExtent[1],curExtent[1]);
+            }
             for (let target in mapper_output.links[nodeName]){
               //update the link data
+              
               graphData.links.push( {source:nodeName, target:mapper_output.links[nodeName][target]});
             }
           }
@@ -188,9 +195,10 @@ const MapperGraph = ({input_projection, lens, mapper_output, dataRange, birefMap
         const yScale = d3.scaleLinear().domain(yDomain).range([svgHeightRange[1], svgHeightRange[0]]);
         const radiusScale = d3.scaleLinear().domain([minElements,maxElements]).range([10,20]);
         const colorScale=d3.scaleLinear().domain([lensMinAvg,lensMaxAvg]).range(['#FFE0B2','#FB8C00']);
-         
+        const opacityScale=d3.scaleLinear().domain(opacityExtent).range([0.1,1]);
+        console.log(opacityExtent);
         //render the graph
-        render_graph( chartGroup, xScale, yScale, radiusScale, colorScale, graphData, svgWidthRange, svgHeightRange);
+        render_graph( chartGroup, xScale, yScale, radiusScale, colorScale, opacityScale, graphData, svgWidthRange, svgHeightRange);
 
         //add brush
         let brush=d3.brush()
@@ -224,9 +232,45 @@ const MapperGraph = ({input_projection, lens, mapper_output, dataRange, birefMap
         }
 
     });
+
+
+    const changeNodeColorFeature = (event) => {
+      console.log(event.target.value);
+      setState((prevState)=>({...prevState, nodeColorBy:event.target.value}));
+    };
+
+    const changeNodeColorAgg = (event) => {
+      console.log(event.target.value);
+      setState((prevState)=>({...prevState, nodeColorAgg:event.target.value}));
+    };
+
   return (
     <>
+      <div className='mapper-selection-container'>
+      <label htmlFor='nodeColorBy'>Node Color:</label>
+      <select value={state.nodeColorBy} id="nodeColorBy"  onChange={changeNodeColorFeature}>
+        <option value="lens" selected={true}>lens</option>
+        <option value="y">y</option>
+          {columns.map((column,i) => (
+            i<columns.length-2?
+            <option value={i}>{column}</option>
+            :<></>
+            ))}
+      </select>
+      <label htmlFor="nodeColorAgg">Aggregation:</label>
+      <select value={state.nodeColorAgg} id="nodeColorAgg"  onChange={changeNodeColorAgg}>
+        <option value="mean">Mean</option>
+        <option value="median">Median</option>
+        <option value="sd">Standard Deviation</option>
+        <option value="var">Variance</option>
+        <option value="max">Max</option>
+        <option value="min">Min</option>
+      </select> 
+
+      </div>
+      <div className='svg-container'>
       <svg ref={ref}></svg>
+      </div>
     </>
   )
 }

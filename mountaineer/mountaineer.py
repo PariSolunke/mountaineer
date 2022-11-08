@@ -1,3 +1,4 @@
+from collections import defaultdict
 import glob
 from notebookjs import execute_js
 from sklearn.manifold import TSNE
@@ -22,7 +23,6 @@ from notebookjs import execute_js
 class Mountaineer:
     input_projection=[]
     mapper_output={}
-
     def __init__(self) -> None:
                 
         self.visapp = None
@@ -30,6 +30,8 @@ class Mountaineer:
             self.visapp = f.read()
 
     def visualize(self, X, y, lens, column_names=None, projection_method='TSNE'):
+
+        overlap=defaultdict(list)
 
         ## setting callbacks
         callbacks = {
@@ -45,16 +47,26 @@ class Mountaineer:
             self.input_projection=TSNE(n_components=2,random_state=42).fit_transform(X).tolist()
 
         #Gale to get the mapper output
-        self.mapper_output = create_mapper(X, lens, resolution=10, gain=0.2, dist_thresh=0.5)
+        self.mapper_output = create_mapper(X, lens, resolution=10, gain=0.3, dist_thresh=0.5)
         #remove duplicated nodes from the mapper output
         self.mapper_output=remove_graph_duplicates(self.mapper_output)
         #remove duplicated links
         self.mapper_output=remove_duplicated_links(self.mapper_output)
         
+        for node1,link_nodes in self.mapper_output['links'].items():
+            for node2 in link_nodes:
+                i=0
+                node1_set=set(self.mapper_output['nodes'][node1])
+                node2_set=set(self.mapper_output['nodes'][node2])
+                overlap[node1].append(len(node1_set.intersection(node2_set))/len(node1_set.union(node2_set)))
+        print(self.mapper_output)
+        print(overlap)
+      
         #setting the input data dictionary for the frontend
         input_data = {
             'input_projection': self.input_projection,
             'mapper_output': self.mapper_output,
+            'overlap': overlap,
             'dataframe':X.tolist(),
             'lens': lens.tolist(),
             'y': y.tolist(),
