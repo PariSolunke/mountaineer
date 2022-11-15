@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import PaginatedTable from './PaginatedTable';
 
-const DataTable = ({dataframe, birefDataTable, columns}) => {
+const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
 
   //state to check filtered data
   const [filters,setFilter]=useState({filteredIndices: new Set(), filterStatus: false });
@@ -20,17 +20,18 @@ const DataTable = ({dataframe, birefDataTable, columns}) => {
     otherBrushed: otherBrushed
   };
   
+  //filter table data
+
   let tableData;
   if (!filters.filterStatus){
     tableData=dataframe;
   }
-
   else{
     tableData=dataframe.filter((e,i)=>{return filters.filteredIndices.has(i);})
   }
 
   return (
-    <PaginatedTable tableData={tableData} columns={columns}/>
+    <PaginatedTable tableData={tableData} columns={columns} lensCount={lensCount}/>
   )
 }
 

@@ -2,7 +2,6 @@ from collections import defaultdict
 import glob
 from notebookjs import execute_js
 from sklearn.manifold import TSNE
-from gale import create_mapper
 from .util import remove_duplicated_links, remove_graph_duplicates
 import umap
 import os
@@ -22,16 +21,17 @@ from notebookjs import execute_js
 
 class Mountaineer:
     input_projection=[]
-    mapper_output={}
+    mapper_outputs=[]
     def __init__(self) -> None:
                 
         self.visapp = None
         with open('./mountaineer/vis/dist/mountaineer.js') as f:
             self.visapp = f.read()
 
-    def visualize(self, X, y, lens, column_names=None, projection_method='TSNE'):
-
-        overlap=defaultdict(list)
+    def visualize(self, X, y, mappers, lenses, column_names=None, projection_method='TSNE'):
+        self.mapper_outputs=[]
+        overlaps=[]
+        output_lenses=[]
 
         ## setting callbacks
         callbacks = {
@@ -41,34 +41,39 @@ class Mountaineer:
         #Use TSNE to get a 2d projection of the input data (Extend support for others later)
 
         if(projection_method=='UMAP'):
-            self.input_projection=umap.UMAP().fit_transform(X).tolist()
+            self.input_projection=umap.UMAP(random_state=42).fit_transform(X).tolist()
 
         else:
             self.input_projection=TSNE(n_components=2,random_state=42).fit_transform(X).tolist()
 
-        #Gale to get the mapper output
-        self.mapper_output = create_mapper(X, lens, resolution=10, gain=0.3, dist_thresh=0.5)
-        #remove duplicated nodes from the mapper output
-        self.mapper_output=remove_graph_duplicates(self.mapper_output)
-        #remove duplicated links
-        self.mapper_output=remove_duplicated_links(self.mapper_output)
-        
-        for node1,link_nodes in self.mapper_output['links'].items():
-            for node2 in link_nodes:
-                i=0
-                node1_set=set(self.mapper_output['nodes'][node1])
-                node2_set=set(self.mapper_output['nodes'][node2])
-                overlap[node1].append(len(node1_set.intersection(node2_set))/len(node1_set.union(node2_set)))
-        print(self.mapper_output)
-        print(overlap)
-      
+
+        #process every mapper output
+        for i,mapper in enumerate(mappers):
+            overlap=defaultdict(list)
+            #remove duplicated nodes from the mapper output
+            self.mapper_outputs.append(remove_graph_duplicates(mappers[i]))
+            #remove duplicated links
+            self.mapper_outputs[i]=remove_duplicated_links(self.mapper_outputs[i])
+            
+            #find the overlap for each connected node
+            for node1,link_nodes in self.mapper_outputs[i]['links'].items():
+                for node2 in link_nodes:
+                    node1_set=set(self.mapper_outputs[i]['nodes'][node1])
+                    node2_set=set(self.mapper_outputs[i]['nodes'][node2])
+                    overlap[node1].append(len(node1_set.intersection(node2_set))/len(node1_set.union(node2_set)))
+            overlaps.append(overlap)
+
+        #append lenses as list to the output object
+        for lens in lenses:
+            output_lenses.append(lens.tolist())
+
         #setting the input data dictionary for the frontend
         input_data = {
             'input_projection': self.input_projection,
-            'mapper_output': self.mapper_output,
-            'overlap': overlap,
+            'mapper_outputs': self.mapper_outputs,
+            'overlaps': overlaps,
             'dataframe':X.tolist(),
-            'lens': lens.tolist(),
+            'lenses': output_lenses,
             'y': y.tolist(),
             'column_names': column_names.tolist()
         }

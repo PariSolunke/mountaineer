@@ -8,3 +8,19 @@
     opacity: 0.2;
     fill:#69b3a2;
 }
+
+.mapper-selection-container{
+    height: 25px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-content: center;
+    align-content: center;
+}
+
+.mapper-selection-container div{
+    text-align: center;
+}
+
+.svg-container{
+    height: 375px;
+}

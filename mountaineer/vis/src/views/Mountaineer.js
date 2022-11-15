@@ -65,11 +65,20 @@ const Mountaineer = ({data}) => {
             onBrush: onBrush
         }
     }
-     
+
+    //Bidirectional reference object for Data table component
     var birefDataTable = {};
     
-    //combining data, y and lens for datatable
-    let dataframe=data.dataframe.map((obj,i) =>{ return { ...obj, y: data.y[i], lens: data.lens[i]}})
+    //combining data, y and lenses into a dataframe
+    let dataframe=data.dataframe.map((obj,i) =>{ 
+        obj = { ...obj, y: data.y[i]}
+        data.lenses.forEach((lens,j) => {
+            obj[("lens"+(j+1))]= lens[i];            
+        });
+        return obj; 
+    })
+
+
 
     //generating column names if not provided
     let columns=[]
@@ -77,7 +86,11 @@ const Mountaineer = ({data}) => {
       columns=Array.from({length: Object.keys(dataframe[0]).length-2}, (_, i) => {return "Feature"+(i + 1)});
     else
       columns=data.column_names
-    columns.push("y","lens");
+    columns.push("y");
+    data.lenses.forEach((lens,index) => {
+        columns.push("lens"+(index+1));  
+    });
+
 
     //range of the input data projection
     const dataRange = calculate_data_range(data.input_projection);
@@ -90,13 +103,14 @@ const Mountaineer = ({data}) => {
                     <DataProjection input_projection={data.input_projection} dataRange={dataRange} birefDataProj={birefDataProj}/>
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph input_projection={data.input_projection} lens={data.lens} mapper_output={data.mapper_output} overlap={data.overlap} dataRange={dataRange} birefMapperGraph={birefMapperGraph} dataframe={dataframe} columns={columns}/> 
+                    <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} dataRange={dataRange} birefMapperGraph={birefMapperGraph} dataframe={dataframe} columns={columns} lensCount={data.lenses.length}/> 
                 </div>
             </div>
+    
             <div className='datatable-wrapper'>
-               <DataTable dataframe={dataframe} birefDataTable={birefDataTable} columns={columns} />
-            
+               <DataTable dataframe={dataframe} birefDataTable={birefDataTable} columns={columns} lensCount={data.lenses.length} />
             </div>
+            
             
         </div>
     )
