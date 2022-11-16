@@ -21,6 +21,10 @@
     text-align: center;
 }
 
+.mapper-selection-container div select{
+    max-width: 50%;
+}
+
 .svg-container{
     height: 375px;
 }

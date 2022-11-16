@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import { Table } from 'react-bootstrap';
 import './styles/PaginatedTable.css'
 import Pagination from './Pagination.js';
@@ -11,6 +11,12 @@ const PaginatedTable = ({tableData, columns, lensCount, summary}) => {
     let pageSize=6;
     let startIndex=(state.currentPage-1)*pageSize;
     let displayData=tableData.slice(startIndex,startIndex+pageSize);
+    console.log("Curpage: "+state.currentPage);
+
+    useEffect(() => {
+      setState((prevState)=>({...prevState, currentPage:1}));
+    }, [tableData]);
+    
   return (
     <>
         <Table responsive striped>

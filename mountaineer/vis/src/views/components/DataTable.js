@@ -11,8 +11,7 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
 
   //Update state when the other component is brushed
   function otherBrushed(selectedIndices,filterStatus){
-    let tempObj={filteredIndices:new Set(selectedIndices), filterStatus: filterStatus}
-    setFilter(tempObj);
+    setFilter((prevFilter)=>({...prevFilter, filteredIndices:new Set(selectedIndices), filterStatus: filterStatus}));
   } 
   
   //Bidirectional reference object to enable two way communication between parent and child component

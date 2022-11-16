@@ -82,7 +82,7 @@ const Mountaineer = ({data}) => {
 
     //generating column names if not provided
     let columns=[]
-    if (!data.column_names)
+    if (data.column_names==null)
       columns=Array.from({length: Object.keys(dataframe[0]).length-2}, (_, i) => {return "Feature"+(i + 1)});
     else
       columns=data.column_names

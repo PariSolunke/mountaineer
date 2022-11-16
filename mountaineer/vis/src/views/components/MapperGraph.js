@@ -159,17 +159,14 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
           maxElements=Math.max(maxElements,numElements);
           
           //find the colorValue for each node based on selected aggregation
-          colorVal= findColorVal(mapper_output.nodes[nodeName], numElements);
-          if(!colorVal)
-            colorVal=0;      
-          if (!colorMinAvg){
+          colorVal= findColorVal(mapper_output.nodes[nodeName], numElements);     
+          if (colorMinAvg == null){
             colorMinAvg = colorVal;
             colorMaxAvg = colorVal;  
           }
           colorMinAvg= Math.min(colorMinAvg, colorVal);
           colorMaxAvg= Math.max(colorMaxAvg, colorVal);
-
-
+          
           //update the node data
           graphData.nodes.push({id:nodeName, colorVal:colorVal, numElements:numElements, indices:mapper_output.nodes[nodeName]})
           if (nodeName in mapper_output.links){
@@ -196,7 +193,12 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
         const xScale = d3.scaleLinear().domain(xDomain).range(svgWidthRange);
         const yScale = d3.scaleLinear().domain(yDomain).range([svgHeightRange[1], svgHeightRange[0]]);
         const radiusScale = d3.scaleLinear().domain([minElements,maxElements]).range([10,20]);
-        const colorScale=d3.scaleLinear().domain([colorMinAvg,colorMaxAvg]).range(['#FFE0B2','#FB8C00']);
+        let colorScale;
+        if (state.nodeColorAgg=='min')
+          colorScale=d3.scaleLinear().domain([colorMaxAvg,colorMinAvg]).range(['#FFE0B2','#FB8C00']);
+        else
+          colorScale=d3.scaleLinear().domain([colorMinAvg,colorMaxAvg]).range(['#FFE0B2','#FB8C00']);
+
         const opacityScale=d3.scaleLinear().domain(opacityExtent).range([0.1,1]);
 
         //render the graph
@@ -222,7 +224,7 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
                                                       }
                                                       return "node-mapper-graph";
                                                     }
-                                                    if(!extent)
+                                                    if(extent == null)
                                                       return "node-mapper-graph";
                                                     else  
                                                       return "node-mapper-graph node-mapper-graph-unselected"; } );
@@ -250,7 +252,7 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
         else if (state.nodeColorAgg=='max'){
           let returnValue;
           curIndices.forEach(j => {
-            if (!returnValue)
+            if (returnValue==null)
               returnValue=dataframe[j][state.nodeColorBy];
             else
               returnValue=Math.max(returnValue, dataframe[j][state.nodeColorBy]);
@@ -262,12 +264,12 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
         else if (state.nodeColorAgg=='min'){
           let returnValue;
           curIndices.forEach(j => {
-            if (!returnValue)
+            if (returnValue == null)
               returnValue=dataframe[j][state.nodeColorBy];
             else
               returnValue=Math.min(returnValue, dataframe[j][state.nodeColorBy]);
           });
-          return -1*returnValue; 
+          return returnValue; 
         }
 
         //median
