@@ -30,6 +30,7 @@ class Mountaineer:
 
     def visualize(self, X, y, mappers, lenses, column_names=None, projection_method='TSNE'):
         self.mapper_outputs=[]
+        
         overlaps=[]
         output_lenses=[]
 

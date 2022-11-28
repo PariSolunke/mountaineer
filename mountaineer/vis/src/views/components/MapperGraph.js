@@ -55,10 +55,10 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
       .on('tick',onTick)
       .force("link", d3.forceLink()                              
         .id(function(d) { return d.id; })                     
-        .links(links)
-        .distance(250))
-        .force("center", d3.forceCenter(svgWidthRange[1]/2,svgHeightRange[1]/2))
-        .force("collide", d3.forceCollide().radius(35).iterations(1));
+        .links(links))
+       // .distance(12)) 
+        .force("center", d3.forceCenter(svgWidthRange[1]/2,svgHeightRange[1]/2).strength(1) )
+        .force("collide", d3.forceCollide().strength(0.8).radius(12).iterations(1));
      
     //links
     let link=chartGroup
@@ -66,11 +66,11 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
       .data(links)
       .enter()
       .append("line")
-      .attr("stroke-opacity", function(d){
-        return (opacityScale(overlap[d.source.id]));
-    
-      })
-      .attr("class","link-mapper-graph")  
+      .attr("class", function(d){
+
+        console.log(d);
+        return "link-mapper-graph";
+      })  
 
     //nodes in graph
     let n=chartGroup
@@ -89,8 +89,7 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
             return "node-mapper-graph node-mapper-graph-unselected";
         }
         else
-          return "node-mapper-graph";
-        
+          return "node-mapper-graph"; 
       })
       .attr("r", d=>{return radiusScale(d.numElements);})
       
@@ -192,14 +191,16 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
         //scales for x and y positions, color, and radii of the nodes
         const xScale = d3.scaleLinear().domain(xDomain).range(svgWidthRange);
         const yScale = d3.scaleLinear().domain(yDomain).range([svgHeightRange[1], svgHeightRange[0]]);
-        const radiusScale = d3.scaleLinear().domain([minElements,maxElements]).range([10,20]);
+        const radiusScale = d3.scaleLinear().domain([minElements,maxElements]).range([3,12]);
         let colorScale;
         if (state.nodeColorAgg=='min')
           colorScale=d3.scaleLinear().domain([colorMaxAvg,colorMinAvg]).range(['#FFE0B2','#FB8C00']);
         else
           colorScale=d3.scaleLinear().domain([colorMinAvg,colorMaxAvg]).range(['#FFE0B2','#FB8C00']);
 
-        const opacityScale=d3.scaleLinear().domain(opacityExtent).range([0.1,1]);
+        console.log(colorMinAvg);
+        console.log(colorMaxAvg);
+        const opacityScale=d3.scaleLinear().domain(opacityExtent).range([0,0]);
 
         //render the graph
         render_graph( chartGroup, xScale, yScale, radiusScale, colorScale, opacityScale, graphData, svgWidthRange, svgHeightRange);
@@ -333,8 +334,9 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
         <div>
           <label htmlFor="mapperSelect">Mapper:&nbsp;</label>
           <select value={state.selectedMapper} id="mapperSelect"  onChange={changeSelectedMapper}>
-            <option value="0">Mapper 1</option>
-            <option value="1">Mapper 2</option>
+              {mapper_outputs.map((mapper,i) => (
+                <option value={i}>Mapper{i+1}</option>
+                ))}
           </select>
         </div>
         <div>

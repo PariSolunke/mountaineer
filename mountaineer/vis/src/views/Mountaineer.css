@@ -34,3 +34,7 @@
   overflow-y: scroll;
   
 }
+
+svg{
+  background-color: rgb(28, 27, 27);
+}
