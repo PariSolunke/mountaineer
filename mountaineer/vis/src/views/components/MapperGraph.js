@@ -2,6 +2,7 @@
 import React,{useState} from 'react';
 import { renderD3 } from '../../hooks/render.hook';
 
+
 //styles
 import './styles/MapperGraph.css'
 
@@ -9,7 +10,11 @@ import './styles/MapperGraph.css'
 import * as d3 from 'd3';
 
 
-const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, dataframe, columns, lensCount}) => {
+
+
+const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, dataframe, columns, lensCount, lasso}) => {
+
+
 
   //state to check filtered data
   const [state,setState]=useState({filteredIndices: new Set(), filterStatus: false, selectedMapper:0, nodeColorBy:"lens1", nodeColorAgg:"mean"});
@@ -45,7 +50,7 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
   }  
   //render the mapper output plot
 
-  const render_graph = ( chartGroup, xScale, yScale, radiusScale, colorScale, opacityScale, data, svgWidthRange, svgHeightRange) => {
+  const render_graph = ( chartGroup, xScale, yScale, radiusScale, colorScale, distanceScale, data, svgWidthRange, svgHeightRange) => {
     //creating copies of the data 
     let nodes = JSON.parse(JSON.stringify(data.nodes));
     let links = JSON.parse(JSON.stringify(data.links));
@@ -55,8 +60,12 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
       .on('tick',onTick)
       .force("link", d3.forceLink()                              
         .id(function(d) { return d.id; })                     
-        .links(links))
-       // .distance(12)) 
+        .links(links)
+        .distance(function(d){
+          //console.log(d);
+          return (distanceScale(d.linkOverlap));  
+          //return 10;
+          })) 
         .force("center", d3.forceCenter(svgWidthRange[1]/2,svgHeightRange[1]/2).strength(1) )
         .force("collide", d3.forceCollide().strength(0.8).radius(12).iterations(1));
      
@@ -67,9 +76,7 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
       .enter()
       .append("line")
       .attr("class", function(d){
-
-        console.log(d);
-        return "link-mapper-graph";
+        return "link-mapper-graph link-mapper-graph-default";
       })  
 
     //nodes in graph
@@ -146,7 +153,7 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
         let minElements= mapper_output.nodes[nodeNames[0]].length;
         let maxElements=minElements;
         let colorMinAvg,colorMaxAvg;
-        let opacityExtent=[];
+        let overlapExtent=[];
 
         //iterate through every node in the graph
         for(let i=0; i<nodeNames.length;i++){
@@ -169,21 +176,22 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
           //update the node data
           graphData.nodes.push({id:nodeName, colorVal:colorVal, numElements:numElements, indices:mapper_output.nodes[nodeName]})
           if (nodeName in mapper_output.links){
-            if(opacityExtent.length==0){
-              opacityExtent=d3.extent(overlap[nodeName]);
-            }
-            else{
-              let curExtent=d3.extent(overlap[nodeName]);
-              opacityExtent[0]=Math.min(opacityExtent[0],curExtent[0]);
-              opacityExtent[1]=Math.max(opacityExtent[1],curExtent[1]);
-            }
+
             for (let target in mapper_output.links[nodeName]){
               //update the link data
-              graphData.links.push( {source:nodeName, target:mapper_output.links[nodeName][target]});
+              let curOverlap=overlap[nodeName][mapper_output.links[nodeName][target]]
+              graphData.links.push( {source:nodeName, target:mapper_output.links[nodeName][target], linkOverlap: curOverlap});
+              if(overlapExtent.length==0){
+                overlapExtent=[curOverlap,curOverlap]
+              }
+              else{
+                overlapExtent[0]=Math.min(overlapExtent[0],curOverlap);
+                overlapExtent[1]=Math.max(overlapExtent[1],curOverlap);
+              }
             }
           }
         }
-        
+        //console.log(graphData.links);
         //the mapper output will be projected along the same dimensions as the input projection
         const xDomain = [ dataRange[0], dataRange[1] ];
         const yDomain = [ dataRange[2], dataRange[3] ] ;
@@ -194,23 +202,77 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
         const radiusScale = d3.scaleLinear().domain([minElements,maxElements]).range([3,12]);
         let colorScale;
         if (state.nodeColorAgg=='min')
-          colorScale=d3.scaleLinear().domain([colorMaxAvg,colorMinAvg]).range(['#FFE0B2','#FB8C00']);
+          colorScale=d3.scaleLinear().domain([colorMaxAvg, (colorMaxAvg+colorMinAvg)/2 , colorMinAvg]).range(['#2cba00','#ede40e','#db0f0f']);
         else
-          colorScale=d3.scaleLinear().domain([colorMinAvg,colorMaxAvg]).range(['#FFE0B2','#FB8C00']);
+          colorScale=d3.scaleLinear().domain([colorMinAvg,(colorMaxAvg+colorMinAvg)/2, colorMaxAvg]).range(['#2cba00','#ede40e','#db0f0f']);
 
-        console.log(colorMinAvg);
-        console.log(colorMaxAvg);
-        const opacityScale=d3.scaleLinear().domain(opacityExtent).range([0,0]);
-
+        const distanceScale=d3.scaleLinear().domain(overlapExtent).range([20,1]);
+      
         //render the graph
-        render_graph( chartGroup, xScale, yScale, radiusScale, colorScale, opacityScale, graphData, svgWidthRange, svgHeightRange);
+        render_graph( chartGroup, xScale, yScale, radiusScale, colorScale, distanceScale, graphData, svgWidthRange, svgHeightRange);
 
         //add brush
-        let brush=d3.brush()
-          .extent( [ [0,0], [svgWidthRange[1],svgHeightRange[1]]])
-          .on('end', handleBrush);
+        //let brush=d3.brush()
+         // .extent( [ [0-margins.left,0-margins.top], [svgWidthRange[1]+margins.right,svgHeightRange[1]+margins.bottom]])
+        //  .on('end', handleBrush);
         
-        brushGroup.call(brush);
+       // brushGroup.call(brush);
+
+        let v=lasso()
+        .items(chartGroup.selectAll('.node-mapper-graph'))
+        .targetArea(svgref)
+        .on("draw",lasso_draw)
+        .on("end",lasso_end);
+
+        svgref.call(v);
+        
+        function lasso_draw(){
+
+          v.items()
+          .attr("class","node-mapper-graph node-mapper-graph-unselected");
+
+        }
+
+        function lasso_end(){
+          selectedIndices.clear()
+          v.items()
+          .attr("class","node-mapper-graph");
+
+          let links=chartGroup.selectAll('.link-mapper-graph');
+
+          links.attr("class","link-mapper-graph link-mapper-graph-default");
+          
+          let nodesSelected=v.selectedItems()["_groups"][0];
+
+          console.log("Nodes Selected");
+          console.log(nodesSelected);
+          if (nodesSelected.length>0){
+            let selectedIds=new Set();
+            v.notSelectedItems()
+              .attr("class","node-mapper-graph node-mapper-graph-unselected");
+            nodesSelected.forEach((node) =>{
+              
+              for(let i=0;i<node.__data__.indices.length;i++){
+                selectedIndices.add(node.__data__.indices[i]);
+              }
+              selectedIds.add(node.__data__.id)
+            });
+            
+            links.attr("class",function(d){
+              if (selectedIds.has(d.source.id) || selectedIds.has(d.target.id))
+                return "link-mapper-graph link-mapper-graph-selected"
+              else
+                return "link-mapper-graph link-mapper-graph-hide"
+            });
+            birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph", true);
+          }
+          else{
+            birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph", false);
+
+          }
+
+
+        }
 
         //handle Brushing
         function handleBrush(e) {
@@ -327,6 +389,7 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
       setState((prevState)=>({...prevState, nodeColorAgg:event.target.value}));
     };
 
+    
   return (
     <>
       <div className='mapper-selection-container'>

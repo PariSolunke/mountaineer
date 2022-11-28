@@ -5,6 +5,7 @@ from sklearn.manifold import TSNE
 from .util import remove_duplicated_links, remove_graph_duplicates
 import umap
 import os
+import copy
 
 try:
     import importlib.resources as pkg_resources
@@ -50,9 +51,10 @@ class Mountaineer:
 
         #process every mapper output
         for i,mapper in enumerate(mappers):
-            overlap=defaultdict(list)
+            curMapper= copy.deepcopy(mapper)
+            overlap=defaultdict(dict)
             #remove duplicated nodes from the mapper output
-            self.mapper_outputs.append(remove_graph_duplicates(mappers[i]))
+            self.mapper_outputs.append(remove_graph_duplicates(curMapper))
             #remove duplicated links
             self.mapper_outputs[i]=remove_duplicated_links(self.mapper_outputs[i])
             
@@ -61,7 +63,7 @@ class Mountaineer:
                 for node2 in link_nodes:
                     node1_set=set(self.mapper_outputs[i]['nodes'][node1])
                     node2_set=set(self.mapper_outputs[i]['nodes'][node2])
-                    overlap[node1].append(len(node1_set.intersection(node2_set))/len(node1_set.union(node2_set)))
+                    overlap[node1][node2]= len(node1_set.intersection(node2_set))/len(node1_set.union(node2_set))
             overlaps.append(overlap)
 
         #append lenses as list to the output object

@@ -1,9 +1,40 @@
 .link-mapper-graph{
     stroke:#f6e4e4;
-    stroke-width: 1;
+}
+
+.link-mapper-graph-default{
+    stroke-width:1;
     stroke-opacity: 0.3;
 }
 
+.link-mapper-graph-hide{    
+    stroke-opacity: 0;
+}
+
+.link-mapper-graph-selected{
+    stroke-width: 1;
+    stroke-opacity: 0.5;
+
+}
+
+.lasso path {
+    stroke: rgb(255, 255, 255);
+    stroke-width:3px;
+}
+
+.lasso .drawn {
+    fill-opacity:.05 ;
+}
+
+.lasso .loop_close {
+    fill:none;
+    stroke-dasharray: 4,4;
+}
+
+.lasso .origin {
+    fill:#3399FF;
+    fill-opacity:.5;
+}
 
 .node-mapper-graph-unselected{
     opacity: 0.2;
