@@ -16,6 +16,7 @@ import './Mountaineer.css'
 
 const Mountaineer = ({data}) => {
 
+    /*
     // CALLBACK EXAMPLE
     const callback_example = () => {
         console.log('clicking...');
@@ -25,16 +26,15 @@ const Mountaineer = ({data}) => {
         let comm_callback_example = new CommAPI('callback_test', callback_function);
         comm_callback_example.call();
     }
-
+    */
     //calculate the range for the data
     const calculate_data_range = (inputData) => {
         let xmin = inputData[0][0]; 
         let xmax = inputData[0][0];
         let ymin = inputData[0][1]; 
         let ymax = inputData[0][1];
-        
+          
         for( let i=1;i<inputData.length;i++){
-     
           xmin=Math.min(xmin,inputData[i][0]);      
           xmax=Math.max(xmax,inputData[i][0]);
           ymin=Math.min(ymin,inputData[i][1]);      
@@ -43,6 +43,8 @@ const Mountaineer = ({data}) => {
         return([xmin,xmax,ymin,ymax]);
       }
 
+
+      //lasso brush function - handles creation of the brush
       let lasso = ()=>{
             let items =[],
                 closePathDistance = 75,
@@ -301,7 +303,6 @@ const Mountaineer = ({data}) => {
             return lasso;
       };
 
-
     //Whenever brushing interaction occurs in any child component
     const onBrush = (selectedIndices,source, filterStatus) => {
         if (source=="DataProjection"){
@@ -341,8 +342,6 @@ const Mountaineer = ({data}) => {
         return obj; 
     })
 
-
-
     //generating column names if not provided
     let columns=[]
     if (data.column_names==null)
@@ -354,10 +353,8 @@ const Mountaineer = ({data}) => {
         columns.push("lens"+(index+1));  
     });
 
-
     //range of the input data projection
     const dataRange = calculate_data_range(data.input_projection);
-
 
     return (
         <div className='main-wrapper'>
@@ -369,12 +366,9 @@ const Mountaineer = ({data}) => {
                     <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso}/> 
                 </div>
             </div>
-    
             <div className='datatable-wrapper'>
                <DataTable dataframe={dataframe} birefDataTable={birefDataTable} columns={columns} lensCount={data.lenses.length} />
             </div>
-            
-            
         </div>
     )
 

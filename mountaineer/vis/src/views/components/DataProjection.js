@@ -43,6 +43,7 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso}) => 
         .data( data )
         .enter()
         .append("circle")
+          //show or hide nodes depending on filters
           .attr("class",function(d,i){
             if(filters.filterStatus){
               if(filters.filteredIndices.has(i))
@@ -95,8 +96,6 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso}) => 
         
 
         //add brush
-        
-
         let lassoBrush=lasso()
         .items(chartGroup.selectAll('.node-input-projection'))
         .targetArea(svgref)
@@ -105,24 +104,26 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso}) => 
         svgref.call(lassoBrush);
         
         //lasso handler functions
+
+        //while lasso is being drawn
         function lasso_draw(){
           lassoBrush.items()
           .attr("class","node-input-projection node-input-projection-unselected");
         }
 
+        //on drawing of lasso
         function lasso_end(){
 
           selectedIndices.clear()          
           let nodesSelected=lassoBrush.selectedItems()["_groups"][0];
 
           if (nodesSelected.length>0){
-
+            //set appropriate classses for selected nodes
             lassoBrush.selectedItems().attr("class","node-input-projection node-input-projection-selected");
             lassoBrush.notSelectedItems().attr("class","node-input-projection node-input-projection-unselected");
 
             let nodes=chartGroup.selectAll('.node-input-projection')["_groups"][0];
-            console.log(nodes)
-
+            //add nodes to selected indices set and send this to parent
             nodes.forEach((node,i) =>{
               if (node.classList.contains("node-input-projection-selected"))
                 selectedIndices.add(i)
@@ -130,31 +131,13 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso}) => 
             birefDataProj.parent.onBrush(selectedIndices, "DataProjection", true);
 
           }
+          //case where no nodes are selectet - reset filters and inform parent
           else{
             lassoBrush.items()
             .attr("class","node-input-projection");
             birefDataProj.parent.onBrush(selectedIndices, "DataProjection", false);
           }
 
-        }
-
-
-        //handle brushing
-        function handleBrush(e) {
-          let nodes=chartGroup.selectAll('.node-input-projection');
-          nodes.classed("node-input-projection-unselected", false);
-          selectedIndices.clear();
-          let extent = e.selection;
-          nodes.attr("class", function(d,i){ 
-                                                    if(extent && isBrushed(extent, xScale(d[0]), yScale(d[1]) )){
-                                                      selectedIndices.add(i);
-                                                      return "node-input-projection node-input-projection-selected";
-                                                    }
-                                                    return "node-input-projection node-input-projection-unselected"; } );
-          if(extent)
-            birefDataProj.parent.onBrush(selectedIndices, "DataProjection", true);
-          else
-            birefDataProj.parent.onBrush(selectedIndices, "DataProjection", false);    
         }
     });
 

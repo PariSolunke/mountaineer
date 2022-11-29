@@ -18,6 +18,8 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
   const [state,setState]=useState({filteredIndices: new Set(), filterStatus: false, selectedMapper:0, nodeColorBy:"lens1", nodeColorAgg:"mean"});
   let mapper_output=mapper_outputs[state.selectedMapper];
   let overlap=overlaps[state.selectedMapper];
+  let filteredNodeNames=new Set();
+
 
   //Update state when the other component is brushed
   function otherBrushed(selectedIndices, filterStatus){
@@ -64,7 +66,10 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
       .enter()
       .append("line")
       .attr("class", function(d){
-        return "link-mapper-graph link-mapper-graph-default";
+          if(d.source.nodeVisibility || d.target.nodeVisibility || !state.filterStatus)
+            return "link-mapper-graph link-mapper-graph-default";
+          else
+            return "link-mapper-graph link-mapper-graph-hide";
       })  
 
     //nodes in graph
@@ -76,9 +81,10 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
       .attr("fill",function(d){
         return colorScale(d.colorVal);
       })
+      //check if nodes are to be shown or hidden
       .attr("class", function(d){
         if (state.filterStatus){
-          if (d.indices.some((element) => {return state.filteredIndices.has(element)}))
+          if (d.nodeVisibility)
             return "node-mapper-graph node-mapper-graph-selected";
           else
             return "node-mapper-graph node-mapper-graph-unselected";
@@ -86,6 +92,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         else
           return "node-mapper-graph"; 
       })
+      //size of nodes based on number of elements
       .attr("r", d=>{return radiusScale(d.numElements);})
       
     function onTick() {
@@ -120,10 +127,6 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         const chartGroup = svgref
             .append("g")
             .attr("transform", `translate(${margins.left},${margins.top})`);
-
-        //group for brushing
-        const brushGroup=chartGroup.append("g");
-
 
         // svg dimensions
         const svgWidthRange = [0, d3.selectAll('.svg-container').node().getBoundingClientRect().width - margins.left - margins.right];
@@ -161,8 +164,12 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
           colorMinAvg= Math.min(colorMinAvg, colorVal);
           colorMaxAvg= Math.max(colorMaxAvg, colorVal);
           
+          let nodeVisibility=true;
+          
+          if (state.filterStatus && !mapper_output.nodes[nodeName].some((element) => {return state.filteredIndices.has(element)}))
+            nodeVisibility=false;
           //update the node data
-          graphData.nodes.push({id:nodeName, colorVal:colorVal, numElements:numElements, indices:mapper_output.nodes[nodeName]})
+          graphData.nodes.push({id:nodeName, colorVal:colorVal, numElements:numElements, indices:mapper_output.nodes[nodeName], nodeVisibility:nodeVisibility })
           if (nodeName in mapper_output.links){
 
             for (let target in mapper_output.links[nodeName]){
@@ -201,44 +208,47 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         .on("end",lasso_end);
         svgref.call(lassoBrush);
         
-        //lasso handler functions
+        //lasso handlers
+        //While lasso is being drawn
         function lasso_draw(){
           lassoBrush.items()
           .attr("class","node-mapper-graph node-mapper-graph-unselected");
         }
 
+        //after lasso is drawn
         function lasso_end(){
-          selectedIndices.clear()
-          lassoBrush.items()
-          .attr("class","node-mapper-graph");
+          selectedIndices.clear();
 
+          //reset class of nodes and links
+          lassoBrush.items().attr("class","node-mapper-graph");
           let links=chartGroup.selectAll('.link-mapper-graph');
-
           links.attr("class","link-mapper-graph link-mapper-graph-default");
           
           let nodesSelected=lassoBrush.selectedItems()["_groups"][0];
 
-
           if (nodesSelected.length>0){
             let selectedIds=new Set();
-            lassoBrush.notSelectedItems()
-              .attr("class","node-mapper-graph node-mapper-graph-unselected");
+            lassoBrush.notSelectedItems().attr("class","node-mapper-graph node-mapper-graph-unselected");
             nodesSelected.forEach((node) =>{
-              
+            
               for(let i=0;i<node.__data__.indices.length;i++){
                 selectedIndices.add(node.__data__.indices[i]);
               }
               selectedIds.add(node.__data__.id)
             });       
-   
+            
+            //show only links with source/destination among selected nodes
             links.attr("class",function(d){
               if (selectedIds.has(d.source.id) || selectedIds.has(d.target.id))
                 return "link-mapper-graph link-mapper-graph-default"
               else
                 return "link-mapper-graph link-mapper-graph-hide"
             });
+            //send selected indices to parent
             birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph", true);
           }
+
+          //case where no node is selected, disables filters
           else{
             birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph", false);
           }
@@ -294,13 +304,14 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
             return (valArray[(numElements/2 - 1)]+valArray[(numElements/2)])/2;    
         }
 
+        //variance or SD
         else{
           let valArray=[];
           curIndices.forEach(j => {
             valArray.push(dataframe[j][state.nodeColorBy]);
           });
           
-          //variance or SD
+         
           if (state.nodeColorAgg=='var')  
             return getVariance(valArray);
           else
