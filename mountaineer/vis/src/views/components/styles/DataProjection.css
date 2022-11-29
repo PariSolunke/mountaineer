@@ -1,12 +1,14 @@
-.nodes-input-projection-unselected{
+
+
+.node-input-projection{
     fill:#69b3a2;
 }
 
-.nodes-input-projection-transparent{
-    opacity:0.2;
+.node-input-projection-unselected{
+    opacity:0.05;
 }
 
-.nodes-input-projection-selected{
+.node-input-projection-selected{
     fill: #eb710d;
 }
 

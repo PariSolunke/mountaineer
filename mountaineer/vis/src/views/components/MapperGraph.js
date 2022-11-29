@@ -12,9 +12,7 @@ import * as d3 from 'd3';
 
 
 
-const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, dataframe, columns, lensCount, lasso}) => {
-
-
+const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lensCount, lasso}) => {
 
   //state to check filtered data
   const [state,setState]=useState({filteredIndices: new Set(), filterStatus: false, selectedMapper:0, nodeColorBy:"lens1", nodeColorAgg:"mean"});
@@ -34,23 +32,13 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
   //selected indices for brushing
   let selectedIndices=new Set();
 
-  //Brushing helper
-  function isBrushed(brush_coords, cx, cy) {
-    let x0 = brush_coords[0][0],
-        x1 = brush_coords[1][0],
-        y0 = brush_coords[0][1],
-        y1 = brush_coords[1][1];
-   return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;    
-  }
-
-
   //clear plot
   const clear_plot = (svgref) => {
     svgref.selectAll('*').remove();
   }  
   //render the mapper output plot
 
-  const render_graph = ( chartGroup, xScale, yScale, radiusScale, colorScale, distanceScale, data, svgWidthRange, svgHeightRange) => {
+  const render_graph = ( chartGroup, radiusScale, colorScale, distanceScale, data, svgWidthRange, svgHeightRange) => {
     //creating copies of the data 
     let nodes = JSON.parse(JSON.stringify(data.nodes));
     let links = JSON.parse(JSON.stringify(data.links));
@@ -62,12 +50,12 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
         .id(function(d) { return d.id; })                     
         .links(links)
         .distance(function(d){
-          //console.log(d);
           return (distanceScale(d.linkOverlap));  
-          //return 10;
-          })) 
-        .force("center", d3.forceCenter(svgWidthRange[1]/2,svgHeightRange[1]/2).strength(1) )
-        .force("collide", d3.forceCollide().strength(0.8).radius(12).iterations(1));
+          })
+        .iterations(1)
+        ) 
+        .force("center", d3.forceCenter(svgWidthRange[1]/2,svgHeightRange[1]/2).strength(1.1) )
+        .force("collide", d3.forceCollide().strength(0.8).radius(10).iterations(1));
      
     //links
     let link=chartGroup
@@ -191,14 +179,8 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
             }
           }
         }
-        //console.log(graphData.links);
-        //the mapper output will be projected along the same dimensions as the input projection
-        const xDomain = [ dataRange[0], dataRange[1] ];
-        const yDomain = [ dataRange[2], dataRange[3] ] ;
 
-        //scales for x and y positions, color, and radii of the nodes
-        const xScale = d3.scaleLinear().domain(xDomain).range(svgWidthRange);
-        const yScale = d3.scaleLinear().domain(yDomain).range([svgHeightRange[1], svgHeightRange[0]]);
+        //scales for color, radii, and distance of the nodes
         const radiusScale = d3.scaleLinear().domain([minElements,maxElements]).range([3,12]);
         let colorScale;
         if (state.nodeColorAgg=='min')
@@ -209,46 +191,37 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
         const distanceScale=d3.scaleLinear().domain(overlapExtent).range([20,1]);
       
         //render the graph
-        render_graph( chartGroup, xScale, yScale, radiusScale, colorScale, distanceScale, graphData, svgWidthRange, svgHeightRange);
+        render_graph( chartGroup, radiusScale, colorScale, distanceScale, graphData, svgWidthRange, svgHeightRange);
 
         //add brush
-        //let brush=d3.brush()
-         // .extent( [ [0-margins.left,0-margins.top], [svgWidthRange[1]+margins.right,svgHeightRange[1]+margins.bottom]])
-        //  .on('end', handleBrush);
-        
-       // brushGroup.call(brush);
-
-        let v=lasso()
+        let lassoBrush=lasso()
         .items(chartGroup.selectAll('.node-mapper-graph'))
         .targetArea(svgref)
         .on("draw",lasso_draw)
         .on("end",lasso_end);
-
-        svgref.call(v);
+        svgref.call(lassoBrush);
         
+        //lasso handler functions
         function lasso_draw(){
-
-          v.items()
+          lassoBrush.items()
           .attr("class","node-mapper-graph node-mapper-graph-unselected");
-
         }
 
         function lasso_end(){
           selectedIndices.clear()
-          v.items()
+          lassoBrush.items()
           .attr("class","node-mapper-graph");
 
           let links=chartGroup.selectAll('.link-mapper-graph');
 
           links.attr("class","link-mapper-graph link-mapper-graph-default");
           
-          let nodesSelected=v.selectedItems()["_groups"][0];
+          let nodesSelected=lassoBrush.selectedItems()["_groups"][0];
 
-          console.log("Nodes Selected");
-          console.log(nodesSelected);
+
           if (nodesSelected.length>0){
             let selectedIds=new Set();
-            v.notSelectedItems()
+            lassoBrush.notSelectedItems()
               .attr("class","node-mapper-graph node-mapper-graph-unselected");
             nodesSelected.forEach((node) =>{
               
@@ -256,11 +229,11 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
                 selectedIndices.add(node.__data__.indices[i]);
               }
               selectedIds.add(node.__data__.id)
-            });
-            
+            });       
+   
             links.attr("class",function(d){
               if (selectedIds.has(d.source.id) || selectedIds.has(d.target.id))
-                return "link-mapper-graph link-mapper-graph-selected"
+                return "link-mapper-graph link-mapper-graph-default"
               else
                 return "link-mapper-graph link-mapper-graph-hide"
             });
@@ -268,36 +241,8 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
           }
           else{
             birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph", false);
-
           }
-
-
         }
-
-        //handle Brushing
-        function handleBrush(e) {
-          let nodes=chartGroup.selectAll('.node-mapper-graph');
-          nodes.classed("node-mapper-graph-selected", false);
-          selectedIndices.clear();
-          let extent = e.selection;
-          nodes.attr("class", function(d,i){
-                                                    if(extent && isBrushed(extent, d.x, d.y )){
-                                                      for(let i=0;i<d.indices.length;i++){
-                                                        selectedIndices.add(d.indices[i]);
-                                                      }
-                                                      return "node-mapper-graph";
-                                                    }
-                                                    if(extent == null)
-                                                      return "node-mapper-graph";
-                                                    else  
-                                                      return "node-mapper-graph node-mapper-graph-unselected"; } );
-        //colorVallog(selectedIndices);
-          if(extent)
-            birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph", true);
-          else
-            birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph", false);    
-        }
-
 
       //function to find the colorValue for node based on user selection
       function findColorVal(curIndices, numElements){
@@ -367,10 +312,8 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
             const mean = valArr.reduce((a, b) => a + b) / n
             return valArr.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n
           }  
+        }
       }
-      
-      }
-
     });
 
     //on change of selected mapper
@@ -382,7 +325,6 @@ const MapperGraph = ({ mapper_outputs, overlaps, dataRange, birefMapperGraph, da
     const changeNodeColorFeature = (event) => {
       setState((prevState)=>({...prevState, nodeColorBy:event.target.value}));
     };
-
 
     //on change of aggregation method
     const changeNodeColorAgg = (event) => {

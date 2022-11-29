@@ -363,10 +363,10 @@ const Mountaineer = ({data}) => {
         <div className='main-wrapper'>
             <div className='viz-wrapper'>
                 <div className='data-projection-container'>
-                    <DataProjection input_projection={data.input_projection} dataRange={dataRange} birefDataProj={birefDataProj}/>
+                    <DataProjection input_projection={data.input_projection} dataRange={dataRange} birefDataProj={birefDataProj} lasso={lasso}/>
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} dataRange={dataRange} birefMapperGraph={birefMapperGraph} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso}/> 
+                    <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso}/> 
                 </div>
             </div>
     

@@ -11,12 +11,6 @@
     stroke-opacity: 0;
 }
 
-.link-mapper-graph-selected{
-    stroke-width: 1;
-    stroke-opacity: 0.5;
-
-}
-
 .lasso path {
     stroke: rgb(255, 255, 255);
     stroke-width:3px;
