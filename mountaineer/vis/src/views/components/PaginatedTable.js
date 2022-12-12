@@ -11,7 +11,6 @@ const PaginatedTable = ({tableData, columns, lensCount, summary}) => {
     let pageSize=6;
     let startIndex=(state.currentPage-1)*pageSize;
     let displayData=tableData.slice(startIndex,startIndex+pageSize);
-    console.log("Curpage: "+state.currentPage);
 
     useEffect(() => {
       setState((prevState)=>({...prevState, currentPage:1}));
