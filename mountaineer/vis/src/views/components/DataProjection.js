@@ -99,17 +99,19 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso}) => 
         let lassoBrush=lasso()
         .items(chartGroup.selectAll('.node-input-projection'))
         .targetArea(svgref)
-        .on("draw",lasso_draw)
+        //.on("draw",lasso_draw)
         .on("end",lasso_end);
         svgref.call(lassoBrush);
         
         //lasso handler functions
 
+        /*
         //while lasso is being drawn
         function lasso_draw(){
           lassoBrush.items()
           .attr("class","node-input-projection node-input-projection-unselected");
         }
+        */
 
         //on drawing of lasso
         function lasso_end(){
