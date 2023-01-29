@@ -365,9 +365,17 @@ const Mountaineer = ({data}) => {
                 <div className='mapper-graph-container'>
                     <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso}/> 
                 </div>
+                <div className='mapper-list'>
+                    
+                </div>
             </div>
-            <div className='datatable-wrapper'>
-               <DataTable dataframe={dataframe} birefDataTable={birefDataTable} columns={columns} lensCount={data.lenses.length} />
+            <div className='bottom-container'>
+                <div>
+
+                </div>
+                <div className='datatable-wrapper'>
+                    <DataTable dataframe={dataframe} birefDataTable={birefDataTable} columns={columns} lensCount={data.lenses.length} />
+                </div>
             </div>
         </div>
     )

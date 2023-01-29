@@ -94,7 +94,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         .iterations(1)
         ) 
         .force("center", d3.forceCenter(svgWidthRange[1]/2,svgHeightRange[1]/2).strength(1.1) )
-        .force("collide", d3.forceCollide().strength(0.8).radius(10).iterations(1));
+        .force("collide", d3.forceCollide().strength(0.8).radius(20).iterations(1));
      
     //links
     let link=chartGroup
@@ -204,14 +204,14 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         }
 
         //scales for color, radii, and distance of the nodes
-        const radiusScale = d3.scaleLinear().domain([minElements,maxElements]).range([3,12]);
+        const radiusScale = d3.scaleLinear().domain([minElements,maxElements]).range([6,15]);
         
         if (nodeColorAgg=='min')
           colorScale=d3.scaleLinear().domain([colorMaxAvg, (colorMaxAvg+colorMinAvg)/2 , colorMinAvg]).range(['#2cba00','#ede40e','#db0f0f']);
         else
           colorScale=d3.scaleLinear().domain([colorMinAvg,(colorMaxAvg+colorMinAvg)/2, colorMaxAvg]).range(['#2cba00','#ede40e','#db0f0f']);
 
-        const distanceScale=d3.scaleLinear().domain(overlapExtent).range([20,1]);
+        const distanceScale=d3.scaleLinear().domain(overlapExtent).range([30,5]);
       
         //render the graph
         render_graph(radiusScale, distanceScale, svgWidthRange, svgHeightRange);
