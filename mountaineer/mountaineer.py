@@ -3,6 +3,7 @@ import glob
 from notebookjs import execute_js
 from sklearn.manifold import TSNE
 from .util import remove_duplicated_links, remove_graph_duplicates
+from gale import bottleneck_distance
 import umap
 import os
 import copy
@@ -23,6 +24,7 @@ from notebookjs import execute_js
 class Mountaineer:
     input_projection=[]
     mapper_outputs=[]
+    lenses=[]
     def __init__(self) -> None:
                 
         self.visapp = None
@@ -31,7 +33,7 @@ class Mountaineer:
 
     def visualize(self, X, y, mappers, lenses, column_names=None, projection_method='TSNE'):
         self.mapper_outputs=[]
-        
+        self.lenses=copy.deepcopy(lenses)
         overlaps=[]
         output_lenses=[]
 
@@ -48,9 +50,19 @@ class Mountaineer:
         else:
             self.input_projection=TSNE(n_components=2,random_state=42).fit_transform(X).tolist()
 
+        distance_matrix = [[0 for i in range(len(mappers))] for j in range(len(mappers))]
+
 
         #process every mapper output
         for i,mapper in enumerate(mappers):
+            #create distance matrix
+            j=i+1
+            while j < len(mappers):
+                curDist=round(bottleneck_distance(mapper,mappers[j]),6)
+                distance_matrix[i][j]=curDist
+                distance_matrix[j][i]=curDist
+                j+=1
+
             curMapper= copy.deepcopy(mapper)
             overlap=defaultdict(dict)
             #remove duplicated nodes from the mapper output
@@ -67,7 +79,7 @@ class Mountaineer:
             overlaps.append(overlap)
 
         #append lenses as list to the output object
-        for lens in lenses:
+        for lens in self.lenses:
             output_lenses.append(lens.tolist())
 
         #setting the input data dictionary for the frontend
@@ -78,7 +90,8 @@ class Mountaineer:
             'dataframe':X.tolist(),
             'lenses': output_lenses,
             'y': y.tolist(),
-            'column_names': column_names.tolist()
+            'column_names': column_names.tolist(),
+            'distance_matrix':distance_matrix
         }
 
         #Execute and send data to the frontend

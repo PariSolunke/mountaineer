@@ -5,32 +5,29 @@ channels:
 dependencies:
   - _libgcc_mutex=0.1=main
   - _openmp_mutex=5.1=1_gnu
-  - blas=1.0=mkl
+  - blas=1.0=openblas
   - bottleneck=1.3.5=py39h7deecbd_0
-  - ca-certificates=2022.9.24=ha878542_0
-  - certifi=2022.9.24=pyhd8ed1ab_0
+  - ca-certificates=2022.10.11=h06a4308_0
+  - certifi=2022.9.24=py39h06a4308_0
   - colorama=0.4.6=pyhd8ed1ab_0
-  - fftw=3.3.10=nompi_h77c792f_102
-  - intel-openmp=2021.4.0=h06a4308_3561
   - joblib=1.2.0=pyhd8ed1ab_0
   - ld_impl_linux-64=2.38=h1181459_1
+  - libblas=3.9.0=15_linux64_openblas
+  - libcblas=3.9.0=15_linux64_openblas
   - libffi=3.3=he6710b0_2
   - libgcc-ng=11.2.0=h1234567_1
   - libgfortran-ng=12.2.0=h69a702a_19
   - libgfortran5=12.2.0=h337968e_19
   - libgomp=11.2.0=h1234567_1
+  - liblapack=3.9.0=15_linux64_openblas
   - libllvm11=11.1.0=hf817b99_2
+  - libopenblas=0.3.20=pthreads_h78a6416_0
   - libstdcxx-ng=11.2.0=h1234567_1
   - llvmlite=0.39.1=py39he621ea3_0
-  - mkl=2021.4.0=h06a4308_640
-  - mkl-service=2.4.0=py39h7f8727e_0
-  - mkl_fft=1.3.1=py39hd3c417c_0
-  - mkl_random=1.2.2=py39h51133e4_0
   - ncurses=6.3=h5eee18b_3
   - numba=0.56.3=py39h417a72b_0
-  - numexpr=2.8.3=py39h807cd23_0
-  - numpy-base=1.21.5=py39ha15fc14_3
-  - openssl=1.1.1q=h7f8727e_0
+  - numexpr=2.8.3=py39hd2a5715_0
+  - openssl=1.1.1s=h7f8727e_0
   - packaging=21.3=pyhd3eb1b0_0
   - pandas=1.4.4=py39h6a678d5_0
   - pip=22.2.2=py39h06a4308_0
@@ -41,7 +38,6 @@ dependencies:
   - python_abi=3.9=2_cp39
   - pytz=2022.1=py39h06a4308_0
   - readline=8.1.2=h7f8727e_1
-  - scikit-learn=1.1.2=py39h6a678d5_0
   - setuptools=63.4.1=py39h06a4308_0
   - six=1.16.0=pyhd3eb1b0_1
   - sqlite=3.39.3=h5082296_0
@@ -62,15 +58,24 @@ dependencies:
     - backcall==0.2.0
     - beautifulsoup4==4.11.1
     - bleach==5.0.1
+    - captum==0.6.0
     - cffi==1.15.1
+    - cloudpickle==2.2.1
+    - contourpy==1.0.7
+    - cycler==0.11.0
+    - cython==0.29.33
     - debugpy==1.6.3
     - decorator==5.1.1
     - defusedxml==0.7.1
+    - deprecated==1.2.13
     - entrypoints==0.4
     - executing==1.1.0
     - fastjsonschema==2.16.2
+    - fonttools==4.38.0
     - gale-topo==0.0.3
     - gudhi==3.6.0
+    - hopcroftkarp==1.2.5
+    - imageio==2.25.0
     - importlib-metadata==5.0.0
     - ipykernel==6.16.0
     - ipython==8.5.0
@@ -81,8 +86,11 @@ dependencies:
     - jupyter-client==7.3.5
     - jupyter-core==4.11.1
     - jupyterlab-pygments==0.2.2
+    - kiwisolver==1.4.4
     - kmapper==2.0.1
+    - lime==0.2.0.1
     - markupsafe==2.1.1
+    - matplotlib==3.6.3
     - matplotlib-inline==0.1.6
     - mistune==2.0.4
     - nbclient==0.6.8
@@ -93,10 +101,16 @@ dependencies:
     - notebook==6.4.12
     - notebookjs==0.1.4
     - numpy==1.23.4
+    - nvidia-cublas-cu11==11.10.3.66
+    - nvidia-cuda-nvrtc-cu11==11.7.99
+    - nvidia-cuda-runtime-cu11==11.7.99
+    - nvidia-cudnn-cu11==8.5.0.96
     - pandocfilters==1.5.0
     - parso==0.8.3
+    - persim==0.3.1
     - pexpect==4.8.0
     - pickleshare==0.7.5
+    - pillow==9.4.0
     - prometheus-client==0.14.1
     - prompt-toolkit==3.0.31
     - psutil==5.9.2
@@ -105,16 +119,28 @@ dependencies:
     - pycparser==2.21
     - pygments==2.13.0
     - pyrsistent==0.18.1
+    - pywavelets==1.4.1
     - pyzmq==24.0.1
+    - ripser==0.6.4
+    - scikit-image==0.19.3
+    - scikit-learn==1.1.2
+    - scikit-tda==1.0.0
     - scipy==1.9.2
     - send2trash==1.8.0
+    - shap==0.41.0
+    - slicer==0.0.7
     - soupsieve==2.3.2.post1
     - stack-data==0.5.1
+    - tadasets==0.0.4
     - terminado==0.16.0
+    - tifffile==2023.1.23.1
     - tinycss2==1.1.1
+    - torch==1.13.1
     - tornado==6.2
     - traitlets==5.4.0
+    - typing-extensions==4.4.0
     - wcwidth==0.2.5
     - webencodings==0.5.1
+    - wrapt==1.14.1
     - zipp==3.8.1
-prefix: /home/pari/miniconda3/envs/mountaineer
+prefix: /home/parisol/anaconda3/envs/mountaineer

@@ -10,6 +10,8 @@ import classifyPoint from "robust-point-in-polygon";
 import DataProjection from './components/DataProjection.js';
 import MapperGraph from './components/MapperGraph.js';
 import DataTable from './components/DataTable.js';
+import DistanceMatrix from './components/DistanceMatrix.js';
+
 // styles
 import './Mountaineer.css'
 
@@ -332,6 +334,8 @@ const Mountaineer = ({data}) => {
 
     //Bidirectional reference object for Data table component
     var birefDataTable = {};
+
+    var birefDistMatrix = {};
     
     //combining data, y and lenses into a dataframe
     let dataframe=data.dataframe.map((obj,i) =>{ 
@@ -362,18 +366,17 @@ const Mountaineer = ({data}) => {
                 <div className='data-projection-container'>
                     <DataProjection input_projection={data.input_projection} dataRange={dataRange} birefDataProj={birefDataProj} lasso={lasso}/>
                 </div>
+                <div></div>
+
                 <div className='mapper-graph-container'>
                     <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso}/> 
                 </div>
-                <div className='mapper-list'>
-                    
-                </div>
             </div>
-            <div className='bottom-container'>
-                <div>
-
+            <div className='datatable-wrapper'>
+                <div className='distance-matrix-container'>
+                    <DistanceMatrix distance_matrix={data.distance_matrix} birefDistMatrix={birefDistMatrix}/>
                 </div>
-                <div className='datatable-wrapper'>
+                <div className='datatable-container'>
                     <DataTable dataframe={dataframe} birefDataTable={birefDataTable} columns={columns} lensCount={data.lenses.length} />
                 </div>
             </div>
