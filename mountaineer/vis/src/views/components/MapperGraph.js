@@ -345,6 +345,8 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
     }
     //on change of selected mapper
     const changeSelectedMapper = (event) => {
+      document.getElementById("nodeColorAgg").value = "mean"
+      document.getElementById("nodeColorBy").value = "lens1"
       birefMapperGraph.parent.onBrush([], "MapperGraph", false);
       setState((prevState)=>({...prevState, selectedMapper:event.target.value}));
     };
@@ -399,7 +401,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         </div>
         <div>
           <label htmlFor='nodeColorBy'>Node Color:&nbsp;</label>
-          <select id="nodeColorBy"  onChange={changeNodeColor}>
+          <select id="nodeColorBy" onChange={changeNodeColor}>
               {columns.map((column,i) => (
                 i<columns.length-(lensCount+1)?
                 <option value={i}>{column}</option>
