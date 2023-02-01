@@ -42,8 +42,7 @@ class Mountaineer:
             'callback_test': self.test
         }
 
-        #Use TSNE to get a 2d projection of the input data (Extend support for others later)
-
+        #Use TSNE/UMAP to get a 2d projection of the input data
         if(projection_method=='UMAP'):
             self.input_projection=umap.UMAP(random_state=42).fit_transform(X).tolist()
 
