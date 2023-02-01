@@ -10,6 +10,7 @@ const PaginatedTable = ({tableData, columns, lensCount, summary}) => {
 
     let pageSize=6;
     let startIndex=(state.currentPage-1)*pageSize;
+    console.log(tableData)
     let displayData=tableData.slice(startIndex,startIndex+pageSize);
 
     useEffect(() => {

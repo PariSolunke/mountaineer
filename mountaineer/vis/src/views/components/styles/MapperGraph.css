@@ -3,8 +3,8 @@
 }
 
 .link-mapper-graph-default{
-    stroke-width:1;
-    stroke-opacity: 0.3;
+    stroke-width: 2px;
+    stroke-opacity: 0.6;
 }
 
 .link-mapper-graph-hide{    
