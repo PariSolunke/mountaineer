@@ -1,8 +1,10 @@
 import React, {useState} from 'react';
-import PaginatedTable from './PaginatedTable';
+import PaginatedTable from './PaginatedTable.js';
+import FeatureDistributionViolin from './FeatureDistributionViolin.js';
+
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-import  './styles/tabStlyes.css'
+import  './styles/DataTable.css'
 
 const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
 
@@ -25,7 +27,6 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
   
   if (state.selectedTab=="table"){
     //filter table data
-
     if (!state.filterStatus){
       tableData=dataframe;
     }
@@ -47,17 +48,27 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
       }
     })
   }
-  
 
+  else if (state.selectedTab=="distribution"){
+
+
+  }
+  
   return (
-    <Tabs id="TabComponent" activeKey={state.selectedTab} justify={true} variant='tabs' onSelect={(k) =>setState((prevState)=>({...prevState, selectedTab: k}))} transition={false} className="mb-3">
+    <Tabs id="TabComponent" activeKey={state.selectedTab} justify={true} variant='tabs' onSelect={(k) =>setState((prevState)=>({...prevState, selectedTab: k}))} transition={false}>
+      <Tab eventKey="distribution" title="Distribution">
+          {state.selectedTab=='distribution' &&
+            <div className='distribution-wrapper'>
+              <div className='violin-container'><FeatureDistributionViolin/></div>
+              <div className='scatter-container'></div>
+            </div>
+          }
+      </Tab>
+
       <Tab eventKey="table" title="Table">
         { state.selectedTab=='table' &&
           <PaginatedTable tableData={tableData} columns={columns} lensCount={lensCount} summary={summary}/>
         }
-      </Tab>
-      <Tab eventKey="distribution" title="Distribution">
-        Distribution Goes Here
       </Tab>
     </Tabs>
   )

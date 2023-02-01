@@ -20,7 +20,7 @@
 .viz-wrapper{
   height: 400px;
   display: grid;
-  grid-template-columns: 2fr 3fr 4fr;
+  grid-template-columns: 2fr 3fr 3fr;
   grid-gap: 1%;
 }
 
@@ -28,7 +28,7 @@
 
 .datatable-wrapper{
   display:grid;
-  grid-template-columns: 2fr 7fr;
+  grid-template-columns: 2fr 6fr;
   grid-gap: 1%;
   height: 400px;
 }
