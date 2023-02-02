@@ -23,7 +23,6 @@
 }
 
 .nav {
-    --bs-nav-link-padding-x: 1rem;
     --bs-nav-link-padding-y: 0.5rem;
  
     --bs-nav-link-hover-color: #81a9e6;

@@ -17,8 +17,8 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
   //state to check filtered data
   const [state,setState]=useState({selectedMapper:0, nodeColorBy:"lens1", nodeColorAgg:"mean"});
   let chartGroup;
-  let nodeColorBy="lens1";
-  let nodeColorAgg="mean";
+  let nodeColorBy=state.nodeColorBy;
+  let nodeColorAgg=state.nodeColorAgg;
   let mapper_output=mapper_outputs[state.selectedMapper];
   let overlap=overlaps[state.selectedMapper];
   let nodeNames=Object.keys(mapper_output.nodes);
@@ -345,10 +345,10 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
     }
     //on change of selected mapper
     const changeSelectedMapper = (event) => {
-      document.getElementById("nodeColorAgg").value = "mean"
-      document.getElementById("nodeColorBy").value = "lens1"
+      //document.getElementById("nodeColorAgg").value = "mean"
+      //document.getElementById("nodeColorBy").value = "lens1"
       birefMapperGraph.parent.onBrush([], "MapperGraph", false);
-      setState((prevState)=>({...prevState, selectedMapper:event.target.value}));
+      setState((prevState)=>({...prevState, selectedMapper:event.target.value, nodeColorBy:nodeColorBy, nodeColorAgg:nodeColorAgg}));
     };
 
     //on change of node feature to color by
@@ -404,20 +404,20 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
           <select id="nodeColorBy" onChange={changeNodeColor}>
               {columns.map((column,i) => (
                 i<columns.length-(lensCount+1)?
-                <option value={i}>{column}</option>
-                :<option selected={column=='lens1'?true:false} value={column}>{column}</option>
+                <option selected={column==nodeColorBy?true:false} value={i}>{column}</option>
+                :<option selected={column==nodeColorBy?true:false} value={column}>{column}</option>
                 ))}
           </select>
         </div>
         <div>
           <label htmlFor="nodeColorAgg">Aggregation:&nbsp;</label>
-          <select id="nodeColorAgg"  onChange={changeNodeColor}>
-            <option value="mean" selected>Mean</option>
-            <option value="median">Median</option>
-            <option value="sd">Standard Deviation</option>
-            <option value="var">Variance</option>
-            <option value="max">Max</option>
-            <option value="min">Min</option>
+          <select id="nodeColorAgg" onChange={changeNodeColor}>
+            <option selected={nodeColorAgg=="mean"?true:false} value="mean">Mean</option>
+            <option selected={nodeColorAgg=="median"?true:false} value="median">Median</option>
+            <option selected={nodeColorAgg=="sd"?true:false} value="sd">Standard Deviation</option>
+            <option selected={nodeColorAgg=="var"?true:false} value="var">Variance</option>
+            <option selected={nodeColorAgg=="max"?true:false} value="max">Max</option>
+            <option selected={nodeColorAgg=="min"?true:false} value="min">Min</option>
           </select>
         </div>
 

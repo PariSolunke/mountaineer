@@ -9,9 +9,11 @@ import  './styles/DataTable.css'
 const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
 
   //state to check filtered data
-  const [state,setState]=useState({selectedTab: 'table',filteredIndices: new Set(), filterStatus: false });
+  const [state,setState]=useState({selectedTab: 'table', selectedFeature:"lens1", filteredIndices: new Set(), filterStatus: false });
 
   let tableData=[];
+  let distributionValues=[];
+  let globalMax,globalMin;
   let summary={};
 
   //Update state when the other component is brushed
@@ -50,18 +52,55 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
   }
 
   else if (state.selectedTab=="distribution"){
+    dataframe.forEach(( row, i) =>{
+      let featureVal=row[state.selectedFeature].toFixed(6);
+      distributionValues.push({ featureVal: featureVal, dist:'global'});
+      
+      if(state.filteredIndices.has(i))
+        distributionValues.push({ featureVal: featureVal, dist:'filter1'});
+      
+      if(globalMax===undefined){
+        globalMax=featureVal;
+        globalMin=featureVal;
+      }
 
+      else{
+        globalMax=Math.max(featureVal,globalMax)
+        globalMin=Math.min(featureVal,globalMin)
+      }
 
+    })
+
+    console.log(distributionValues)
+    console.log(globalMax, globalMin)
+    
   }
+
+  const changeSelectedFeature = (event) => {
+    setState((prevState)=>({...prevState, selectedFeature:event.target.value}));
+  };
   
   return (
     <Tabs id="TabComponent" activeKey={state.selectedTab} justify={true} variant='tabs' onSelect={(k) =>setState((prevState)=>({...prevState, selectedTab: k}))} transition={false}>
       <Tab eventKey="distribution" title="Distribution">
           {state.selectedTab=='distribution' &&
-            <div className='distribution-wrapper'>
-              <div className='violin-container'><FeatureDistributionViolin/></div>
-              <div className='scatter-container'></div>
-            </div>
+            <>
+              <div style={{marginTop:'3px', textAlign:'left', paddingLeft:'3px' }}>
+                <label htmlFor='selectFeature'>Select Feature:&nbsp;</label>
+                <select id='selectFeature' value={state.selectedFeature} onChange={changeSelectedFeature}>
+                  {columns.map((column,i) => (
+                    i<columns.length-(lensCount+1)?
+                    <option value={i}>{column}</option>
+                    :<option value={column}>{column}</option>
+                ))}
+              </select>
+              </div>
+                <div className='distribution-wrapper'> 
+                <div className='violin-container'><FeatureDistributionViolin distributionValues={distributionValues} globalMax={globalMax} globalMin={globalMin}/></div>
+                <div className='scatter-container'></div>
+              </div>
+            </>
+      
           }
       </Tab>
 

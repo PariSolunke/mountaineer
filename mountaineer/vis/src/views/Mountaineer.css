@@ -3,6 +3,7 @@
   grid-template-columns: 1fr;
   grid-gap:3%;
   padding: 2%;
+  max-width: 2000px;
 }
 
 .data-projection-container{
