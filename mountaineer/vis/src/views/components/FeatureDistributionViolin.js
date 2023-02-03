@@ -75,34 +75,46 @@ const FeatureDistributionViolin = ({distributionValues, globalMax, globalMin}) =
   
     // What is the biggest number of value in a bin? We need it cause this value will have a width of 100% of the bandwidth.
     let maxNum = 0
-    for ( let i in sumstat ){
-      let allBins = sumstat[i].value
-      let lengths = allBins.map(function(a){return a.length;})
-      let longest = d3.max(lengths)
-      if (longest > maxNum) { maxNum = longest }
+
+
+    for (let value of  sumstat.values()) {
+      let lengths = value.map(function(a){return a.length;})
+      maxNum= Math.max(maxNum,d3.max(lengths))
     }
+    //for ( let i=0;i<sumstat.size; i++ ){
+      //let allBins = sumstat[i].value
+      //let lengths = allBins.map(function(a){return a.length;})
+      //let longest = d3.max(lengths)
+      //if (longest > maxNum) { maxNum = longest }
+    //}
   
     // The maximum width of a violin must be x.bandwidth = the width dedicated to a group
     let xNum = d3.scaleLinear()
-      .range([0, xScale.bandwidth()])
+      .range([5, xScale.bandwidth()-5])
       .domain([-maxNum,maxNum])
+
+    //console.log(-maxNum, maxNum)
+    //console.log(xScale.bandwidth())
     
-    console.log (sumstat);
+    //console.log (sumstat);
     chartGroup
       .selectAll("myViolin")
       .data(sumstat)
       .enter()        // So now we are working group per group
       .append("g")
-        .attr("transform", function(d){ console.log(d) 
+        .attr("transform", function(d){ //console.log(d) 
           return("translate(" + xScale(d[0]) +" ,0)") } ) // Translation on the right to be at the group position
         .append("path")
-          .datum(function(d){ return(d[1])})     // So now we are working bin per bin
+          .datum(function(d){  return(d[1])})     // So now we are working bin per bin
           .style("stroke", "none")
           .style("fill","#69b3a2")
           .attr("d", d3.area()
-            .x0(function(d){ return(xNum(-d.length)) } )
-            .x1(function(d){ return(xNum(d.length)) } )
-            .y(function(d){ return(y(d.x0)) } )
+            .x0(function(d){ //console.log(xNum(-d.length))
+                            return(xNum(-d.length)) } )
+            .x1(function(d){ //console.log(xNum(d.length))
+              return(xNum(d.length)) } )
+            .y(function(d){ //console.log(yScale(d.x0))
+              return(yScale(d.x0)) } )
             .curve(d3.curveCatmullRom)    // This makes the line smoother to give the violin appearance. Try d3.curveStep to see the difference
         )
 
