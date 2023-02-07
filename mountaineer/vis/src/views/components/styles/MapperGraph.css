@@ -1,5 +1,5 @@
 .link-mapper-graph{
-    stroke:#f6e4e4;
+    stroke:#3b3838;
 }
 
 .link-mapper-graph-default{
@@ -12,12 +12,18 @@
 }
 
 .lasso path {
-    stroke: rgb(255, 255, 255);
+    stroke: rgb(94, 92, 92);
     stroke-width:3px;
 }
 
-.lasso .drawn {
-    fill-opacity:.05 ;
+.lasso.MapperLasso1 .drawn {
+    fill:  #39b8be;
+    fill-opacity:.3 ;
+}
+
+.lasso.MapperLasso2 .drawn {
+    fill: #ff00ee;
+    fill-opacity:.3 ;
 }
 
 .lasso .loop_close {

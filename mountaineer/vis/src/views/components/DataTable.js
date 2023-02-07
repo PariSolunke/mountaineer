@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import PaginatedTable from './PaginatedTable.js';
 import FeatureDistributionViolin from './FeatureDistributionViolin.js';
+import FeatureDistributionScatter from './FeatureDistributionScatter.js'
 
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
@@ -9,7 +10,7 @@ import  './styles/DataTable.css'
 const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
 
   //state to check filtered data
-  const [state,setState]=useState({selectedTab: 'table', selectedFeature:"lens1", filteredIndices: new Set(), filterStatus: false });
+  const [state,setState]=useState({selectedTab: 'table', selectedFeature:"lens1", filteredIndices1: new Set(), filterStatus1: false, filteredIndices2: new Set(), filterStatus2: false });
 
   let tableData=[];
   let distributionValues=[];
@@ -17,8 +18,11 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
   let summary={};
 
   //Update state when the other component is brushed
-  function otherBrushed(selectedIndices,filterStatus){
-    setState((prevState)=>({...prevState, filteredIndices:new Set(selectedIndices), filterStatus: filterStatus}));
+  function otherBrushed(selectedIndices,filterStatus, source){
+    if (source=='MapperGraph1')
+      setState((prevState)=>({...prevState, filteredIndices1:new Set(selectedIndices), filterStatus1: filterStatus}));
+    else if(source=="MapperGraph2")
+      setState((prevState)=>({...prevState, filteredIndices2:new Set(selectedIndices), filterStatus2: filterStatus}));
   } 
   
   //Bidirectional reference object to enable two way communication between parent and child component
@@ -29,11 +33,11 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
   
   if (state.selectedTab=="table"){
     //filter table data
-    if (!state.filterStatus){
+    if (!state.filterStatus1 && !state.filterStatus2){
       tableData=dataframe;
     }
     else{
-      tableData=dataframe.filter((e,i)=>{return state.filteredIndices.has(i);})
+      tableData=dataframe.filter((e,i)=>{return (state.filteredIndices1.has(i) || state.filteredIndices2.has(i));})
     }
 
     //summary for filtered data  
@@ -54,10 +58,13 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
   else if (state.selectedTab=="distribution"){
     dataframe.forEach(( row, i) =>{
       let featureVal=row[state.selectedFeature].toFixed(6);
-      distributionValues.push({ featureVal: featureVal, dist:'global'});
+      distributionValues.push({ featureVal: featureVal, dist:'global', y:row['y']});
       
-      if(state.filteredIndices.has(i))
-        distributionValues.push({ featureVal: featureVal, dist:'filter1'});
+      if(state.filteredIndices1.has(i))
+        distributionValues.push({ featureVal: featureVal, dist:'filter1',y:row['y']});
+      
+      if(state.filteredIndices2.has(i))
+        distributionValues.push({ featureVal: featureVal, dist:'filter2',y:row['y']});
       
       if(globalMax===undefined){
         globalMax=featureVal;
@@ -71,8 +78,6 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
 
     })
 
-    console.log(distributionValues)
-    console.log(globalMax, globalMin)
     
   }
 
@@ -96,8 +101,12 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
               </select>
               </div>
                 <div className='distribution-wrapper'> 
-                <div className='violin-container'><FeatureDistributionViolin distributionValues={distributionValues} globalMax={globalMax} globalMin={globalMin}/></div>
-                <div className='scatter-container'></div>
+                <div className='violin-container'>
+                  <FeatureDistributionViolin distributionValues={distributionValues} globalMax={globalMax} globalMin={globalMin}/>
+                </div>
+                <div className='scatter-container'>
+                  <FeatureDistributionScatter distributionValues={distributionValues} globalMax={globalMax} globalMin={globalMin}/>
+                </div>
               </div>
             </>
       

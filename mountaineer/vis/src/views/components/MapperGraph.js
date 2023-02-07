@@ -12,10 +12,10 @@ import * as d3 from 'd3';
 
 
 
-const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lensCount, lasso}) => {
+const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lensCount, lasso, mapperId}) => {
 
   //state to check filtered data
-  const [state,setState]=useState({selectedMapper:0, nodeColorBy:"lens1", nodeColorAgg:"mean"});
+  const [state,setState]=useState({selectedMapper:mapperId-1, nodeColorBy:"lens1", nodeColorAgg:"var"});
   let chartGroup;
   let nodeColorBy=state.nodeColorBy;
   let nodeColorAgg=state.nodeColorAgg;
@@ -227,6 +227,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         //lasso handlers
         //While lasso is being drawn
         function lasso_draw(){
+          svgref.selectAll('.lasso').classed("MapperLasso"+mapperId,true)
           lassoBrush.items()
           .attr("class","node-mapper-graph node-mapper-graph-unselected");
         }
@@ -261,12 +262,12 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
                 return "link-mapper-graph link-mapper-graph-hide"
             });
             //send selected indices to parent
-            birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph", true);
+            birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph"+mapperId, true);
           }
 
           //case where no node is selected, disables filters
           else{
-            birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph", false);
+            birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph"+mapperId, false);
           }
         }
     });
@@ -347,7 +348,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
     const changeSelectedMapper = (event) => {
       //document.getElementById("nodeColorAgg").value = "mean"
       //document.getElementById("nodeColorBy").value = "lens1"
-      birefMapperGraph.parent.onBrush([], "MapperGraph", false);
+      birefMapperGraph.parent.onBrush([], "MapperGraph"+mapperId, false);
       setState((prevState)=>({...prevState, selectedMapper:event.target.value, nodeColorBy:nodeColorBy, nodeColorAgg:nodeColorAgg}));
     };
 

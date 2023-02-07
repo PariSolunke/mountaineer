@@ -39,7 +39,7 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix}) => {
     });
     console.log(maxDist)
     let colorScale=d3.scaleLinear()
-    .range(["#e5f5e0", "#006d2c"])
+    .range(["#ffffd4", "#993404"])
     .domain([0,maxDist])
 
     for(let i=0;i<distance_matrix.length;i++){

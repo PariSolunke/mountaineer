@@ -1,14 +1,25 @@
 
 
 .node-input-projection{
-    fill:#69b3a2;
+    fill: black;
+    
 }
 
 .node-input-projection-unselected{
     opacity:0.05;
 }
 
-.node-input-projection-selected{
-    fill: #eb710d;
+
+.node-input-projection-selected2.node-input-projection-selected1{
+    fill:black;
 }
+
+.node-input-projection-selected1{
+    fill: #39b8be;
+}
+
+.node-input-projection-selected2{
+    fill: #ff00ee;
+}
+
 

@@ -309,13 +309,15 @@ const Mountaineer = ({data}) => {
     //Whenever brushing interaction occurs in any child component
     const onBrush = (selectedIndices,source, filterStatus) => {
         if (source=="DataProjection"){
-            birefMapperGraph.child.otherBrushed(selectedIndices, filterStatus);
-            birefDataTable.child.otherBrushed(selectedIndices, filterStatus);
+            birefMapperGraph1.child.otherBrushed(selectedIndices, filterStatus, source);
+            birefMapperGraph2.child.otherBrushed(selectedIndices, filterStatus, source);
+            birefDataTable.child.otherBrushed(selectedIndices, filterStatus, source);
 
         }
-        else if (source=="MapperGraph"){
-            birefDataProj.child.otherBrushed(selectedIndices, filterStatus);
-            birefDataTable.child.otherBrushed(selectedIndices, filterStatus);
+        else if (source=="MapperGraph1"|| source=="MapperGraph2"){
+            birefDataProj.child.otherBrushed(selectedIndices, filterStatus, source);
+            birefDataTable.child.otherBrushed(selectedIndices, filterStatus, source);
+            //birefMapperGraph2.child.otherBrushed(selectedIndices, filterStatus);
         }
     }
 
@@ -327,7 +329,13 @@ const Mountaineer = ({data}) => {
      }
      
      //Bidirectional reference object for Mapper Graph component
-    var birefMapperGraph = {
+    var birefMapperGraph1 = {
+        parent: {
+            onBrush: onBrush
+        }
+    }
+
+    var birefMapperGraph2 = {
         parent: {
             onBrush: onBrush
         }
@@ -367,11 +375,15 @@ const Mountaineer = ({data}) => {
                 <div className='data-projection-container'>
                     <DataProjection input_projection={data.input_projection} dataRange={dataRange} birefDataProj={birefDataProj} lasso={lasso}/>
                 </div>
-                <div></div>
-
                 <div className='mapper-graph-container'>
-                    <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso}/> 
+                    <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph1} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} mapperId={1}/> 
                 </div>
+                <div className='mapper-graph-container'>
+                    <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph2} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} mapperId={2}/> 
+
+                </div>
+
+
             </div>
             <div className='datatable-wrapper'>
                 <div className='distance-matrix-container'>

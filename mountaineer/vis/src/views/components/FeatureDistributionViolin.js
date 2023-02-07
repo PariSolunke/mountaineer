@@ -1,6 +1,8 @@
 import React from 'react'
 import { renderD3 } from '../../hooks/render.hook';
 import * as d3 from 'd3';
+import  './styles/FeatureDistributionViolin.css'
+
 
 const FeatureDistributionViolin = ({distributionValues, globalMax, globalMin}) => {
 
@@ -17,10 +19,10 @@ const FeatureDistributionViolin = ({distributionValues, globalMax, globalMin}) =
 
         // margins
         const margins = {
-            top: 10,
-            left:20,
-            right: 10,
-            bottom: 20
+            top: 5,
+            left:25,
+            right: 5,
+            bottom: 25
         }
         
         //appending group to svgref
@@ -40,6 +42,11 @@ const FeatureDistributionViolin = ({distributionValues, globalMax, globalMin}) =
         const xScale = d3.scaleBand()
           .domain(['global','filter1','filter2'])
           .range(svgWidthRange);
+        
+        const colorScale=d3.scaleOrdinal()
+          .domain(['global','filter1','filter2'])
+          .range(['#4a4a4a','#39b8be','#ff00ee']);
+
 
         chartGroup.append("g")
             .attr("class","chart-axes")
@@ -62,11 +69,9 @@ const FeatureDistributionViolin = ({distributionValues, globalMax, globalMin}) =
           
   
     // Compute the binning for each group of the dataset
-
-    
       let sumstat= d3.rollup(distributionValues, 
         function(v) {   // For each key..
-          let input = v.map(function(g) { return g.featureVal;})    // Keep the variable called Sepal_Length
+          let input = v.map(function(g) { return g.featureVal;})    // Keep the variable of choice
           let bins = histogram(input)   // And compute the binning on it.
           return(bins)
           } ,
@@ -81,22 +86,12 @@ const FeatureDistributionViolin = ({distributionValues, globalMax, globalMin}) =
       let lengths = value.map(function(a){return a.length;})
       maxNum= Math.max(maxNum,d3.max(lengths))
     }
-    //for ( let i=0;i<sumstat.size; i++ ){
-      //let allBins = sumstat[i].value
-      //let lengths = allBins.map(function(a){return a.length;})
-      //let longest = d3.max(lengths)
-      //if (longest > maxNum) { maxNum = longest }
-    //}
-  
+
     // The maximum width of a violin must be x.bandwidth = the width dedicated to a group
     let xNum = d3.scaleLinear()
       .range([5, xScale.bandwidth()-5])
       .domain([-maxNum,maxNum])
-
-    //console.log(-maxNum, maxNum)
-    //console.log(xScale.bandwidth())
     
-    //console.log (sumstat);
     chartGroup
       .selectAll("myViolin")
       .data(sumstat)
@@ -105,9 +100,10 @@ const FeatureDistributionViolin = ({distributionValues, globalMax, globalMin}) =
         .attr("transform", function(d){ //console.log(d) 
           return("translate(" + xScale(d[0]) +" ,0)") } ) // Translation on the right to be at the group position
         .append("path")
-          .datum(function(d){  return(d[1])})     // So now we are working bin per bin
           .style("stroke", "none")
-          .style("fill","#69b3a2")
+          .style("fill",function(d){return colorScale(d[0]) })
+          .datum(function(d){  return(d[1])})     // So now we are working bin per bin
+          
           .attr("d", d3.area()
             .x0(function(d){ //console.log(xNum(-d.length))
                             return(xNum(-d.length)) } )
@@ -124,7 +120,9 @@ const FeatureDistributionViolin = ({distributionValues, globalMax, globalMin}) =
 
   return (
     <>      
+     
       <svg ref={ref}></svg>
+  
     </>
   )
 }

@@ -13,12 +13,17 @@ import * as d3 from 'd3';
 const DataProjection = ({input_projection, dataRange, birefDataProj, lasso}) => {
 
   //state to check filtered data
-  const [filters,setFilter]=useState({filteredIndices: new Set(), filterStatus: false });
+  const [filters,setFilters]=useState({filteredIndices1: new Set(), filteredIndices2: new Set(), filterStatus1: false, filterStatus2:false });
 
   //Update state when the other component is brushed
-  function otherBrushed(selectedIndices,filterStatus){
-    let tempObj={filteredIndices:new Set(selectedIndices),filterStatus: filterStatus}
-    setFilter(tempObj);
+  function otherBrushed(selectedIndices,filterStatus, source){
+    if (source=='MapperGraph1')
+      setFilters((prevFilters)=>({...prevFilters, filteredIndices1:selectedIndices, filterStatus1:filterStatus}));
+    else if (source=="MapperGraph2")
+      setFilters((prevFilters)=>({...prevFilters, filteredIndices2:selectedIndices, filterStatus2:filterStatus}));
+    console.log(filters)
+    console.log(source)
+
   } 
   
   //Bidirectional reference object to enable two way communication between parent and child component
@@ -29,7 +34,7 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso}) => 
   //selected indices for brushing
   let selectedIndices=new Set();
 
-  //clear plot
+  //clear plotDataProjection
   const clear_plot = (svgref) => {
     svgref.selectAll('*').remove();
   }
@@ -45,9 +50,14 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso}) => 
         .append("circle")
           //show or hide nodes depending on filters
           .attr("class",function(d,i){
-            if(filters.filterStatus){
-              if(filters.filteredIndices.has(i))
-                return "node-input-projection node-input-projection-selected";
+            if(filters.filterStatus1 || filters.filterStatus2){
+              if(filters.filteredIndices1.has( i) && filters.filteredIndices2.has( i))
+                return "node-input-projection node-input-projection-selected1 node-input-projection-selected2";
+              else if (filters.filteredIndices1.has( i))
+                return "node-input-projection node-input-projection-selected1"
+              else if (filters.filteredIndices2.has( i))
+                return "node-input-projection node-input-projection-selected2"
+              
               else
                 return "node-input-projection node-input-projection-unselected";          
               }
