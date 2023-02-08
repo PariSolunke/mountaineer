@@ -10,7 +10,7 @@ import  './styles/DataTable.css'
 const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
 
   //state to check filtered data
-  const [state,setState]=useState({selectedTab: 'table', selectedFeature:"lens1", filteredIndices1: new Set(), filterStatus1: false, filteredIndices2: new Set(), filterStatus2: false });
+  const [state,setState]=useState({selectedTab: 'table', selectedFeature:"lens1", projectionSelection: new Set(), projectionFiltered:false, filteredIndices1: new Set(), filterStatus1: false, filteredIndices2: new Set(), filterStatus2: false });
 
   let tableData=[];
   let distributionValues=[];
@@ -23,21 +23,39 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
       setState((prevState)=>({...prevState, filteredIndices1:new Set(selectedIndices), filterStatus1: filterStatus}));
     else if(source=="MapperGraph2")
       setState((prevState)=>({...prevState, filteredIndices2:new Set(selectedIndices), filterStatus2: filterStatus}));
+    else if(source=="DataProjection")
+      setState((prevState)=>({...prevState, projectionSelection:new Set(selectedIndices), projectionFiltered: filterStatus, filteredIndices1: new Set(), filterStatus1: false, filteredIndices2: new Set(), filterStatus2: false }));
+
   } 
   
   //Bidirectional reference object to enable two way communication between parent and child component
   birefDataTable.child={
     otherBrushed: otherBrushed
   };
+
+
+  const onBrush = (clickedId) => {
+    birefScatter.child.otherBrushed(clickedId)
+  }
+
+//Bidirectional reference object for Data Projection component
+var birefViolin = {
+    parent: {
+        onBrush: onBrush
+    }
+ }
+
+ var birefScatter = {};
+
   
   
   if (state.selectedTab=="table"){
     //filter table data
-    if (!state.filterStatus1 && !state.filterStatus2){
+    if (!state.filterStatus1 && !state.filterStatus2 && !state.projectionFiltered){
       tableData=dataframe;
     }
     else{
-      tableData=dataframe.filter((e,i)=>{return (state.filteredIndices1.has(i) || state.filteredIndices2.has(i));})
+      tableData=dataframe.filter((e,i)=>{return (state.filteredIndices1.has(i) || state.filteredIndices2.has(i)) || state.projectionSelection.has(i);})
     }
 
     //summary for filtered data  
@@ -58,13 +76,14 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
   else if (state.selectedTab=="distribution"){
     dataframe.forEach(( row, i) =>{
       let featureVal=row[state.selectedFeature].toFixed(6);
-      distributionValues.push({ featureVal: featureVal, dist:'global', y:row['y']});
+      if(!state.projectionFiltered || state.projectionSelection.has(i))
+        distributionValues.push({ featureVal: featureVal, dist:'global', y:row['y'], lens1:row['lens1']});
       
       if(state.filteredIndices1.has(i))
-        distributionValues.push({ featureVal: featureVal, dist:'filter1',y:row['y']});
+        distributionValues.push({ featureVal: featureVal, dist:'filter1',y:row['y'], lens1:row['lens1']});
       
       if(state.filteredIndices2.has(i))
-        distributionValues.push({ featureVal: featureVal, dist:'filter2',y:row['y']});
+        distributionValues.push({ featureVal: featureVal, dist:'filter2',y:row['y'], lens1:row['lens1']});
       
       if(globalMax===undefined){
         globalMax=featureVal;
@@ -102,10 +121,10 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
               </div>
                 <div className='distribution-wrapper'> 
                 <div className='violin-container'>
-                  <FeatureDistributionViolin distributionValues={distributionValues} globalMax={globalMax} globalMin={globalMin}/>
+                  <FeatureDistributionViolin distributionValues={distributionValues} globalMax={globalMax} globalMin={globalMin} birefViolin={birefViolin}/>
                 </div>
                 <div className='scatter-container'>
-                  <FeatureDistributionScatter distributionValues={distributionValues} globalMax={globalMax} globalMin={globalMin}/>
+                  <FeatureDistributionScatter distributionValues={distributionValues} globalMax={globalMax} globalMin={globalMin} birefScatter={birefScatter}/>
                 </div>
               </div>
             </>

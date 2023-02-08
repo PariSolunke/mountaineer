@@ -1,7 +1,7 @@
 
 
 .node-input-projection{
-    fill: black;
+    fill: #beaed4;
     
 }
 
@@ -11,15 +11,25 @@
 
 
 .node-input-projection-selected2.node-input-projection-selected1{
-    fill:black;
+    fill:#beaed4;
 }
 
 .node-input-projection-selected1{
-    fill: #39b8be;
+    fill:#7fc97f
 }
 
 .node-input-projection-selected2{
-    fill: #ff00ee;
+    fill: #fdc086;
+}
+
+.lasso path {
+    stroke: #beaed4;
+    stroke-width:3px;
+}
+
+.lasso .drawn {
+    fill:  #beaed4;
+    fill-opacity:.3 ;
 }
 
 

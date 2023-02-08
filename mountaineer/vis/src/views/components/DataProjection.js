@@ -18,11 +18,9 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso}) => 
   //Update state when the other component is brushed
   function otherBrushed(selectedIndices,filterStatus, source){
     if (source=='MapperGraph1')
-      setFilters((prevFilters)=>({...prevFilters, filteredIndices1:selectedIndices, filterStatus1:filterStatus}));
+      setFilters((prevFilters)=>({...prevFilters, filteredIndices1:new Set(selectedIndices), filterStatus1:filterStatus}));
     else if (source=="MapperGraph2")
-      setFilters((prevFilters)=>({...prevFilters, filteredIndices2:selectedIndices, filterStatus2:filterStatus}));
-    console.log(filters)
-    console.log(source)
+      setFilters((prevFilters)=>({...prevFilters, filteredIndices2:new Set(selectedIndices), filterStatus2:filterStatus}));
 
   } 
   
@@ -65,7 +63,7 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso}) => 
           })
           .attr("cx", function (d) { return xScale(d[0]); } )
           .attr("cy", function (d) { return yScale(d[1]); } )
-          .attr("r", 2)
+          .attr("r", 3)
 
   }
 

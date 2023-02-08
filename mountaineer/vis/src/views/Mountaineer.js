@@ -369,6 +369,22 @@ const Mountaineer = ({data}) => {
     //range of the input data projection
     const dataRange = calculate_data_range(data.input_projection);
 
+    let minElements, maxElements;
+
+    data.mapper_outputs.forEach((mapper)=>{
+        
+        for (let node of Object.values(mapper.nodes)){
+            if(minElements==null)
+                minElements= maxElements= node.length
+            else{
+                minElements=Math.min(node.length,minElements)
+                maxElements= Math.max(node.length,maxElements)
+            }
+        }
+        console.log(minElements,maxElements)
+
+    })
+
     return (
         <div className='main-wrapper'>
             <div className='viz-wrapper'>
@@ -376,10 +392,10 @@ const Mountaineer = ({data}) => {
                     <DataProjection input_projection={data.input_projection} dataRange={dataRange} birefDataProj={birefDataProj} lasso={lasso}/>
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph1} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} mapperId={1}/> 
+                    <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph1} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={1}/> 
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph2} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} mapperId={2}/> 
+                    <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph2} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={2}/> 
 
                 </div>
 

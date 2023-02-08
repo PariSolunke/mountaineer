@@ -12,7 +12,7 @@ import * as d3 from 'd3';
 
 
 
-const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lensCount, lasso, mapperId}) => {
+const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lensCount, lasso, minElements, maxElements, mapperId}) => {
 
   //state to check filtered data
   const [state,setState]=useState({selectedMapper:mapperId-1, nodeColorBy:"lens1", nodeColorAgg:"var"});
@@ -94,7 +94,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         .iterations(1)
         ) 
         .force("center", d3.forceCenter(svgWidthRange[1]/2,svgHeightRange[1]/2).strength(1.1) )
-        .force("collide", d3.forceCollide().strength(0.8).radius(20).iterations(1));
+        .force("collide", d3.forceCollide().strength(0.8).radius(21).iterations(1));
      
     //links
     let link=chartGroup
@@ -160,8 +160,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
 
 
         //To be used to determine scale for the node radius- minimum and max number of elements in a node in the graph
-        let minElements= mapper_output.nodes[nodeNames[0]].length;
-        let maxElements=minElements;
+
         let colorMinAvg,colorMaxAvg;
         let overlapExtent=[];
 
@@ -179,10 +178,6 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
           }
           colorMinAvg= Math.min(colorMinAvg, colorVal);
           colorMaxAvg= Math.max(colorMaxAvg, colorVal);
-          
-          //update min and max element numbers for radius scale
-          minElements=Math.min(minElements,numElements);
-          maxElements=Math.max(maxElements,numElements);
           
           //update the node data
           graphData.nodes.push({id:nodeName, colorVal:colorVal, numElements:numElements, indices:mapper_output.nodes[nodeName] })
@@ -204,12 +199,12 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         }
 
         //scales for color, radii, and distance of the nodes
-        const radiusScale = d3.scaleLinear().domain([minElements,maxElements]).range([6,15]);
+        const radiusScale = d3.scaleLinear().domain([minElements,maxElements]).range([6,21]);
         
         if (nodeColorAgg=='min')
-          colorScale=d3.scaleLinear().domain([colorMaxAvg, (colorMaxAvg+colorMinAvg)/2 , colorMinAvg]).range(['#2cba00','#ede40e','#db0f0f']);
+          colorScale=d3.scaleLinear().domain([colorMaxAvg, colorMinAvg]).range(['#fed976','#b10026']);
         else
-          colorScale=d3.scaleLinear().domain([colorMinAvg,(colorMaxAvg+colorMinAvg)/2, colorMaxAvg]).range(['#2cba00','#ede40e','#db0f0f']);
+          colorScale=d3.scaleLinear().domain([colorMinAvg, colorMaxAvg]).range(['#fed976','#b10026']);
 
         const distanceScale=d3.scaleLinear().domain(overlapExtent).range([30,5]);
       
@@ -379,9 +374,9 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
       }
 
       if (nodeColorAgg=='min')
-        colorScale=d3.scaleLinear().domain([colorMaxAvg, (colorMaxAvg+colorMinAvg)/2 , colorMinAvg]).range(['#2cba00','#ede40e','#db0f0f']);
+        colorScale=d3.scaleLinear().domain([colorMaxAvg, colorMinAvg]).range(['#fed976','#b10026']);
       else
-        colorScale=d3.scaleLinear().domain([colorMinAvg,(colorMaxAvg+colorMinAvg)/2, colorMaxAvg]).range(['#2cba00','#ede40e','#db0f0f']);
+        colorScale=d3.scaleLinear().domain([colorMinAvg, colorMaxAvg]).range(['#fed976','#b10026']);
 
       nodes.attr("fill",function(d){
           return colorScale(nodeColorVals[d.id]);

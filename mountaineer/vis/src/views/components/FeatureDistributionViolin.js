@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 import  './styles/FeatureDistributionViolin.css'
 
 
-const FeatureDistributionViolin = ({distributionValues, globalMax, globalMin}) => {
+const FeatureDistributionViolin = ({distributionValues, globalMax, globalMin, birefViolin}) => {
 
 //clear plot
   const clear_plot = (svgref) => {
@@ -19,9 +19,9 @@ const FeatureDistributionViolin = ({distributionValues, globalMax, globalMin}) =
 
         // margins
         const margins = {
-            top: 5,
+            top: 10,
             left:25,
-            right: 5,
+            right: 10,
             bottom: 25
         }
         
@@ -45,7 +45,7 @@ const FeatureDistributionViolin = ({distributionValues, globalMax, globalMin}) =
         
         const colorScale=d3.scaleOrdinal()
           .domain(['global','filter1','filter2'])
-          .range(['#4a4a4a','#39b8be','#ff00ee']);
+          .range(['#beaed4','#7fc97f','#fdc086']);
 
 
         chartGroup.append("g")
@@ -98,8 +98,15 @@ const FeatureDistributionViolin = ({distributionValues, globalMax, globalMin}) =
       .enter()        // So now we are working group per group
       .append("g")
         .attr("transform", function(d){ //console.log(d) 
-          return("translate(" + xScale(d[0]) +" ,0)") } ) // Translation on the right to be at the group position
+          return("translate(" + xScale(d[0]) +" ,0)") } )
+         // Translation on the right to be at the group position
         .append("path")
+          .attr('id',function(d){
+            return (d[0]+"-violin")
+          })
+          .on('click', function(e){
+            birefViolin.parent.onBrush(e.target.id);
+          })
           .style("stroke", "none")
           .style("fill",function(d){return colorScale(d[0]) })
           .datum(function(d){  return(d[1])})     // So now we are working bin per bin
