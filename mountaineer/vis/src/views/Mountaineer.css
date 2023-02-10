@@ -21,7 +21,7 @@
 .viz-wrapper{
   height: 400px;
   display: grid;
-  grid-template-columns: 2fr 3fr 3fr;
+  grid-template-columns: 2fr 2fr 2fr;
   grid-gap: 1%;
 }
 

@@ -12,19 +12,19 @@ import * as d3 from 'd3';
 
 
 
-const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lensCount, lasso, minElements, maxElements, mapperId}) => {
+const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lensCount, lasso, minElements, maxElements, mapperId, dataRange}) => {
 
   //state to check filtered data
   const [state,setState]=useState({selectedMapper:mapperId-1, nodeColorBy:"lens1", nodeColorAgg:"var"});
-  let chartGroup;
+  let chartGroup, colorScale;
+  let nodeColorVals={}
   let nodeColorBy=state.nodeColorBy;
   let nodeColorAgg=state.nodeColorAgg;
   let mapper_output=mapper_outputs[state.selectedMapper];
   let overlap=overlaps[state.selectedMapper];
   let nodeNames=Object.keys(mapper_output.nodes);
-  let colorScale;
   let graphData={nodes:[], links:[]};
-  let nodeColorVals={}
+  
 
   //Update nodes and links when the other component is brushed
   function otherBrushed(selectedIndices, status){
@@ -77,25 +77,29 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
   }  
   //render the mapper output plot
 
-  const render_graph = (radiusScale, distanceScale, svgWidthRange, svgHeightRange) => {
+  const render_graph = (radiusScale, distanceScale, svgWidthRange, svgHeightRange, xScale, yScale) => {
     //creating copies of the data 
     let nodes = JSON.parse(JSON.stringify(graphData.nodes));
     let links = JSON.parse(JSON.stringify(graphData.links));
     
+    
     //force layout graph
+    
     let simulation =d3.forceSimulation(nodes)
       .on('tick',onTick)
       .force("link", d3.forceLink()                              
         .id(function(d) { return d.id; })                     
         .links(links)
-        .distance(function(d){
+      .distance(function(d){
           return (distanceScale(d.linkOverlap));  
           })
         .iterations(1)
         ) 
+        //.force("x", d3.forceX(function(d){return xScale(d.xAvg)}))
+        //.force("y", d3.forceY(function(d){return yScale(d.yAvg)}))
         .force("center", d3.forceCenter(svgWidthRange[1]/2,svgHeightRange[1]/2).strength(1.1) )
         .force("collide", d3.forceCollide().strength(0.8).radius(21).iterations(1));
-     
+      
     //links
     let link=chartGroup
       .selectAll(".link-mapper-graph")
@@ -111,8 +115,10 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
       .enter()
       .append("circle")
       .attr("fill",function(d){
-        return colorScale(d.colorVal);
+        return d3.interpolateRdBu(colorScale(d.colorVal));
       })
+     // .attr("cx", function(d){return xScale(d.xAvg)})
+       // .attr("cy",function(d){return yScale(d.yAvg)})
       //check if nodes are to be shown or hidden
       .attr("class", "node-mapper-graph")
       //size of nodes based on number of elements
@@ -169,7 +175,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
           let nodeName=nodeNames[i];
 
           let numElements=mapper_output.nodes[nodeName].length;
-          let colorVal=0;
+          let colorVal=0, xAvg, yAvg;
           //find the colorValue for each node based on selected aggregation
           colorVal= findColorVal(mapper_output.nodes[nodeName], numElements);     
           if (colorMinAvg == null){
@@ -179,14 +185,31 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
           colorMinAvg= Math.min(colorMinAvg, colorVal);
           colorMaxAvg= Math.max(colorMaxAvg, colorVal);
           
-          //update the node data
-          graphData.nodes.push({id:nodeName, colorVal:colorVal, numElements:numElements, indices:mapper_output.nodes[nodeName] })
-          if (nodeName in mapper_output.links){
+          //find the centroid for each node
+          for (let j of mapper_output.nodes[nodeName]){
+            if (xAvg==null){
+              xAvg=input_projection[j][0];
+              yAvg=input_projection[j][1];
+            }
+            else
+            {
+              xAvg+=input_projection[j][0];
+              yAvg+=input_projection[j][1];
+            }
+          }
+          xAvg=xAvg/numElements;
+          yAvg=yAvg/numElements;
 
-            for (let target in mapper_output.links[nodeName]){
+          //update the node data
+          graphData.nodes.push({id:nodeName, xAvg:xAvg, yAvg:yAvg, colorVal:colorVal, numElements:numElements, indices:mapper_output.nodes[nodeName] })
+
+
+          if (nodeName in mapper_output.links){
+            
+            for (let target of mapper_output.links[nodeName]){
               //update the link data
-              let curOverlap=overlap[nodeName][mapper_output.links[nodeName][target]]
-              graphData.links.push( {source:nodeName, target:mapper_output.links[nodeName][target], linkOverlap: curOverlap});
+              let curOverlap=overlap[nodeName][target]
+              graphData.links.push( {source:nodeName, target:target, linkOverlap: curOverlap});
               if(overlapExtent.length==0){
                 overlapExtent=[curOverlap,curOverlap]
               }
@@ -198,18 +221,26 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
           }
         }
 
-        //scales for color, radii, and distance of the nodes
+       
+  
+        //the mapper output will be projected along the same dimensions as the input projection
+        const xDomain = [ dataRange[0], dataRange[1] ];
+        const yDomain = [ dataRange[2], dataRange[3] ] ;
+
+        //scales for x and y positions, color, and radii of the nodes
+        const xScale = d3.scaleLinear().domain(xDomain).range(svgWidthRange);
+        const yScale = d3.scaleLinear().domain(yDomain).range([svgHeightRange[1], svgHeightRange[0]]);
         const radiusScale = d3.scaleLinear().domain([minElements,maxElements]).range([6,21]);
-        
+
         if (nodeColorAgg=='min')
-          colorScale=d3.scaleLinear().domain([colorMaxAvg, colorMinAvg]).range(['#fed976','#b10026']);
+          colorScale=d3.scaleLinear().domain([colorMaxAvg, colorMinAvg]).range([1,0]);
         else
-          colorScale=d3.scaleLinear().domain([colorMinAvg, colorMaxAvg]).range(['#fed976','#b10026']);
+          colorScale=d3.scaleLinear().domain([colorMinAvg, colorMaxAvg]).range([0,1]);
 
         const distanceScale=d3.scaleLinear().domain(overlapExtent).range([30,5]);
       
         //render the graph
-        render_graph(radiusScale, distanceScale, svgWidthRange, svgHeightRange);
+        render_graph(radiusScale, distanceScale, svgWidthRange, svgHeightRange, xScale, yScale);
 
         //add brush
         let lassoBrush=lasso()
@@ -242,7 +273,6 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
             let selectedIds=new Set();
             lassoBrush.notSelectedItems().attr("class","node-mapper-graph node-mapper-graph-unselected");
             nodesSelected.forEach((node) =>{
-            
               for(let i=0;i<node.__data__.indices.length;i++){
                 selectedIndices.add(node.__data__.indices[i]);
               }
@@ -374,12 +404,12 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
       }
 
       if (nodeColorAgg=='min')
-        colorScale=d3.scaleLinear().domain([colorMaxAvg, colorMinAvg]).range(['#fed976','#b10026']);
+        colorScale=d3.scaleLinear().domain([colorMaxAvg, colorMinAvg]).range([1,0]);
       else
-        colorScale=d3.scaleLinear().domain([colorMinAvg, colorMaxAvg]).range(['#fed976','#b10026']);
+        colorScale=d3.scaleLinear().domain([colorMinAvg, colorMaxAvg]).range([0,1]);
 
       nodes.attr("fill",function(d){
-          return colorScale(nodeColorVals[d.id]);
+          return d3.interpolateRdBu(colorScale(nodeColorVals[d.id]));
         })
     };
     

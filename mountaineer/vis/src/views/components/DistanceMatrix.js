@@ -32,12 +32,10 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix}) => {
 
   //render the distance matrix
   const render_heatmap = ( chartGroup, xScale, yScale ) => {
-    console.log(distance_matrix)
     let maxDist=0;
     distance_matrix.forEach(subArr => {
         maxDist=Math.max(maxDist,d3.max(subArr))
     });
-    console.log(maxDist)
     let colorScale=d3.scaleLinear()
     .range(['#ffffcc','#b10026'])
     .domain([0,maxDist])
