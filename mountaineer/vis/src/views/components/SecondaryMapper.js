@@ -27,17 +27,17 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
   
 
   //Update nodes and links when the other component is brushed
-  function otherBrushed(selectedIndices, status){
+  function otherBrushed(selectedIndices, status, source, xAvg, yAvg){
     let links=chartGroup.selectAll('.link-mapper-graph');
     let nodes=chartGroup.selectAll('.node-mapper-graph')
-
+    let closestNode
     //if status is false, reset the view to default
     if(!status){
       links.attr("class","link-mapper-graph link-mapper-graph-default");
       nodes.attr("class","node-mapper-graph");
     }
     //filter out nodes and edges
-    else{
+    else if (source=="DataProjection"){
       let filteredIndices= new Set(selectedIndices);
       let filteredNodeNames= new Set();
       
@@ -60,6 +60,67 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
         else
           return "link-mapper-graph link-mapper-graph-hide"
       });
+    }
+
+    else{
+        let filteredIndices= new Set(selectedIndices);
+
+        console.log('Mapper1 brushed')
+        console.log(nodes)
+        let minDistance, minId;
+        nodes["_groups"][0].forEach((node)=>{
+            //jaccard
+            console.log(node)
+            let curNodeIndices=new Set(node.__data__.indices)
+            let intersection = new Set([...curNodeIndices].filter(index => filteredIndices.has(index)));
+            let union = new Set([...filteredIndices, ...curNodeIndices])
+            
+            if (minDistance==null){
+                minDistance= intersection.size/union.size
+                minId=node.__data__.id;
+            }
+
+            else{
+                let curDistance=intersection.size/union.size
+                if (curDistance>minDistance){
+                    minDistance=curDistance
+                    minId=node.__data__.id;
+                }
+
+
+            }
+            //centroid
+            /*
+            if (minDistance==null){
+                minDistance=Math.sqrt( ((xAvg - node.__data__.xAvg) * (xAvg - node.__data__.xAvg)) + ((yAvg - node.__data__.yAvg) * (yAvg - node.__data__.yAvg)));
+                minId=node.__data__.id;
+            }
+            else{
+                let curDistance=Math.sqrt( ((xAvg - node.__data__.xAvg) * (xAvg - node.__data__.xAvg)) + ((yAvg - node.__data__.yAvg) * (yAvg - node.__data__.yAvg)));
+                if (curDistance<minDistance){
+                    minDistance=curDistance
+                    minId=node.__data__.id;
+                }
+            }
+            */
+           
+        })
+        console.log(minId, minDistance)
+        nodes.attr("class",function(d){
+            if (d.id==minId)
+              return  "node-mapper-graph"
+            else
+              return "node-mapper-graph node-mapper-graph-unselected";
+          });
+    
+          links.attr("class",function(d){
+            if(d.source.id==minId || d.target.id==minId)
+              return "link-mapper-graph link-mapper-graph-default"
+            else
+              return "link-mapper-graph link-mapper-graph-hide"
+          });
+
+
     }
   } 
   
@@ -261,7 +322,7 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
         //after lasso is drawn
         function lasso_end(){
           selectedIndices.clear();
-          let xAvg, yAvg;
+
           //reset class of nodes and links
           lassoBrush.items().attr("class","node-mapper-graph");
           let links=chartGroup.selectAll('.link-mapper-graph');
@@ -273,8 +334,6 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
             let selectedIds=new Set();
             lassoBrush.notSelectedItems().attr("class","node-mapper-graph node-mapper-graph-unselected");
             nodesSelected.forEach((node) =>{
-              xAvg=node.__data__.xAvg;
-              yAvg=node.__data__.yAvg;
               for(let i=0;i<node.__data__.indices.length;i++){
                 selectedIndices.add(node.__data__.indices[i]);
               }
@@ -289,7 +348,7 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
                 return "link-mapper-graph link-mapper-graph-hide"
             });
             //send selected indices to parent
-            birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph"+mapperId, true, xAvg, yAvg);
+            birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph"+mapperId, true);
           }
 
           //case where no node is selected, disables filters

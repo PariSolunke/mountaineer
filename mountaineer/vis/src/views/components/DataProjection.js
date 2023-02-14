@@ -88,10 +88,10 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso}) => 
 
 
         // svg dimensions
-        const svgWidthRange = [0, d3.selectAll('.data-projection-container').node().getBoundingClientRect().width - margins.left - margins.right];
-        const svgHeightRange = [0, d3.selectAll('.data-projection-container').node().getBoundingClientRect().height - margins.top - margins.bottom];
-        svgref.node().style.width=d3.selectAll('.data-projection-container').node().getBoundingClientRect().width;
-        svgref.node().style.height=d3.selectAll('.data-projection-container').node().getBoundingClientRect().height;
+        const svgWidthRange = [0, d3.selectAll('.data-projection-container').node().getBoundingClientRect().width-2 - margins.left - margins.right];
+        const svgHeightRange = [0, d3.selectAll('.data-projection-container').node().getBoundingClientRect().height-2 - margins.top - margins.bottom];
+        svgref.node().style.width=svgWidthRange[1]+margins.left+margins.right;
+        svgref.node().style.height=svgHeightRange[1]+margins.bottom+margins.top;
 
         //finding the data domain and the scale
         const xDomain = [ dataRange[0], dataRange[1] ];

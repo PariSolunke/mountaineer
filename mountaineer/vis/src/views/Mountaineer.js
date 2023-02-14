@@ -11,7 +11,7 @@ import DataProjection from './components/DataProjection.js';
 import MapperGraph from './components/MapperGraph.js';
 import DataTable from './components/DataTable.js';
 import DistanceMatrix from './components/DistanceMatrix.js';
-
+import SecondaryMapper from './components/SecondaryMapper.js';
 
 // styles
 import './Mountaineer.css'
@@ -307,17 +307,23 @@ const Mountaineer = ({data}) => {
     }
 
     //Whenever brushing interaction occurs in any child component
-    const onBrush = (selectedIndices,source, filterStatus) => {
+    const onBrush = (selectedIndices,source, filterStatus, xAvg, yAvg) => {
         if (source=="DataProjection"){
             birefMapperGraph1.child.otherBrushed(selectedIndices, filterStatus, source);
             birefMapperGraph2.child.otherBrushed(selectedIndices, filterStatus, source);
             birefDataTable.child.otherBrushed(selectedIndices, filterStatus, source);
 
         }
-        else if (source=="MapperGraph1"|| source=="MapperGraph2"){
+        else if (source=="MapperGraph1"){
             birefDataProj.child.otherBrushed(selectedIndices, filterStatus, source);
             birefDataTable.child.otherBrushed(selectedIndices, filterStatus, source);
-            //birefMapperGraph2.child.otherBrushed(selectedIndices, filterStatus);
+            birefMapperGraph2.child.otherBrushed(selectedIndices, filterStatus, source, xAvg, yAvg);
+        }
+
+        else if (source=="MapperGraph2"){
+            birefDataProj.child.otherBrushed(selectedIndices, filterStatus, source);
+            birefDataTable.child.otherBrushed(selectedIndices, filterStatus, source);
+            //birefMapperGraph2.child.otherBrushed(selectedIndices, filterStatus, source, xAvg, yAvg);
         }
     }
 
@@ -392,11 +398,8 @@ const Mountaineer = ({data}) => {
                     <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph1} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={1} dataRange={dataRange}/> 
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph2} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={2} dataRange={dataRange}/> 
-
+                    <SecondaryMapper input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph2} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={2} dataRange={dataRange}/> 
                 </div>
-
-
             </div>
             <div className='datatable-wrapper'>
                 <div className='distance-matrix-container'>
