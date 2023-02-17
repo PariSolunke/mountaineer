@@ -86,8 +86,6 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
                     minDistance=curDistance
                     minId=node.__data__.id;
                 }
-
-
             }
             //centroid
             /*
