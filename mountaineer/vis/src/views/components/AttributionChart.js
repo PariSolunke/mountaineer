@@ -9,34 +9,60 @@ import { renderD3 } from '../../hooks/render.hook';
 
 // d3
 import * as d3 from 'd3';
-import { max } from 'd3';
+import { filter, max } from 'd3';
 
-const AttributionChart = ({column_names , explanations}) => {
+const AttributionChart = ({column_names , explanations, birefAttribChart}) => {
 
-    const  [state, setState]=useState({mapper1:0,mapper2:1,selectedIndices:new Set(), filterStatus:false});
+  const  [state, setState]=useState({mapper1:0,mapper2:1, filteredIndices:new Set(), filterStatus:false});
   //Update state when the other component is brushed
   console.log(explanations)
   
+
+  //Update chart when the other component is brushed
+  function otherBrushed(selectedIndices, status, source){
+    if (source=="MapperGraph1" || source=="MapperGraph2")
+     setState({...state, filteredIndices:new Set(selectedIndices.flat()), filterStatus:status }) 
+    else if (source=="DataProjection")
+      setState({...state, filteredIndices:new Set(selectedIndices), filterStatus:status }) 
+
+  } 
+
   //Bidirectional reference object to enable two way communication between parent and child component
-  //birefDistMatrix.child={
-    //otherBrushed: otherBrushed
-  //};
+  birefAttribChart.child={
+      otherBrushed: otherBrushed
+  };  
+
+
   let maxVal1, maxVal2
   let summary1={}, summary2={};
 
   column_names.forEach((column, ci)=>{
     
-    summary1[column] = (explanations[state.mapper1].reduce((accumulator, row) => {
-      return accumulator + row[ci];
-    }, 0))/explanations[state.mapper1].length;
+    summary1[column] = (explanations[state.mapper1].reduce((accumulator, row, i) => {
+      if (state.filterStatus){
+        if (state.filteredIndices.has(i))
+          return accumulator + row[ci];
+        else  
+          return accumulator;
+      }
+      else
+        return accumulator + row[ci];
+    }, 0))/(explanations[state.mapper1].length-state.filteredIndices.size);
     if (maxVal1==null)
       maxVal1=Math.abs(summary1[column])
     else 
       maxVal1=Math.max(maxVal1, Math.abs(summary1[column]))
 
-    summary2[column] = (explanations[state.mapper2].reduce((accumulator, row) => {
-      return accumulator + row[ci];
-    }, 0))/explanations[state.mapper2].length;
+    summary2[column] = (explanations[state.mapper2].reduce((accumulator, row, i) => {
+      if (state.filterStatus){
+        if (state.filteredIndices.has(i))
+          return accumulator + row[ci];
+        else  
+          return accumulator;
+        }
+      else
+        return accumulator + row[ci];
+    }, 0))/(explanations[state.mapper2].length-state.filteredIndices.size);
 
     if (maxVal2==null)
       maxVal2=Math.abs(summary2[column])
@@ -45,8 +71,8 @@ const AttributionChart = ({column_names , explanations}) => {
 
   })
   
-  let scaleSummary1=d3.scaleLinear().domain([-maxVal1,maxVal1]).range([-5,5])
-  let scaleSummary2=d3.scaleLinear().domain([-maxVal2,maxVal2]).range([-5,5])
+let scaleSummary1=d3.scaleLinear().domain([-maxVal1,maxVal1]).range([-5,5])
+let scaleSummary2=d3.scaleLinear().domain([-maxVal2,maxVal2]).range([-5,5])
 
 let graphData1=[]
 for (let [key, value] of Object.entries(summary1)) {
@@ -63,32 +89,7 @@ for (let [key, value] of Object.entries(summary2)) {
   }
   console.log(graphData1)
   console.log(graphData2)
-  /*
-  //render the distance matrix
-  const render_heatmap = ( chartGroup, xScale, yScale ) => {
-    let maxDist=0;
-    distance_matrix.forEach(subArr => {
-        maxDist=Math.max(maxDist,d3.max(subArr))
-    });
-    let colorScale=d3.scaleLinear()
-    .range(['#ffffcc','#b10026'])
-    .domain([0,maxDist])
 
-    for(let i=0;i<distance_matrix.length;i++){
-        for(let j=0;j<distance_matrix.length;j++){
-            
-            chartGroup
-            .append("rect")
-            .attr("x", xScale(i+1))
-            .attr("y", yScale(j+1))
-            .attr("width", xScale.bandwidth() )
-            .attr("height", yScale.bandwidth() )
-            .style("fill", function(){if (i==j){ return "black"} else return colorScale(distance_matrix[i][j])})
-
-        }
-    }
-  }
-  */
   const ref = renderD3( 
     (svgref) => {
 

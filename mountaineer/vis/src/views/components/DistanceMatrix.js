@@ -74,12 +74,12 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix}) => {
             .append("g")
             .attr("transform", `translate(${margins.left},${margins.top})`);
 
-
+        console.log( JSON.parse(JSON.stringify(svgref.node().style.height=d3.selectAll('.distance-matrix-container').node().getBoundingClientRect().height-2)))
         // svg dimensions
         const svgWidthRange = [0, d3.selectAll('.distance-matrix-container').node().getBoundingClientRect().width - margins.left - margins.right];
-        const svgHeightRange = [0, d3.selectAll('.distance-matrix-container').node().getBoundingClientRect().height - margins.top - margins.bottom];
+        const svgHeightRange = [0, d3.selectAll('.distance-matrix-container').node().getBoundingClientRect().height-2 - margins.top - margins.bottom];
         svgref.node().style.width=d3.selectAll('.distance-matrix-container').node().getBoundingClientRect().width;
-        svgref.node().style.height=d3.selectAll('.distance-matrix-container').node().getBoundingClientRect().height;
+        svgref.node().style.height=d3.selectAll('.distance-matrix-container').node().getBoundingClientRect().height-2;
 
         //finding the data domain and the scale
 

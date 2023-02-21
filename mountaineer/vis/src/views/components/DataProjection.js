@@ -20,7 +20,7 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso, data
     if (source=='MapperGraph1')
       setFilters((prevFilters)=>({...prevFilters, filteredIndices: new Set(selectedIndices.flat()), filterStatus:filterStatus}));
     else if (source=="MapperGraph2")
-      setFilters((prevFilters)=>({...prevFilters, filteredIndices: new Set(), filterStatus:filterStatus}));
+      setFilters((prevFilters)=>({...prevFilters, filteredIndices: new Set(selectedIndices.flat()), filterStatus:filterStatus}));
 
   } 
   
@@ -88,10 +88,10 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso, data
 
 
         // svg dimensions
-        const svgWidthRange = [0, d3.selectAll('.data-projection-container').node().getBoundingClientRect().width-2 - margins.left - margins.right];
+        const svgWidthRange = [0, d3.selectAll('.data-projection-container').node().getBoundingClientRect().width - margins.left - margins.right];
         const svgHeightRange = [0, d3.selectAll('.data-projection-container').node().getBoundingClientRect().height-2 - margins.top - margins.bottom];
         svgref.node().style.width=svgWidthRange[1]+margins.left+margins.right;
-        svgref.node().style.height=svgHeightRange[1]+margins.bottom+margins.top;
+        svgref.node().style.height=svgHeightRange[1]+margins.bottom+margins.top-2;
 
         //finding the data domain and the scale
         const xDomain = [ dataRange[0], dataRange[1] ];

@@ -211,11 +211,11 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
             .append("g")
             .attr("transform", `translate(${margins.left},${margins.top})`);
 
-        // svg dimensions
+        // svg dimensions 
         const svgWidthRange = [0, d3.selectAll('.svg-container').node().getBoundingClientRect().width - margins.left - margins.right];
-        const svgHeightRange = [0, d3.selectAll('.svg-container').node().getBoundingClientRect().height - margins.top - margins.bottom];
+        const svgHeightRange = [0, d3.selectAll('.svg-container').node().getBoundingClientRect().height -2 - margins.top - margins.bottom];
         svgref.node().style.width=d3.selectAll('.svg-container').node().getBoundingClientRect().width;
-        svgref.node().style.height=d3.selectAll('.svg-container').node().getBoundingClientRect().height;
+        svgref.node().style.height=d3.selectAll('.svg-container').node().getBoundingClientRect().height-2;
 
 
 
@@ -480,7 +480,7 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
           <label htmlFor="mapperSelect">Mapper:&nbsp;</label>
           <select value={state.selectedMapper} id="mapperSelect"  onChange={changeSelectedMapper}>
               {mapper_outputs.map((mapper,i) => (
-                <option value={i}>Mapper{i+1}</option>
+                <option value={i}>Expl{" "+(i+1)}</option>
                 ))}
           </select>
         </div>
@@ -509,7 +509,7 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
 
       </div>
       <div className='svg-container'>
-      <svg ref={ref}></svg>
+      <svg height="373px" width="100%" ref={ref}></svg>
       </div>
     </>
   )

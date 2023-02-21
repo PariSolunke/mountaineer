@@ -312,18 +312,23 @@ const Mountaineer = ({data}) => {
             birefMapperGraph1.child.otherBrushed(selectedIndices, filterStatus, source);
             birefMapperGraph2.child.otherBrushed(selectedIndices, filterStatus, source);
             birefDataTable.child.otherBrushed(selectedIndices, filterStatus, source);
+            birefAttribChart.child.otherBrushed(selectedIndices, filterStatus, source)
+
 
         }
         else if (source=="MapperGraph1"){
             birefDataProj.child.otherBrushed(selectedIndices, filterStatus, source);
             birefDataTable.child.otherBrushed(selectedIndices, filterStatus, source);
             birefMapperGraph2.child.otherBrushed(selectedIndices, filterStatus, source, xAvg, yAvg);
+            birefAttribChart.child.otherBrushed(selectedIndices, filterStatus, source)
         }
 
         else if (source=="MapperGraph2"){
             birefDataProj.child.otherBrushed(selectedIndices, filterStatus, source);
             birefDataTable.child.otherBrushed(selectedIndices, filterStatus, source);
             birefMapperGraph1.child.otherBrushed(selectedIndices, filterStatus, source, xAvg, yAvg);
+            birefAttribChart.child.otherBrushed(selectedIndices, filterStatus, source)
+
         }
     }
 
@@ -351,6 +356,8 @@ const Mountaineer = ({data}) => {
     var birefDataTable = {};
 
     var birefDistMatrix = {};
+
+    var birefAttribChart = {};
     
     //combining data, y and lenses into a dataframe
     let dataframe=data.dataframe.map((obj,i) =>{ 
@@ -409,7 +416,7 @@ const Mountaineer = ({data}) => {
                     <DataTable dataframe={dataframe} birefDataTable={birefDataTable} columns={columns} lensCount={data.lenses.length} />
                 </div>
                 <div className='attributions-container'>
-                    <AttributionChart column_names={data.column_names} explanations={data.explanation_list}/>
+                    <AttributionChart column_names={data.column_names} explanations={data.explanation_list} birefAttribChart={birefAttribChart}/>
                 </div>
 
                 

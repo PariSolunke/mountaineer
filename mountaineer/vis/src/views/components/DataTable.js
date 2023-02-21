@@ -10,7 +10,7 @@ import  './styles/DataTable.css'
 const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
 
   //state to check filtered data
-  const [state,setState]=useState({selectedTab: 'table', selectedFeature:"lens1", projectionSelection: new Set(), projectionFiltered:false, filteredIndices1: new Set(), filterStatus1: false, filteredIndices2: new Set(), filterStatus2: false });
+  const [state,setState]=useState({selectedTab: 'distribution', selectedFeature:"lens1", filteredIndices: new Set(), filterStatus: false});
 
   let tableData=[];
   let distributionValues=[];
@@ -19,12 +19,10 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
 
   //Update state when the other component is brushed
   function otherBrushed(selectedIndices,filterStatus, source){
-    if (source=='MapperGraph1')
-      setState((prevState)=>({...prevState, filteredIndices1:new Set(selectedIndices.flat()), filterStatus1: filterStatus}));
-    else if(source=="MapperGraph2")
-      setState((prevState)=>({...prevState, filteredIndices2:new Set(selectedIndices.flat()), filterStatus2: filterStatus}));
+    if (source=='MapperGraph1' || source=="MapperGraph2")
+      setState((prevState)=>({...prevState, filteredIndices:new Set(selectedIndices.flat()), filterStatus: filterStatus}));
     else if(source=="DataProjection")
-      setState((prevState)=>({...prevState, projectionSelection:new Set(selectedIndices), projectionFiltered: filterStatus, filteredIndices1: new Set(), filterStatus1: false, filteredIndices2: new Set(), filterStatus2: false }));
+      setState((prevState)=>({...prevState, filteredIndices:new Set(selectedIndices), filterStatus: filterStatus}));
 
   } 
   
@@ -51,12 +49,10 @@ var birefViolin = {
   
   if (state.selectedTab=="table"){
     //filter table data
-    if (!state.filterStatus1 && !state.filterStatus2 && !state.projectionFiltered){
+    if (!state.filterStatus)
       tableData=dataframe;
-    }
-    else{
-      tableData=dataframe.filter((e,i)=>{return (state.filteredIndices1.has(i) || state.filteredIndices2.has(i)) || state.projectionSelection.has(i);})
-    }
+    else
+      tableData=dataframe.filter((e,i)=>{return state.filteredIndices.has(i) })
 
     //summary for filtered data  
     columns.forEach((column, ci)=>{
@@ -76,14 +72,10 @@ var birefViolin = {
   else if (state.selectedTab=="distribution"){
     dataframe.forEach(( row, i) =>{
       let featureVal=row[state.selectedFeature].toFixed(6);
-      if(!state.projectionFiltered || state.projectionSelection.has(i))
-        distributionValues.push({ featureVal: featureVal, dist:'global', y:row['y'], lens1:row['lens1']});
+      distributionValues.push({ featureVal: featureVal, dist:'global', y:row['y'], lens1:row['lens1']});
       
-      if(state.filteredIndices1.has(i))
+      if(state.filteredIndices.has(i))
         distributionValues.push({ featureVal: featureVal, dist:'filter1',y:row['y'], lens1:row['lens1']});
-      
-      if(state.filteredIndices2.has(i))
-        distributionValues.push({ featureVal: featureVal, dist:'filter2',y:row['y'], lens1:row['lens1']});
       
       if(globalMax===undefined){
         globalMax=featureVal;
@@ -109,7 +101,7 @@ var birefViolin = {
       <Tab eventKey="distribution" title="Distribution">
           {state.selectedTab=='distribution' &&
             <>
-              <div style={{marginTop:'3px', textAlign:'left', paddingLeft:'3px' }}>
+              <div style={{textAlign:'left', paddingLeft:'3px', marginTop:'4px' }}>
                 <label htmlFor='selectFeature'>Select Feature:&nbsp;</label>
                 <select id='selectFeature' value={state.selectedFeature} onChange={changeSelectedFeature}>
                   {columns.map((column,i) => (
