@@ -11,7 +11,7 @@ import DataProjection from './components/DataProjection.js';
 import MapperGraph from './components/MapperGraph.js';
 import DataTable from './components/DataTable.js';
 import DistanceMatrix from './components/DistanceMatrix.js';
-import SecondaryMapper from './components/SecondaryMapper.js';
+import AttributionChart from './components/AttributionChart.js';
 
 // styles
 import './Mountaineer.css'
@@ -323,7 +323,7 @@ const Mountaineer = ({data}) => {
         else if (source=="MapperGraph2"){
             birefDataProj.child.otherBrushed(selectedIndices, filterStatus, source);
             birefDataTable.child.otherBrushed(selectedIndices, filterStatus, source);
-            //birefMapperGraph2.child.otherBrushed(selectedIndices, filterStatus, source, xAvg, yAvg);
+            birefMapperGraph1.child.otherBrushed(selectedIndices, filterStatus, source, xAvg, yAvg);
         }
     }
 
@@ -366,7 +366,7 @@ const Mountaineer = ({data}) => {
     if (data.column_names==null)
       columns=Array.from({length: Object.keys(dataframe[0]).length-2}, (_, i) => {return "Feature"+(i + 1)});
     else
-      columns=data.column_names
+      columns=JSON.parse(JSON.stringify(data.column_names))
     columns.push("y");
     data.lenses.forEach((lens,index) => {
         columns.push("lens"+(index+1));  
@@ -392,13 +392,13 @@ const Mountaineer = ({data}) => {
         <div className='main-wrapper'>
             <div className='viz-wrapper'>
                 <div className='data-projection-container'>
-                    <DataProjection input_projection={data.input_projection} dataRange={dataRange} birefDataProj={birefDataProj} lasso={lasso}/>
+                    <DataProjection input_projection={data.input_projection} dataRange={dataRange} birefDataProj={birefDataProj} lasso={lasso} dataframe={dataframe}/>
                 </div>
                 <div className='mapper-graph-container'>
                     <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph1} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={1} dataRange={dataRange}/> 
                 </div>
                 <div className='mapper-graph-container'>
-                    <SecondaryMapper input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph2} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={2} dataRange={dataRange}/> 
+                    <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph2} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={2} dataRange={dataRange}/> 
                 </div>
             </div>
             <div className='datatable-wrapper'>
@@ -408,6 +408,11 @@ const Mountaineer = ({data}) => {
                 <div className='datatable-container'>
                     <DataTable dataframe={dataframe} birefDataTable={birefDataTable} columns={columns} lensCount={data.lenses.length} />
                 </div>
+                <div className='attributions-container'>
+                    <AttributionChart column_names={data.column_names} explanations={data.explanation_list}/>
+                </div>
+
+                
             </div>
         </div>
     )

@@ -30,7 +30,6 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
   function otherBrushed(selectedIndices, status, source, xAvg, yAvg){
     let links=chartGroup.selectAll('.link-mapper-graph');
     let nodes=chartGroup.selectAll('.node-mapper-graph')
-    let closestNode
     //if status is false, reset the view to default
     if(!status){
       links.attr("class","link-mapper-graph link-mapper-graph-default");
@@ -103,7 +102,6 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
             */
            
         })
-        console.log(minId, minDistance)
         nodes.attr("class",function(d){
             if (d.id==minId)
               return  "node-mapper-graph"
@@ -117,8 +115,6 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
             else
               return "link-mapper-graph link-mapper-graph-hide"
           });
-
-
     }
   } 
   

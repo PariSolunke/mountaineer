@@ -26,7 +26,7 @@ from captum.attr import IntegratedGradients, DeepLift
 from collections import defaultdict
 import shap
 
-rs = 42
+rs = 2022
 np.random.seed(rs)
 torch.manual_seed(rs)
 random.seed(rs)

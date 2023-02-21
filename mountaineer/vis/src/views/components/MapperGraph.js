@@ -15,7 +15,7 @@ import * as d3 from 'd3';
 const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lensCount, lasso, minElements, maxElements, mapperId, dataRange}) => {
 
   //state to check filtered data
-  const [state,setState]=useState({selectedMapper:mapperId-1, nodeColorBy:"lens1", nodeColorAgg:"var"});
+  const [state,setState]=useState({selectedMapper:mapperId-1, nodeColorBy:"lens1", nodeColorAgg:"mean"});
   let chartGroup, colorScale;
   let nodeColorVals={}
   let nodeColorBy=state.nodeColorBy;
@@ -27,17 +27,16 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
   
 
   //Update nodes and links when the other component is brushed
-  function otherBrushed(selectedIndices, status){
+  function otherBrushed(selectedIndices, status, source, xAvg, yAvg){
     let links=chartGroup.selectAll('.link-mapper-graph');
     let nodes=chartGroup.selectAll('.node-mapper-graph')
-
     //if status is false, reset the view to default
     if(!status){
       links.attr("class","link-mapper-graph link-mapper-graph-default");
       nodes.attr("class","node-mapper-graph");
     }
     //filter out nodes and edges
-    else{
+    else if (source=="DataProjection"){
       let filteredIndices= new Set(selectedIndices);
       let filteredNodeNames= new Set();
       
@@ -61,15 +60,70 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
           return "link-mapper-graph link-mapper-graph-hide"
       });
     }
+
+    else{
+
+        let maxSimIdSet= new Set();
+        for (let subArray of selectedIndices){
+          let filteredIndices= new Set(subArray);
+          let maxSimilarity, maxSimId;
+
+          nodes["_groups"][0].forEach((node)=>{
+              //jaccard
+              let curNodeIndices=new Set(node.__data__.indices)
+              let intersection = new Set([...curNodeIndices].filter(index => filteredIndices.has(index)));
+              let union = new Set([...filteredIndices, ...curNodeIndices])
+              
+              if (maxSimilarity==null){
+                  maxSimilarity= intersection.size/union.size
+                  maxSimId=node.__data__.id;
+              }
+
+              else{
+                  let curSimilarity=intersection.size/union.size
+                  if (curSimilarity>maxSimilarity){
+                      maxSimilarity=curSimilarity
+                      maxSimId=node.__data__.id;
+                  }
+              }
+              //centroid
+              /*
+              if (minDistance==null){
+                  minDistance=Math.sqrt( ((xAvg - node.__data__.xAvg) * (xAvg - node.__data__.xAvg)) + ((yAvg - node.__data__.yAvg) * (yAvg - node.__data__.yAvg)));
+                  minId=node.__data__.id;
+              }
+              else{
+                  let curDistance=Math.sqrt( ((xAvg - node.__data__.xAvg) * (xAvg - node.__data__.xAvg)) + ((yAvg - node.__data__.yAvg) * (yAvg - node.__data__.yAvg)));
+                  if (curDistance<minDistance){
+                      minDistance=curDistance
+                      minId=node.__data__.id;
+                  }
+              }
+              */   
+          })
+          maxSimIdSet.add(maxSimId);
+        }
+        console.log(maxSimIdSet)
+        nodes.attr("class",function(d){
+            if (maxSimIdSet.has(d.id))
+              return  "node-mapper-graph"
+            else
+              return "node-mapper-graph node-mapper-graph-unselected";
+          });
+    
+          links.attr("class",function(d){
+            if(maxSimIdSet.has(d.source.id) || maxSimIdSet.has(d.target.id))
+              return "link-mapper-graph link-mapper-graph-default"
+            else
+              return "link-mapper-graph link-mapper-graph-hide"
+          });
+    }
   } 
-  
+
   //Bidirectional reference object to enable two way communication between parent and child component
   birefMapperGraph.child={
       otherBrushed: otherBrushed
   };
-  
-  //selected indices for brushing
-  let selectedIndices=new Set();
 
   //clear plot
   const clear_plot = (svgref) => {
@@ -260,7 +314,8 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
 
         //after lasso is drawn
         function lasso_end(){
-          selectedIndices.clear();
+          let selectedIndices= []
+          
           let xAvg, yAvg;
           //reset class of nodes and links
           lassoBrush.items().attr("class","node-mapper-graph");
@@ -275,12 +330,14 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
             nodesSelected.forEach((node) =>{
               xAvg=node.__data__.xAvg;
               yAvg=node.__data__.yAvg;
+              selectedIndices.push(node.__data__.indices);
+              /*
               for(let i=0;i<node.__data__.indices.length;i++){
-                selectedIndices.add(node.__data__.indices[i]);
-              }
+                selectedIndices.push(node.__data__.indices[i]);
+              }*/
               selectedIds.add(node.__data__.id)
             });       
-            
+            console.log("Selected:", selectedIndices)
             //show only links with source/destination among selected nodes
             links.attr("class",function(d){
               if (selectedIds.has(d.source.id) || selectedIds.has(d.target.id))

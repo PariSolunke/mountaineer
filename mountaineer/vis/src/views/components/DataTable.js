@@ -20,9 +20,9 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
   //Update state when the other component is brushed
   function otherBrushed(selectedIndices,filterStatus, source){
     if (source=='MapperGraph1')
-      setState((prevState)=>({...prevState, filteredIndices1:new Set(selectedIndices), filterStatus1: filterStatus}));
+      setState((prevState)=>({...prevState, filteredIndices1:new Set(selectedIndices.flat()), filterStatus1: filterStatus}));
     else if(source=="MapperGraph2")
-      setState((prevState)=>({...prevState, filteredIndices2:new Set(selectedIndices), filterStatus2: filterStatus}));
+      setState((prevState)=>({...prevState, filteredIndices2:new Set(selectedIndices.flat()), filterStatus2: filterStatus}));
     else if(source=="DataProjection")
       setState((prevState)=>({...prevState, projectionSelection:new Set(selectedIndices), projectionFiltered: filterStatus, filteredIndices1: new Set(), filterStatus1: false, filteredIndices2: new Set(), filterStatus2: false }));
 
@@ -122,10 +122,7 @@ var birefViolin = {
                 <div className='distribution-wrapper'> 
                 <div className='violin-container'>
                   <FeatureDistributionViolin distributionValues={distributionValues} globalMax={globalMax} globalMin={globalMin} birefViolin={birefViolin}/>
-                </div>
-                <div className='scatter-container'>
-                  <FeatureDistributionScatter distributionValues={distributionValues} globalMax={globalMax} globalMin={globalMin} birefScatter={birefScatter}/>
-                </div>
+               </div>
               </div>
             </>
       

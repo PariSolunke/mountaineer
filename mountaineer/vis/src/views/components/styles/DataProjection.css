@@ -1,25 +1,5 @@
-
-
-.node-input-projection{
-    fill: #beaed4;
-    
-}
-
 .node-input-projection-unselected{
     opacity:0.05;
-}
-
-
-.node-input-projection-selected2.node-input-projection-selected1{
-    fill:#beaed4;
-}
-
-.node-input-projection-selected1{
-    fill:#7fc97f
-}
-
-.node-input-projection-selected2{
-    fill: #fdc086;
 }
 
 .lasso path {

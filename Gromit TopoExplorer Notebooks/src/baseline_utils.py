@@ -5,7 +5,7 @@ import shap
 import torch
 from scipy.ndimage.filters import gaussian_filter
 
-rs = 42
+rs = 2022
 np.random.seed(rs)
 random.seed(rs)
 torch.manual_seed(rs)

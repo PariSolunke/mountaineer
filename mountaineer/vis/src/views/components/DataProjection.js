@@ -10,17 +10,17 @@ import './styles/DataProjection.css'
 // d3
 import * as d3 from 'd3';
 
-const DataProjection = ({input_projection, dataRange, birefDataProj, lasso}) => {
+const DataProjection = ({input_projection, dataRange, birefDataProj, lasso, dataframe}) => {
 
   //state to check filtered data
-  const [filters,setFilters]=useState({filteredIndices1: new Set(), filteredIndices2: new Set(), filterStatus1: false, filterStatus2:false });
+  const [filters,setFilters]=useState({filteredIndices: new Set(), filterStatus: false });
 
   //Update state when the other component is brushed
   function otherBrushed(selectedIndices,filterStatus, source){
     if (source=='MapperGraph1')
-      setFilters((prevFilters)=>({...prevFilters, filteredIndices1:new Set(selectedIndices), filterStatus1:filterStatus}));
+      setFilters((prevFilters)=>({...prevFilters, filteredIndices: new Set(selectedIndices.flat()), filterStatus:filterStatus}));
     else if (source=="MapperGraph2")
-      setFilters((prevFilters)=>({...prevFilters, filteredIndices2:new Set(selectedIndices), filterStatus2:filterStatus}));
+      setFilters((prevFilters)=>({...prevFilters, filteredIndices: new Set(), filterStatus:filterStatus}));
 
   } 
   
@@ -48,19 +48,19 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso}) => 
         .append("circle")
           //show or hide nodes depending on filters
           .attr("class",function(d,i){
-            if(filters.filterStatus1 || filters.filterStatus2){
-              if(filters.filteredIndices1.has( i) && filters.filteredIndices2.has( i))
-                return "node-input-projection node-input-projection-selected1 node-input-projection-selected2";
-              else if (filters.filteredIndices1.has( i))
-                return "node-input-projection node-input-projection-selected1"
-              else if (filters.filteredIndices2.has( i))
-                return "node-input-projection node-input-projection-selected2"
-              
+            if(filters.filterStatus){
+              if(filters.filteredIndices.has(i))
+                return "node-input-projection";  
               else
                 return "node-input-projection node-input-projection-unselected";          
               }
             return "node-input-projection" 
           })
+          .attr("fill",(d, i)=>{
+            if ( (dataframe[i]["lens1"]<0.5 && dataframe[i]["y"]>0.5) || (dataframe[i]["lens1"]>=0.5 && dataframe[i]["y"]<0.5)) 
+              return "#d7191c"
+            else
+              return "#2b83ba"})
           .attr("cx", function (d) { return xScale(d[0]); } )
           .attr("cy", function (d) { return yScale(d[1]); } )
           .attr("r", 3)
