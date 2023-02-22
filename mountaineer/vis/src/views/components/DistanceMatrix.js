@@ -59,7 +59,7 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix}) => {
             .attr("height", yScale.bandwidth() )
             .style("fill", ()=>{
               if (i==j)
-                return "green"
+                return "#98eb98"
               else
                 return colorScale(distance_matrix[i][j])})
             .classed("curSelection", ()=>{

@@ -61,13 +61,7 @@ const FeatureDistributionDensity = ({distributionValues, globalMax, globalMin}) 
       .attr("transform", `translate(0, ${svgHeightRange[1]})`)
       .call(d3.axisBottom(xScale));
   
-    const yScale = d3.scaleLinear()
-      .domain([0, 0.2])
-      .range([svgHeightRange[1], svgHeightRange[0]]);
 
-    chartGroup.append("g")
-      .attr("class","chart-axes")
-      .call(d3.axisLeft(yScale));
 
     // Compute kernel density estimation
     let kdeBandwidth= (globalMax-globalMin) * 0.05
@@ -80,45 +74,72 @@ const FeatureDistributionDensity = ({distributionValues, globalMax, globalMin}) 
       .filter( function(d){return d.dist == "filter1"} )
       .map(function(d){  return d.featureVal; }) )
   
-  console.log(density2)
+    console.log(density1)
+    console.log(density2)
+    let filtered=true
+
+    if(density2[0][1]==null)
+        filtered=false
+    let yMax=0;
+    for (let i=0; i< density1.length; i++){
+      if (!filtered){
+        yMax=Math.max(density1[i][1], yMax);
+      }
+      else
+        yMax=d3.max([density1[i][1], density2[i][1] ,yMax]);
+    }
+
+    const yScale = d3.scaleLinear()
+      .domain([0, yMax+0.1])
+      .range([svgHeightRange[1], svgHeightRange[0]]);
+
+    chartGroup.append("g")
+      .attr("class","chart-axes")
+      .call(d3.axisLeft(yScale));
+    
   // Plot the area
-  chartGroup.append("path")
-  .datum(density1)
-  .attr("fill", "#69b3a2")
-  .attr("opacity", ".6")
-  .attr("stroke", "#000")
-  .attr("stroke-width", 1)
-  .attr("stroke-linejoin", "round")
-  .attr("d",  d3.line()
-    .curve(d3.curveBasis)
-      .x(function(d) { console.log(d)
-        return xScale(d[0]); })
-      .y(function(d) { return yScale(d[1]); })
-  );
-  
-  // Plot the area
-  chartGroup.append("path")
-    .datum(density2)
-    .attr("fill", "#404080")
+    chartGroup.append("path")
+    .datum(density1)
+    .attr("fill", "#69b3a2")
     .attr("opacity", ".6")
     .attr("stroke", "#000")
     .attr("stroke-width", 1)
     .attr("stroke-linejoin", "round")
     .attr("d",  d3.line()
       .curve(d3.curveBasis)
-        .x(function(d) { return xScale(d[0]); })
+        .x(function(d) { console.log(d)
+          return xScale(d[0]); })
         .y(function(d) { return yScale(d[1]); })
     );
 
-    
+    let xLocation= 70/100*svgWidthRange[1];
+    chartGroup.append("circle").attr("cx",xLocation).attr("cy",15).attr("r", 6).style("fill", "#69b3a2")
+    chartGroup.append("text").attr("x", xLocation+20).attr("y", 15).text("Global Prob. Density").style("font-size", "15px").attr("alignment-baseline","middle").style("fill","black")
+
+    if(filtered){
+    // Plot the area
+    chartGroup.append("path")
+      .datum(density2)
+      .attr("fill", "#404080")
+      .attr("opacity", ".6")
+      .attr("stroke", "#000")
+      .attr("stroke-width", 1)
+      .attr("stroke-linejoin", "round")
+      .attr("d",  d3.line()
+        .curve(d3.curveBasis)
+          .x(function(d) { return xScale(d[0]); })
+          .y(function(d) { return yScale(d[1]); })
+      );
+
+      chartGroup.append("circle").attr("cx",xLocation).attr("cy",40).attr("r", 6).style("fill", "#404080")
+      chartGroup.append("text").attr("x", xLocation+20).attr("y", 40).text("Filtered Prob. Density").style("font-size", "15px").attr("alignment-baseline","middle").style("fill","black")
+    }
         
   });
 
   return (
     <>      
-     
       <svg ref={ref}></svg>
-  
     </>
   )
 }

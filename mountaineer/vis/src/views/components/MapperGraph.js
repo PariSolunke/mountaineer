@@ -173,7 +173,7 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
       .enter()
       .append("circle")
       .attr("fill",function(d){
-        return d3.interpolateRdBu(colorScale(d.colorVal));
+        return colorScale(d.colorVal);
       })
      // .attr("cx", function(d){return xScale(d.xAvg)})
        // .attr("cy",function(d){return yScale(d.yAvg)})
@@ -276,9 +276,9 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
         const radiusScale = d3.scaleLinear().domain([minElements,maxElements]).range([6,21]);
 
         if (nodeColorAgg=='min')
-          colorScale=d3.scaleLinear().domain([colorMaxAvg, colorMinAvg]).range([0,1]);
+          colorScale=d3.scaleLinear().domain([colorMaxAvg, colorMinAvg]).range(["#fffcc5", "#8f0026"]);
         else
-          colorScale=d3.scaleLinear().domain([colorMinAvg, colorMaxAvg]).range([1,0]);
+          colorScale=d3.scaleLinear().domain([colorMinAvg, colorMaxAvg]).range(["#fffcc5", "#8f0026"]);
 
         const distanceScale=d3.scaleLinear().domain(overlapExtent).range([30,5]);
       
@@ -450,12 +450,12 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
       }
 
       if (nodeColorAgg=='min')
-        colorScale=d3.scaleLinear().domain([colorMaxAvg, colorMinAvg]).range([0,1]);
+        colorScale=d3.scaleLinear().domain([colorMaxAvg, colorMinAvg]).range(["#fffcc5", "#8f0026"]);
       else
-        colorScale=d3.scaleLinear().domain([colorMinAvg, colorMaxAvg]).range([1,0]);
+        colorScale=d3.scaleLinear().domain([colorMinAvg, colorMaxAvg]).range(["#fffcc5", "#8f0026"]);
 
       nodes.attr("fill",function(d){
-          return d3.interpolateRdBu(colorScale(nodeColorVals[d.id]));
+          return colorScale(nodeColorVals[d.id]);
         })
     };
     

@@ -75,7 +75,7 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso, data
 
         // margins
         const margins = {
-            top: 15,
+            top: 50,
             left:15,
             right: 15,
             bottom: 15
@@ -101,6 +101,13 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso, data
         
         //render scatterplot
         render_scatterplot( chartGroup, xScale, yScale, input_projection);
+
+        let xLocation= 80/100*svgWidthRange[1];
+
+        svgref.append("circle").attr("cx",xLocation).attr("cy",10).attr("r", 6).style("fill", "#2b83ba")
+        svgref.append("text").attr("x", xLocation+15).attr("y", 10).text("Correct Prediciton").style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
+        svgref.append("circle").attr("cx",xLocation).attr("cy",35).attr("r", 6).style("fill", "#d7191c")
+        svgref.append("text").attr("x", xLocation+15).attr("y", 35).text("Wrong Prediciton").style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
         
 
         //add brush

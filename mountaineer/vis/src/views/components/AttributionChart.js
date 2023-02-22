@@ -110,7 +110,7 @@ for (let [key, value] of Object.entries(summary2)) {
 
         // margins
         const margins = {
-            top: 60,
+            top: 40,
             left:20,
             right: 30,
             bottom: 20
@@ -177,12 +177,21 @@ for (let [key, value] of Object.entries(summary2)) {
             .join('line')
           
 
+          
+        let xLocation1= 0.25*svgWidthRange[1];
+        let xLocation2= 0.70*svgWidthRange[1];
+        svgref.append("rect").attr("x",xLocation1).attr("y",3).attr("height",14).attr("width", 14).style("fill", "#7fc97f")
+        svgref.append("text").attr("x", xLocation1+15).attr("y", 10).text("Explanation "+(state.mapper1+1)).style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
+        svgref.append("rect").attr("x",xLocation2).attr("y",3).attr("height",14).attr("width", 14).style("fill", "#fdc086")
+        svgref.append("text").attr("x", xLocation2+15).attr("y", 10).text("Explanation "+(state.mapper2+1)).style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
+        
+
         
     });
 
   return (
     <>
-      <div>Mean Feature Importance</div>
+      <div style={{fontWeight:'bold'}}>Mean Feature Importance</div>
       <svg ref={ref}></svg>
     </>
   )

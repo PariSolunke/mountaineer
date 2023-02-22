@@ -81,7 +81,7 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
   
   return (
     <Tabs id="TabComponent" activeKey={state.selectedTab} justify={true} variant='tabs' onSelect={(k) =>setState((prevState)=>({...prevState, selectedTab: k}))} transition={false}>
-      <Tab eventKey="distribution" title="Distribution">
+      <Tab eventKey="distribution" title="Data Distribution Density">
           {state.selectedTab=='distribution' &&
             <>
               <div style={{textAlign:'left', paddingLeft:'3px', marginTop:'4px' }}>
