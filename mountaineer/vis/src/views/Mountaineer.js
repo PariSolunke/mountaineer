@@ -307,7 +307,7 @@ const Mountaineer = ({data}) => {
     }
 
     //Whenever brushing interaction occurs in any child component
-    const onBrush = (selectedIndices,source, filterStatus, xAvg, yAvg) => {
+    const onBrush = (selectedIndices, source, filterStatus) => {
         if (source=="DataProjection"){
             birefMapperGraph1.child.otherBrushed(selectedIndices, filterStatus, source);
             birefMapperGraph2.child.otherBrushed(selectedIndices, filterStatus, source);
@@ -319,18 +319,30 @@ const Mountaineer = ({data}) => {
         else if (source=="MapperGraph1"){
             birefDataProj.child.otherBrushed(selectedIndices, filterStatus, source);
             birefDataTable.child.otherBrushed(selectedIndices, filterStatus, source);
-            birefMapperGraph2.child.otherBrushed(selectedIndices, filterStatus, source, xAvg, yAvg);
+            birefMapperGraph2.child.otherBrushed(selectedIndices, filterStatus, source);
             birefAttribChart.child.otherBrushed(selectedIndices, filterStatus, source)
         }
 
         else if (source=="MapperGraph2"){
             birefDataProj.child.otherBrushed(selectedIndices, filterStatus, source);
             birefDataTable.child.otherBrushed(selectedIndices, filterStatus, source);
-            birefMapperGraph1.child.otherBrushed(selectedIndices, filterStatus, source, xAvg, yAvg);
+            birefMapperGraph1.child.otherBrushed(selectedIndices, filterStatus, source);
             birefAttribChart.child.otherBrushed(selectedIndices, filterStatus, source)
-
         }
     }
+
+    const onMapperSelect = (mapper1, mapper2) =>{
+        birefMapperGraph1.child.otherBrushed(mapper1, true, "DistMatrix");
+        birefMapperGraph2.child.otherBrushed(mapper2, true, "DistMatrix");
+        birefAttribChart.child.mapperChanged([mapper1, mapper2], "DistMatrix")
+
+    }
+    
+    const onMapperChange = (newMapper, source) =>{
+        birefDistMatrix.child.otherBrushed(newMapper, source)
+        birefAttribChart.child.mapperChanged(newMapper, source)
+    }
+
 
     //Bidirectional reference object for Data Projection component
     var birefDataProj = {
@@ -342,20 +354,26 @@ const Mountaineer = ({data}) => {
      //Bidirectional reference object for Mapper Graph component
     var birefMapperGraph1 = {
         parent: {
-            onBrush: onBrush
+            onBrush: onBrush,
+            onMapperChange: onMapperChange
         }
     }
 
     var birefMapperGraph2 = {
         parent: {
-            onBrush: onBrush
+            onBrush: onBrush,
+            onMapperChange: onMapperChange
         }
     }
 
     //Bidirectional reference object for Data table component
     var birefDataTable = {};
 
-    var birefDistMatrix = {};
+    var birefDistMatrix = {
+        parent: {
+            onMapperSelect: onMapperSelect
+        }
+    }
 
     var birefAttribChart = {};
     

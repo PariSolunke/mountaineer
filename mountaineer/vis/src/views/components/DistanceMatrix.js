@@ -12,10 +12,16 @@ import * as d3 from 'd3';
 
 const DistanceMatrix = ({distance_matrix , birefDistMatrix}) => {
 
-    
+  const [state,setState]=useState({selected1:0,selected2:1})
+  console.log(state)
   //Update state when the other component is brushed
-  function otherBrushed(){
-
+  function otherBrushed(newMapper, source){
+  
+    if (source=="MapperGraph1")
+      setState((prevState)=>({...prevState, selected1:newMapper}))
+    else if (source=="MapperGraph2")
+      setState((prevState)=>({...prevState, selected2:newMapper}))
+  
   } 
   
   //Bidirectional reference object to enable two way communication between parent and child component
@@ -41,16 +47,36 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix}) => {
     .domain([0,maxDist])
 
     for(let i=0;i<distance_matrix.length;i++){
-        for(let j=0;j<distance_matrix.length;j++){
+        for(let j=i;j<distance_matrix.length;j++){
             
             chartGroup
             .append("rect")
             .attr("x", xScale(i+1))
             .attr("y", yScale(j+1))
-            .attr("width", xScale.bandwidth() )
+            .attr("data-i",i)
+            .attr("data-j",j)
+            .attr("width", xScale.bandwidth())
             .attr("height", yScale.bandwidth() )
-            .style("fill", function(){if (i==j){ return "black"} else return colorScale(distance_matrix[i][j])})
-
+            .style("fill", ()=>{
+              if (i==j)
+                return "green"
+              else
+                return colorScale(distance_matrix[i][j])})
+            .classed("curSelection", ()=>{
+              if ((i==state.selected1 && j==state.selected2) || (j==state.selected1 && i==state.selected2) )
+                return true
+              return false 
+            })
+            .on("click", (d)=>{
+              let newI=parseInt(d.target.dataset["i"]);
+              let newJ=parseInt(d.target.dataset["j"])
+              console.log(state.selected1, state.selected2)
+              console.log(newI, newJ)
+              if (!((state.selected1==newI && state.selected2==newJ) ||(state.selected2==newI && state.selected1==newJ))){
+                birefDistMatrix.parent.onMapperSelect(newI, newJ)
+                setState((prevState)=>({...prevState, selected1:newI, selected2:newJ}))
+              }
+            })
         }
     }
   }
@@ -91,7 +117,7 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix}) => {
             .attr("transform", `translate(0, ${svgHeightRange[1]})`)
             .call(d3.axisBottom(xScale));
 
-        const yScale = d3.scaleBand().domain(domain).range([svgHeightRange[1], svgHeightRange[0]]).padding(0.01);
+        const yScale = d3.scaleBand().domain(domain).range(svgHeightRange).padding(0.01);
         chartGroup.append("g")
             .attr("class","chart-axes")
           .call(d3.axisLeft(yScale));

@@ -46,7 +46,7 @@
   border: solid #a2a2a2 1px;
   border-radius: 5px;
   text-align: center;
-  overflow-y: scroll;
+  overflow-y: none;
 }
 
 .attributions-container{

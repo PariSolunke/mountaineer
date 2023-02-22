@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import PaginatedTable from './PaginatedTable.js';
-import FeatureDistributionViolin from './FeatureDistributionViolin.js';
-import FeatureDistributionScatter from './FeatureDistributionScatter.js'
+import FeatureDistributionDensity from './FeatureDistributionDensity.js';
 
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
@@ -30,22 +29,6 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
   birefDataTable.child={
     otherBrushed: otherBrushed
   };
-
-
-  const onBrush = (clickedId) => {
-    birefScatter.child.otherBrushed(clickedId)
-  }
-
-//Bidirectional reference object for Data Projection component
-var birefViolin = {
-    parent: {
-        onBrush: onBrush
-    }
- }
-
- var birefScatter = {};
-
-  
   
   if (state.selectedTab=="table"){
     //filter table data
@@ -113,7 +96,7 @@ var birefViolin = {
               </div>
                 <div className='distribution-wrapper'> 
                 <div className='violin-container'>
-                  <FeatureDistributionViolin distributionValues={distributionValues} globalMax={globalMax} globalMin={globalMin} birefViolin={birefViolin}/>
+                  <FeatureDistributionDensity distributionValues={distributionValues} globalMax={globalMax} globalMin={globalMin} />
                </div>
               </div>
             </>

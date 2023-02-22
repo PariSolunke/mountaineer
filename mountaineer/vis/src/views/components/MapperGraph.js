@@ -27,13 +27,17 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
   
 
   //Update nodes and links when the other component is brushed
-  function otherBrushed(selectedIndices, status, source, xAvg, yAvg){
+  function otherBrushed(selectedIndices, status, source){
     let links=chartGroup.selectAll('.link-mapper-graph');
     let nodes=chartGroup.selectAll('.node-mapper-graph')
     //if status is false, reset the view to default
     if(!status){
       links.attr("class","link-mapper-graph link-mapper-graph-default");
       nodes.attr("class","node-mapper-graph");
+    }
+
+    else if (source=="DistMatrix"){
+      setState((prevState)=>({...prevState, selectedMapper:parseInt(selectedIndices), nodeColorBy:nodeColorBy, nodeColorAgg:nodeColorAgg}));
     }
     //filter out nodes and edges
     else if (source=="DataProjection"){
@@ -229,7 +233,7 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
           let nodeName=nodeNames[i];
 
           let numElements=mapper_output.nodes[nodeName].length;
-          let colorVal=0, xAvg, yAvg;
+          let colorVal=0;
           //find the colorValue for each node based on selected aggregation
           colorVal= findColorVal(mapper_output.nodes[nodeName], numElements);     
           if (colorMinAvg == null){
@@ -238,24 +242,9 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
           }
           colorMinAvg= Math.min(colorMinAvg, colorVal);
           colorMaxAvg= Math.max(colorMaxAvg, colorVal);
-          
-          //find the centroid for each node
-          for (let j of mapper_output.nodes[nodeName]){
-            if (xAvg==null){
-              xAvg=input_projection[j][0];
-              yAvg=input_projection[j][1];
-            }
-            else
-            {
-              xAvg+=input_projection[j][0];
-              yAvg+=input_projection[j][1];
-            }
-          }
-          xAvg=xAvg/numElements;
-          yAvg=yAvg/numElements;
 
           //update the node data
-          graphData.nodes.push({id:nodeName, xAvg:xAvg, yAvg:yAvg, colorVal:colorVal, numElements:numElements, indices:mapper_output.nodes[nodeName] })
+          graphData.nodes.push({id:nodeName, colorVal:colorVal, numElements:numElements, indices:mapper_output.nodes[nodeName] })
 
 
           if (nodeName in mapper_output.links){
@@ -315,8 +304,7 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
         //after lasso is drawn
         function lasso_end(){
           let selectedIndices= []
-          
-          let xAvg, yAvg;
+  
           //reset class of nodes and links
           lassoBrush.items().attr("class","node-mapper-graph");
           let links=chartGroup.selectAll('.link-mapper-graph');
@@ -328,8 +316,6 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
             let selectedIds=new Set();
             lassoBrush.notSelectedItems().attr("class","node-mapper-graph node-mapper-graph-unselected");
             nodesSelected.forEach((node) =>{
-              xAvg=node.__data__.xAvg;
-              yAvg=node.__data__.yAvg;
               selectedIndices.push(node.__data__.indices);
               /*
               for(let i=0;i<node.__data__.indices.length;i++){
@@ -346,7 +332,7 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
                 return "link-mapper-graph link-mapper-graph-hide"
             });
             //send selected indices to parent
-            birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph"+mapperId, true, xAvg, yAvg);
+            birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph"+mapperId, true);
           }
 
           //case where no node is selected, disables filters
@@ -433,7 +419,8 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
       //document.getElementById("nodeColorAgg").value = "mean"
       //document.getElementById("nodeColorBy").value = "lens1"
       birefMapperGraph.parent.onBrush([], "MapperGraph"+mapperId, false);
-      setState((prevState)=>({...prevState, selectedMapper:event.target.value, nodeColorBy:nodeColorBy, nodeColorAgg:nodeColorAgg}));
+      birefMapperGraph.parent.onMapperChange(parseInt(event.target.value),"MapperGraph"+mapperId)
+      setState((prevState)=>({...prevState, selectedMapper:parseInt(event.target.value), nodeColorBy:nodeColorBy, nodeColorAgg:nodeColorAgg}));
     };
 
     //on change of node feature to color by

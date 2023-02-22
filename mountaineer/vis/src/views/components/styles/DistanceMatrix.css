@@ -5,3 +5,8 @@
   text{
     fill: white;
   }
+
+  .curSelection{
+    stroke-width: 4px;
+    stroke:rgb(3, 24, 98);
+  }

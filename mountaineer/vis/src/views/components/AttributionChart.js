@@ -20,16 +20,28 @@ const AttributionChart = ({column_names , explanations, birefAttribChart}) => {
 
   //Update chart when the other component is brushed
   function otherBrushed(selectedIndices, status, source){
+    if (!status)
+      setState((prevState)=>({...prevState, filteredIndices:new Set(), filterStatus:false })) 
     if (source=="MapperGraph1" || source=="MapperGraph2")
-     setState({...state, filteredIndices:new Set(selectedIndices.flat()), filterStatus:status }) 
+     setState((prevState)=>({...prevState, filteredIndices:new Set(selectedIndices.flat()), filterStatus:status })) 
     else if (source=="DataProjection")
       setState({...state, filteredIndices:new Set(selectedIndices), filterStatus:status }) 
 
   } 
 
+  function mapperChanged(newMapper, source){
+    if (source =="DistMatrix")
+      setState((prevState)=>({...prevState, mapper1:newMapper[0], mapper2:newMapper[1]})) 
+    else if (source=="MapperGraph1")
+      setState((prevState)=>({...prevState, mapper1:newMapper})) 
+    else if (source=="MapperGraph2")
+      setState((prevState)=>({...prevState, mapper2:newMapper})) 
+  }
+
   //Bidirectional reference object to enable two way communication between parent and child component
   birefAttribChart.child={
-      otherBrushed: otherBrushed
+      otherBrushed: otherBrushed,
+      mapperChanged: mapperChanged
   };  
 
 
