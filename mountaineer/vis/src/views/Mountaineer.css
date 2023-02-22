@@ -33,6 +33,7 @@
   grid-template-columns: 2fr 3fr 3fr;
   grid-gap: 1%;
   height: 400px;
+
 }
 
 .distance-matrix-container{
@@ -47,6 +48,7 @@
   border-radius: 5px;
   text-align: center;
   overflow-y: none;
+  overflow-x: scroll;
 }
 
 .attributions-container{
