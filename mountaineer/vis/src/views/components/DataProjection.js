@@ -10,17 +10,17 @@ import './styles/DataProjection.css'
 // d3
 import * as d3 from 'd3';
 
-const DataProjection = ({input_projection, dataRange, birefDataProj, lasso, dataframe}) => {
-
+const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => {
+  console.log("Projection Re-render")
   //state to check filtered data
-  const [filters,setFilters]=useState({filteredIndices: new Set(), filterStatus: false });
+  const [state,setState]=useState({colorBy: "" ,selectedProjection: "UMAP", filteredIndices: new Set(), filterStatus: false });
 
   //Update state when the other component is brushed
   function otherBrushed(selectedIndices,filterStatus, source){
     if (source=='MapperGraph1')
-      setFilters((prevFilters)=>({...prevFilters, filteredIndices: new Set(selectedIndices.flat()), filterStatus:filterStatus}));
+      setState((prevState)=>({...prevState, filteredIndices: new Set(selectedIndices.flat()), filterStatus:filterStatus}));
     else if (source=="MapperGraph2")
-      setFilters((prevFilters)=>({...prevFilters, filteredIndices: new Set(selectedIndices.flat()), filterStatus:filterStatus}));
+      setState((prevState)=>({...prevState, filteredIndices: new Set(selectedIndices.flat()), filterStatus:filterStatus}));
 
   } 
   
@@ -48,8 +48,8 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso, data
         .append("circle")
           //show or hide nodes depending on filters
           .attr("class",function(d,i){
-            if(filters.filterStatus){
-              if(filters.filteredIndices.has(i))
+            if(state.filterStatus){
+              if(state.filteredIndices.has(i))
                 return "node-input-projection";  
               else
                 return "node-input-projection node-input-projection-unselected";          
@@ -88,11 +88,19 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso, data
 
 
         // svg dimensions
-        const svgWidthRange = [0, d3.selectAll('.data-projection-container').node().getBoundingClientRect().width - margins.left - margins.right];
-        const svgHeightRange = [0, d3.selectAll('.data-projection-container').node().getBoundingClientRect().height-2 - margins.top - margins.bottom];
+        const svgWidthRange = [0, d3.selectAll('.projection-svg-container').node().getBoundingClientRect().width - margins.left - margins.right];
+        const svgHeightRange = [0, d3.selectAll('.projection-svg-container').node().getBoundingClientRect().height-2 - margins.top - margins.bottom];
         svgref.node().style.width=svgWidthRange[1]+margins.left+margins.right;
         svgref.node().style.height=svgHeightRange[1]+margins.bottom+margins.top-2;
 
+
+        let selectedProjection, dataRange;
+        if (state.selectedProjection=="UMAP")
+          selectedProjection = input_projection['UMAP']
+        else
+          selectedProjection = input_projection['TSNE']
+        dataRange=calculate_data_range(selectedProjection);
+          
         //finding the data domain and the scale
         const xDomain = [ dataRange[0], dataRange[1] ];
         const yDomain = [ dataRange[2], dataRange[3] ] ;
@@ -100,7 +108,7 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso, data
         const yScale = d3.scaleLinear().domain(yDomain).range([svgHeightRange[1], svgHeightRange[0]]);
         
         //render scatterplot
-        render_scatterplot( chartGroup, xScale, yScale, input_projection);
+        render_scatterplot( chartGroup, xScale, yScale, selectedProjection);
 
         let xLocation= 80/100*svgWidthRange[1];
 
@@ -158,9 +166,46 @@ const DataProjection = ({input_projection, dataRange, birefDataProj, lasso, data
         }
     });
 
+  //calculate the range for the data
+  const calculate_data_range = (inputData) => {
+    let xmin = inputData[0][0]; 
+    let xmax = inputData[0][0];
+    let ymin = inputData[0][1]; 
+    let ymax = inputData[0][1];
+      
+    for( let i=1;i<inputData.length;i++){
+      xmin=Math.min(xmin,inputData[i][0]);      
+      xmax=Math.max(xmax,inputData[i][0]);
+      ymin=Math.min(ymin,inputData[i][1]);      
+      ymax=Math.max(ymax,inputData[i][1]);   
+    }
+    return([xmin,xmax,ymin,ymax]);
+}
+
+  const changeProjection = (event) =>{
+    setState((prevState)=>({...prevState, selectedProjection:event.target.value}));
+  }
   return (
     <>
-      <svg ref={ref}></svg>
+      <div className='projection-options-selection'>
+        <div>
+          <label htmlFor="projectionSelect">Projection:&nbsp;</label>
+          <select value={state.selectedProjection} id="projectionSelect"  onChange={changeProjection}>
+            <option value="UMAP">UMAP</option>
+            <option value="TSNE">TSNE</option>
+
+          </select>
+        </div>
+        <div>
+          <label htmlFor='nodeColorBy'>Node Color:&nbsp;</label>
+          <select id="nodeColorBy" >
+
+          </select>
+        </div>
+      </div>
+      <div className='projection-svg-container'>
+        <svg ref={ref}></svg>
+      </div>
     </>
   )
 }

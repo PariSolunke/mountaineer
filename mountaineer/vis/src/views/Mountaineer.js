@@ -30,7 +30,7 @@ const Mountaineer = ({data}) => {
         comm_callback_example.call();
     }
     */
-
+    console.log(data)
     let lasso = ()=>{
         let items =[],
             closePathDistance = 75,
@@ -289,23 +289,6 @@ const Mountaineer = ({data}) => {
         return lasso;
     };
 
-
-    //calculate the range for the data
-    const calculate_data_range = (inputData) => {
-        let xmin = inputData[0][0]; 
-        let xmax = inputData[0][0];
-        let ymin = inputData[0][1]; 
-        let ymax = inputData[0][1];
-          
-        for( let i=1;i<inputData.length;i++){
-          xmin=Math.min(xmin,inputData[i][0]);      
-          xmax=Math.max(xmax,inputData[i][0]);
-          ymin=Math.min(ymin,inputData[i][1]);      
-          ymax=Math.max(ymax,inputData[i][1]);   
-        }
-        return([xmin,xmax,ymin,ymax]);
-    }
-
     //Whenever brushing interaction occurs in any child component
     const onBrush = (selectedIndices, source, filterStatus) => {
         if (source=="DataProjection"){
@@ -397,9 +380,6 @@ const Mountaineer = ({data}) => {
         columns.push("lens"+(index+1));  
     });
 
-    //range of the input data projection
-    const dataRange = calculate_data_range(data.input_projection);
-
     let minElements, maxElements;
 
     data.mapper_outputs.forEach((mapper)=>{    
@@ -417,13 +397,13 @@ const Mountaineer = ({data}) => {
         <div className='main-wrapper'>
             <div className='viz-wrapper'>
                 <div className='data-projection-container'>
-                    <DataProjection input_projection={data.input_projection} dataRange={dataRange} birefDataProj={birefDataProj} lasso={lasso} dataframe={dataframe}/>
+                    <DataProjection input_projection={data.input_projection} birefDataProj={birefDataProj} lasso={lasso} dataframe={dataframe}/>
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph1} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={1} dataRange={dataRange}/> 
+                    <MapperGraph mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph1} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={1}/> 
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph input_projection={data.input_projection} lens={data.lenses} mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph2} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={2} dataRange={dataRange}/> 
+                    <MapperGraph mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph2} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={2}/> 
                 </div>
             </div>
             <div className='datatable-wrapper'>

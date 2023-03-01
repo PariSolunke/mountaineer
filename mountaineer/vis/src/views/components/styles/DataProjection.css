@@ -12,4 +12,23 @@
     fill-opacity:.3 ;
 }
 
+.projection-svg-container{
+    height: 375px;
+}
 
+
+.projection-options-selection{
+    height: 25px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: center;
+    align-content: center;
+}
+
+.projection-options-selection div{
+    text-align: center;
+}
+
+.projection-options-selection div select{
+    max-width: 50%;
+}

@@ -13,7 +13,6 @@ import * as d3 from 'd3';
 const DistanceMatrix = ({distance_matrix , birefDistMatrix}) => {
 
   const [state,setState]=useState({selected1:0,selected2:1})
-  console.log(state)
   //Update state when the other component is brushed
   function otherBrushed(newMapper, source){
   
@@ -70,8 +69,7 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix}) => {
             .on("click", (d)=>{
               let newI=parseInt(d.target.dataset["i"]);
               let newJ=parseInt(d.target.dataset["j"])
-              console.log(state.selected1, state.selected2)
-              console.log(newI, newJ)
+
               if (!((state.selected1==newI && state.selected2==newJ) ||(state.selected2==newI && state.selected1==newJ))){
                 birefDistMatrix.parent.onMapperSelect(newI, newJ)
                 setState((prevState)=>({...prevState, selected1:newI, selected2:newJ}))
@@ -100,7 +98,6 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix}) => {
             .append("g")
             .attr("transform", `translate(${margins.left},${margins.top})`);
 
-        console.log( JSON.parse(JSON.stringify(svgref.node().style.height=d3.selectAll('.distance-matrix-container').node().getBoundingClientRect().height-2)))
         // svg dimensions
         const svgWidthRange = [0, d3.selectAll('.distance-matrix-container').node().getBoundingClientRect().width - margins.left - margins.right];
         const svgHeightRange = [0, d3.selectAll('.distance-matrix-container').node().getBoundingClientRect().height-2 - margins.top - margins.bottom];

@@ -14,9 +14,6 @@ import { filter, max } from 'd3';
 const AttributionChart = ({column_names , explanations, birefAttribChart}) => {
 
   const  [state, setState]=useState({mapper1:0,mapper2:1, filteredIndices:new Set(), filterStatus:false});
-  //Update state when the other component is brushed
-  console.log(explanations)
-  
 
   //Update chart when the other component is brushed
   function otherBrushed(selectedIndices, status, source){
@@ -99,8 +96,6 @@ for (let [key, value] of Object.entries(summary2)) {
   const clear_plot = (svgref) => {
     svgref.selectAll('*').remove();
   }
-  console.log(graphData1)
-  console.log(graphData2)
 
   const ref = renderD3( 
     (svgref) => {

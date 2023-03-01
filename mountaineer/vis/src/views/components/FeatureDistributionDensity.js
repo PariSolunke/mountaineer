@@ -74,8 +74,6 @@ const FeatureDistributionDensity = ({distributionValues, globalMax, globalMin}) 
       .filter( function(d){return d.dist == "filter1"} )
       .map(function(d){  return d.featureVal; }) )
   
-    console.log(density1)
-    console.log(density2)
     let filtered=true
 
     if(density2[0][1]==null)
@@ -107,8 +105,7 @@ const FeatureDistributionDensity = ({distributionValues, globalMax, globalMin}) 
     .attr("stroke-linejoin", "round")
     .attr("d",  d3.line()
       .curve(d3.curveBasis)
-        .x(function(d) { console.log(d)
-          return xScale(d[0]); })
+        .x(function(d) { return xScale(d[0]); })
         .y(function(d) { return yScale(d[1]); })
     );
 

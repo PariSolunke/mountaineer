@@ -12,7 +12,7 @@ import * as d3 from 'd3';
 
 
 
-const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lensCount, lasso, minElements, maxElements, mapperId, dataRange}) => {
+const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lensCount, lasso, minElements, maxElements, mapperId}) => {
 
   //state to check filtered data
   const [state,setState]=useState({selectedMapper:mapperId-1, nodeColorBy:"lens1", nodeColorAgg:"mean"});
@@ -107,7 +107,6 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
           })
           maxSimIdSet.add(maxSimId);
         }
-        console.log(maxSimIdSet)
         nodes.attr("class",function(d){
             if (maxSimIdSet.has(d.id))
               return  "node-mapper-graph"
@@ -135,7 +134,7 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
   }  
   //render the mapper output plot
 
-  const render_graph = (radiusScale, distanceScale, svgWidthRange, svgHeightRange, xScale, yScale) => {
+  const render_graph = (radiusScale, distanceScale, svgWidthRange, svgHeightRange) => {
     //creating copies of the data 
     let nodes = JSON.parse(JSON.stringify(graphData.nodes));
     let links = JSON.parse(JSON.stringify(graphData.links));
@@ -264,15 +263,7 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
           }
         }
 
-       
-  
-        //the mapper output will be projected along the same dimensions as the input projection
-        const xDomain = [ dataRange[0], dataRange[1] ];
-        const yDomain = [ dataRange[2], dataRange[3] ] ;
-
-        //scales for x and y positions, color, and radii of the nodes
-        const xScale = d3.scaleLinear().domain(xDomain).range(svgWidthRange);
-        const yScale = d3.scaleLinear().domain(yDomain).range([svgHeightRange[1], svgHeightRange[0]]);
+        //scales for color, and radii of the nodes
         const radiusScale = d3.scaleLinear().domain([minElements,maxElements]).range([6,21]);
 
         if (nodeColorAgg=='min')
@@ -283,7 +274,7 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
         const distanceScale=d3.scaleLinear().domain(overlapExtent).range([30,5]);
       
         //render the graph
-        render_graph(radiusScale, distanceScale, svgWidthRange, svgHeightRange, xScale, yScale);
+        render_graph(radiusScale, distanceScale, svgWidthRange, svgHeightRange);
 
         //add brush
         let lassoBrush=lasso()
@@ -323,7 +314,6 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
               }*/
               selectedIds.add(node.__data__.id)
             });       
-            console.log("Selected:", selectedIndices)
             //show only links with source/destination among selected nodes
             links.attr("class",function(d){
               if (selectedIds.has(d.source.id) || selectedIds.has(d.target.id))
@@ -462,7 +452,6 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
   return (
     <>
       <div className='mapper-selection-container'>
-
         <div>
           <label htmlFor="mapperSelect">Mapper:&nbsp;</label>
           <select value={state.selectedMapper} id="mapperSelect"  onChange={changeSelectedMapper}>
@@ -492,9 +481,9 @@ const MapperGraph = ({input_projection, mapper_outputs, overlaps, birefMapperGra
             <option selected={nodeColorAgg=="min"?true:false} value="min">Min</option>
           </select>
         </div>
-
-
       </div>
+
+
       <div className='svg-container'>
       <svg height="373px" width="100%" ref={ref}></svg>
       </div>

@@ -22,7 +22,7 @@ from notebookjs import execute_js
 # from .callbacks import get_reliability_curve, learned_reliability_diagram, confusion, get_table_average
 
 class Mountaineer:
-    input_projection=[]
+    input_projection={}
     mapper_outputs=[]
     lenses=[]
     def __init__(self) -> None:
@@ -43,11 +43,10 @@ class Mountaineer:
         }
 
         #Use TSNE/UMAP to get a 2d projection of the input data
-        if(projection_method=='UMAP'):
-            self.input_projection=umap.UMAP(random_state=42).fit_transform(X).tolist()
+        self.input_projection['UMAP']=umap.UMAP(random_state=42).fit_transform(X).tolist()
 
-        else:
-            self.input_projection=TSNE(n_components=2,random_state=42).fit_transform(X).tolist()
+        
+        self.input_projection['TSNE']=TSNE(n_components=2,random_state=42).fit_transform(X).tolist()
 
         distance_matrix = [[0 for i in range(len(mappers))] for j in range(len(mappers))]
 
