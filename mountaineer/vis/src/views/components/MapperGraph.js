@@ -34,92 +34,47 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
     if(!status){
       links.attr("class","link-mapper-graph link-mapper-graph-default");
       nodes.attr("class","node-mapper-graph");
+      changeNodeColor("resetFilter");
+      document.getElementById("mapper-selection-container"+mapperId).style.display = "block";
+      document.getElementById("densityDisclaimer"+mapperId).style.display = "none";
+      document.getElementById("mapper-selection-container"+mapperId).style.cssText = `
+        height: 25px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        justify-content: center;
+        align-content: center;`;
+      document.querySelectorAll("#mapper-selection-container"+mapperId+" div").style.textAlign="center";
+      document.querySelectorAll("#mapper-selection-container"+mapperId+" div select").style.maxWidth="50%";
+
+
+
     }
 
     else if (source=="DistMatrix"){
       setState((prevState)=>({...prevState, selectedMapper:parseInt(selectedIndices), nodeColorBy:nodeColorBy, nodeColorAgg:nodeColorAgg}));
     }
-    //filter out nodes and edges
-    else if (source=="DataProjection"){
-      let filteredIndices= new Set(selectedIndices);
-      let filteredNodeNames= new Set();
-      
-      for(let i=0; i<nodeNames.length;i++){
-        let nodeName=nodeNames[i];
-        if (mapper_output.nodes[nodeName].some((element) => {return filteredIndices.has(element)}))
-          filteredNodeNames.add(nodeName)
-      }
 
-      nodes.attr("class",function(d){
-        if (filteredNodeNames.has(d.id))
-          return  "node-mapper-graph"
-        else
-          return "node-mapper-graph node-mapper-graph-unselected";
-      });
-
-      links.attr("class",function(d){
-        if(filteredNodeNames.has(d.source.id)||filteredNodeNames.has(d.target.id))
-          return "link-mapper-graph link-mapper-graph-default"
-        else
-          return "link-mapper-graph link-mapper-graph-hide"
-      });
-    }
-
-    else{
-
-        let maxSimIdSet= new Set();
+    else 
+    {
+      let filteredIndices= new Set();
+      if (source=="DataProjection")
+        selectedIndices.forEach(item => filteredIndices.add(item))
+      else{
         for (let subArray of selectedIndices){
-          let filteredIndices= new Set(subArray);
-          let maxSimilarity, maxSimId;
-
-          nodes["_groups"][0].forEach((node)=>{
-              //jaccard
-              let curNodeIndices=new Set(node.__data__.indices)
-              let intersection = new Set([...curNodeIndices].filter(index => filteredIndices.has(index)));
-              let union = new Set([...filteredIndices, ...curNodeIndices])
-              
-              if (maxSimilarity==null){
-                  maxSimilarity= intersection.size/union.size
-                  maxSimId=node.__data__.id;
-              }
-
-              else{
-                  let curSimilarity=intersection.size/union.size
-                  if (curSimilarity>maxSimilarity){
-                      maxSimilarity=curSimilarity
-                      maxSimId=node.__data__.id;
-                  }
-              }
-              //centroid
-              /*
-              if (minDistance==null){
-                  minDistance=Math.sqrt( ((xAvg - node.__data__.xAvg) * (xAvg - node.__data__.xAvg)) + ((yAvg - node.__data__.yAvg) * (yAvg - node.__data__.yAvg)));
-                  minId=node.__data__.id;
-              }
-              else{
-                  let curDistance=Math.sqrt( ((xAvg - node.__data__.xAvg) * (xAvg - node.__data__.xAvg)) + ((yAvg - node.__data__.yAvg) * (yAvg - node.__data__.yAvg)));
-                  if (curDistance<minDistance){
-                      minDistance=curDistance
-                      minId=node.__data__.id;
-                  }
-              }
-              */   
-          })
-          maxSimIdSet.add(maxSimId);
+          subArray.forEach(item => filteredIndices.add(item))
         }
-        nodes.attr("class",function(d){
-            if (maxSimIdSet.has(d.id))
-              return  "node-mapper-graph"
-            else
-              return "node-mapper-graph node-mapper-graph-unselected";
-          });
-    
-          links.attr("class",function(d){
-            if(maxSimIdSet.has(d.source.id) || maxSimIdSet.has(d.target.id))
-              return "link-mapper-graph link-mapper-graph-default"
-            else
-              return "link-mapper-graph link-mapper-graph-hide"
-          });
+      }
+      let densityScale= d3.scaleLinear().domain([0, 1]).range(["#fffcc5", "#8f0026"]);
+      nodes.attr("class","node-mapper-graph")      
+        .attr("fill",function(d){        
+          let currentNodeElements=new Set(d.indices)
+          let intersection = new Set([...filteredIndices].filter(x => currentNodeElements.has(x)));
+          return densityScale(intersection.size/filteredIndices.size);
+      })
+
+      document.getElementById("mapper-selection-container"+mapperId).style.display = "none";
+      document.getElementById("densityDisclaimer"+mapperId).style.display = "block";
+
     }
   } 
 
@@ -174,6 +129,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
       .attr("fill",function(d){
         return colorScale(d.colorVal);
       })
+      .attr("stroke","black")
      // .attr("cx", function(d){return xScale(d.xAvg)})
        // .attr("cy",function(d){return yScale(d.yAvg)})
       //check if nodes are to be shown or hidden
@@ -415,11 +371,12 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
 
     //on change of node feature to color by
     const changeNodeColor = (event) => {
-      if (event.target.id=="nodeColorBy")
-        nodeColorBy=event.target.value;
-      else
-        nodeColorAgg=event.target.value;
-
+      if (event!="resetFilter"){
+        if (event.target.id=="nodeColorBy")
+          nodeColorBy=event.target.value;
+        else
+          nodeColorAgg=event.target.value;
+      }
       let colorMinAvg,colorMaxAvg;
       let nodes=chartGroup.selectAll('.node-mapper-graph')
 
@@ -451,7 +408,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
     
   return (
     <>
-      <div className='mapper-selection-container'>
+      <div id={"mapper-selection-container"+mapperId} className='mapper-selection-container'>
         <div>
           <label htmlFor="mapperSelect">Mapper:&nbsp;</label>
           <select value={state.selectedMapper} id="mapperSelect"  onChange={changeSelectedMapper}>
@@ -482,7 +439,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
           </select>
         </div>
       </div>
-
+      <div id={"densityDisclaimer"+mapperId} style={{display:'none', textAlign:'center'}}>Node Color reflects proportion of filtered points within that node</div>
 
       <div className='svg-container'>
       <svg height="373px" width="100%" ref={ref}></svg>
