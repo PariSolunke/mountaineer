@@ -13,7 +13,7 @@ import * as d3 from 'd3';
 const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => {
   console.log("Projection Re-render")
   //state to check filtered data
-  const [state,setState]=useState({colorBy: "" ,selectedProjection: "UMAP", filteredIndices: new Set(), filterStatus: false });
+  const [state,setState]=useState({colorBy: "class" ,selectedProjection: "UMAP", filteredIndices: new Set(), filterStatus: false });
 
   //Update state when the other component is brushed
   function otherBrushed(selectedIndices,filterStatus, source){
@@ -57,10 +57,21 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
             return "node-input-projection" 
           })
           .attr("fill",(d, i)=>{
-            if ( (dataframe[i]["lens1"]<0.5 && dataframe[i]["y"]>0.5) || (dataframe[i]["lens1"]>=0.5 && dataframe[i]["y"]<0.5)) 
+            if (state.colorBy=='predictionAccuracy'){
+              if ( (dataframe[i]["lens1"]<0.5 && dataframe[i]["y"]>0.5) || (dataframe[i]["lens1"]>=0.5 && dataframe[i]["y"]<0.5)) 
+                return "#d7191c"
+              else
+                return "#2b83ba"
+            }
+            else if (state.colorBy=='class'){
+              if (dataframe[i]["y"]>0.5) 
               return "#d7191c"
             else
-              return "#2b83ba"})
+              return "#2b83ba"
+
+            }
+          })
+            
           .attr("cx", function (d) { return xScale(d[0]); } )
           .attr("cy", function (d) { return yScale(d[1]); } )
           .attr("r", 3)
@@ -113,10 +124,15 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
         let xLocation= 80/100*svgWidthRange[1];
 
         svgref.append("circle").attr("cx",xLocation).attr("cy",10).attr("r", 6).style("fill", "#2b83ba")
-        svgref.append("text").attr("x", xLocation+15).attr("y", 10).text("Correct Prediciton").style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
         svgref.append("circle").attr("cx",xLocation).attr("cy",35).attr("r", 6).style("fill", "#d7191c")
-        svgref.append("text").attr("x", xLocation+15).attr("y", 35).text("Wrong Prediciton").style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
-        
+        if (state.colorBy=="class"){
+          svgref.append("text").attr("x", xLocation+15).attr("y", 10).text("Non Diabetic").style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
+          svgref.append("text").attr("x", xLocation+15).attr("y", 35).text("Diabetic").style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
+        }
+        else{
+          svgref.append("text").attr("x", xLocation+15).attr("y", 10).text("Correct Prediciton").style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
+          svgref.append("text").attr("x", xLocation+15).attr("y", 35).text("Wrong Prediciton").style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
+        }
 
         //add brush
         let lassoBrush=lasso()
@@ -185,6 +201,11 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
   const changeProjection = (event) =>{
     setState((prevState)=>({...prevState, selectedProjection:event.target.value}));
   }
+
+  const changeProjColor = (event) =>{
+    setState((prevState)=>({...prevState, colorBy:event.target.value}));
+  } 
+  
   return (
     <>
       <div className='projection-options-selection'>
@@ -197,9 +218,10 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
           </select>
         </div>
         <div>
-          <label htmlFor='nodeColorBy'>Node Color:&nbsp;</label>
-          <select id="nodeColorBy" >
-
+          <label htmlFor='projNodeColorBy'>Node Color:&nbsp;</label>
+          <select value={state.colorBy} id="projNodeColorBy" onChange={changeProjColor}>
+            <option value="class">Class</option>
+            <option value="predictionAccuracy">Accuracy</option>
           </select>
         </div>
       </div>

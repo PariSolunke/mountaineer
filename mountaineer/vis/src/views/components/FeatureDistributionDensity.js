@@ -59,7 +59,7 @@ const FeatureDistributionDensity = ({distributionValues, globalMax, globalMin}) 
     chartGroup.append("g")
       .attr("class","chart-axes")
       .attr("transform", `translate(0, ${svgHeightRange[1]})`)
-      .call(d3.axisBottom(xScale));
+      .call(d3.axisBottom(xScale).tickSizeOuter(0));
   
 
 

@@ -43,11 +43,6 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         grid-template-columns: 1fr 1fr 1fr;
         justify-content: center;
         align-content: center;`;
-      document.querySelectorAll("#mapper-selection-container"+mapperId+" div").style.textAlign="center";
-      document.querySelectorAll("#mapper-selection-container"+mapperId+" div select").style.maxWidth="50%";
-
-
-
     }
 
     else if (source=="DistMatrix"){
