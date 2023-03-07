@@ -45,10 +45,10 @@ const FeatureDistributionDensity = ({distributionValues, globalMax, globalMin}) 
 
     
     // svg dimensions
-    const svgWidthRange = [0, d3.selectAll('.violin-container').node().getBoundingClientRect().width - margins.left - margins.right];
-    const svgHeightRange = [0, d3.selectAll('.violin-container').node().getBoundingClientRect().height -2 - margins.top - margins.bottom];
-    svgref.node().style.width=d3.selectAll('.violin-container').node().getBoundingClientRect().width;
-    svgref.node().style.height=d3.selectAll('.violin-container').node().getBoundingClientRect().height-2;
+    const svgWidthRange = [0, d3.selectAll('.density-container').node().getBoundingClientRect().width - margins.left - margins.right];
+    const svgHeightRange = [0, d3.selectAll('.density-container').node().getBoundingClientRect().height -2 - margins.top - margins.bottom];
+    svgref.node().style.width=d3.selectAll('.density-container').node().getBoundingClientRect().width;
+    svgref.node().style.height=d3.selectAll('.density-container').node().getBoundingClientRect().height-2;
 
     // X and Y Scales
 

@@ -95,7 +95,7 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
               </select>
               </div>
                 <div className='distribution-wrapper'> 
-                <div className='violin-container'>
+                <div className='density-container'>
                   <FeatureDistributionDensity distributionValues={distributionValues} globalMax={globalMax} globalMin={globalMin} />
                </div>
               </div>

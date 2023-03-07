@@ -60,3 +60,7 @@
 .svg-container{
     height: 375px;
 }
+
+.axis-legend text{
+    fill: black;
+}
