@@ -91,10 +91,10 @@ const FeatureDistributionDensity = ({distributionValues, globalMax, globalMin}) 
       .domain([0, yMax+0.1])
       .range([svgHeightRange[1], svgHeightRange[0]]);
 
-    chartGroup.append("g")
+    /*chartGroup.append("g")
       .attr("class","chart-axes")
-      .call(d3.axisLeft(yScale));
-    
+      .call(d3.axisLeft(yScale).ticks(0));
+    */
   // Plot the area
     chartGroup.append("path")
     .datum(density1)

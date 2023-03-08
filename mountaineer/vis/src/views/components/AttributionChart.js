@@ -11,7 +11,7 @@ import { renderD3 } from '../../hooks/render.hook';
 import * as d3 from 'd3';
 import { filter, max } from 'd3';
 
-const AttributionChart = ({column_names , explanations, birefAttribChart}) => {
+const AttributionChart = ({column_names , explanations, birefAttribChart, labels}) => {
 
   const  [state, setState]=useState({mapper1:0,mapper2:1, filteredIndices:new Set(), filterStatus:false});
 
@@ -176,10 +176,16 @@ for (let [key, value] of Object.entries(summary2)) {
         let xLocation1= 0.25*svgWidthRange[1];
         let xLocation2= 0.70*svgWidthRange[1];
         svgref.append("rect").attr("x",xLocation1).attr("y",3).attr("height",14).attr("width", 14).style("fill", "#7fc97f")
-        svgref.append("text").attr("x", xLocation1+15).attr("y", 10).text("Explanation "+(state.mapper1+1)).style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
         svgref.append("rect").attr("x",xLocation2).attr("y",3).attr("height",14).attr("width", 14).style("fill", "#fdc086")
-        svgref.append("text").attr("x", xLocation2+15).attr("y", 10).text("Explanation "+(state.mapper2+1)).style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
-        
+        if (labels.length>0){
+          svgref.append("text").attr("x", xLocation1+15).attr("y", 10).text(labels[state.mapper1]).style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
+          svgref.append("text").attr("x", xLocation2+15).attr("y", 10).text(labels[state.mapper2]).style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
+
+        }
+        else{
+          svgref.append("text").attr("x", xLocation1+15).attr("y", 10).text("Explanation "+(state.mapper1+1)).style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
+          svgref.append("text").attr("x", xLocation2+15).attr("y", 10).text("Explanation "+(state.mapper2+1)).style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
+        }
 
         
     });
