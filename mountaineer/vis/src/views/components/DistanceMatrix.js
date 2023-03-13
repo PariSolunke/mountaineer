@@ -106,8 +106,11 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix, labels}) => {
       else
         domain = Array.from({length: distance_matrix.length}, (_, i) => i + 1);
 
-      const xScale = d3.scaleBand().domain(domain).range(svgWidthRange).padding(0.01);
-      const yScale = d3.scaleBand().domain(domain).range(svgHeightRange).padding(0.01);
+      let matrixSize = d3.min([svgHeightRange[1], svgWidthRange[1], 40 * distance_matrix.length]);
+  
+      const xScale = d3.scaleBand().domain(domain).range([0,matrixSize]).padding(0.01);
+      const yScale = d3.scaleBand().domain(domain).range([svgHeightRange[1]-matrixSize,svgHeightRange[1]]).padding(0.01);
+        
 
       if (labels.length==0){
         chartGroup.append("g")
