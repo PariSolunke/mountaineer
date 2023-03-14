@@ -35,14 +35,9 @@ const PaginatedTable = ({tableData, columns, lensCount, summary}) => {
               return (
                 <tr>
                   <td>{startIndex+i+1}</td>
-                  {columns.map((column,j)=>{
+                  {columns.map((column)=>{
                     return(
-                      <td>
-                        { j<columns.length-(lensCount+1)
-                            ? row[j].toFixed(4)
-                            : row[column].toFixed(4)
-                        }
-                      </td>
+                      <td> { row[column].toFixed(4)}</td>
                     );
                   })}
                   
@@ -52,7 +47,7 @@ const PaginatedTable = ({tableData, columns, lensCount, summary}) => {
         {
           <tr style={{background:"#c3ebca"}}>
             <td>Avg</td>
-            {columns.map((column,j)=>{  return( <td>{summary[column].toFixed(4)}</td>);})}
+            {columns.map((column)=>{  return( <td>{summary[column].toFixed(4)}</td>);})}
           </tr>
         }
         

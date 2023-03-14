@@ -372,14 +372,28 @@ const Mountaineer = ({data}) => {
     //generating column names if not provided
     let columns=[]
     if (data.column_names==null)
-      columns=Array.from({length: Object.keys(dataframe[0]).length-2}, (_, i) => {return "Feature"+(i + 1)});
+      columns=Array.from({length: Object.keys(data.dataframe[0]).length}, (_, i) => {return "Feature"+(i + 1)});
     else
       columns=JSON.parse(JSON.stringify(data.column_names))
-    columns.push("y");
-    data.lenses.forEach((lens,index) => {
-        columns.push("lens"+(index+1));  
-    });
 
+    let dataframe=data.dataframe.map((obj,i) =>{
+        for (let counter=0; counter< Object.keys(data.dataframe[0]).length; counter++){
+            let newKey = columns[counter] 
+            delete Object.assign(obj, {[newKey]: obj[counter] })[counter];
+        }
+        obj = { ...obj, y: data.y[i]}
+        data.lenses.forEach((lens,j) => {
+            obj[("lens"+(j+1))]= lens[i];            
+        });
+        return obj; 
+    })
+
+    columns.unshift("y");
+    data.lenses.forEach((lens,index) => {
+        columns.unshift("lens"+(index+1));  
+    });
+    console.log(dataframe)
+    console.log(columns)
     let minElements, maxElements;
 
     data.mapper_outputs.forEach((mapper)=>{    

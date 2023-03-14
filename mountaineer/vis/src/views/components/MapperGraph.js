@@ -481,9 +481,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
           <label htmlFor='nodeColorBy'>Node Color:&nbsp;</label>
           <select id="nodeColorBy" onChange={changeNodeColor}>
               {columns.map((column,i) => (
-                i<columns.length-(lensCount+1)?
-                <option selected={column==nodeColorBy?true:false} value={i}>{column}</option>
-                :<option selected={column==nodeColorBy?true:false} value={column}>{column}</option>
+                  <option selected={column==nodeColorBy?true:false} value={column}>{column}</option>
                 ))}
           </select>
         </div>

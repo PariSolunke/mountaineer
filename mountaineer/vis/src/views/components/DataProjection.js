@@ -10,6 +10,9 @@ import './styles/DataProjection.css'
 // d3
 import * as d3 from 'd3';
 
+//alasql
+import * as alasql from 'alasql';
+
 const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => {
   console.log("Projection Re-render")
   //state to check filtered data
@@ -17,7 +20,8 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
 
   //selected indices for brushing
   let selectedIndices=new Set();
-  
+  let res = alasql('SELECT * FROM ?',[dataframe])
+  //console.log(res);
   //Update state when the other component is brushed
   function otherBrushed(indices, source, filterStatus){
     if (source == "DistMatrix" && selectedIndices.size>0)

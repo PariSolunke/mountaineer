@@ -38,17 +38,10 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
       tableData=dataframe.filter((e,i)=>{return state.filteredIndices.has(i) })
 
     //summary for filtered data  
-    columns.forEach((column, ci)=>{
-      if(ci<columns.length-(lensCount+1)){ 
-        summary[column] = (tableData.reduce((accumulator, row) => {
-          return accumulator + row[ci];
-        }, 0))/tableData.length; 
-      }
-      else{
-        summary[column] = (tableData.reduce((accumulator, row) => {
-          return accumulator + row[column];
-        }, 0))/tableData.length; 
-      }
+    columns.forEach((column, ci)=>{     
+      summary[column] = (tableData.reduce((accumulator, row) => {
+        return accumulator + row[column];
+      }, 0))/tableData.length; 
     })
   }
 
@@ -93,11 +86,7 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
               <div style={{textAlign:'left', paddingLeft:'3px', marginTop:'4px' }}>
                 <label htmlFor='selectFeature'>Select Feature:&nbsp;</label>
                 <select id='selectFeature' value={state.selectedFeature} onChange={changeSelectedFeature}>
-                  {columns.map((column,i) => (
-                    i<columns.length-(lensCount+1)?
-                    <option value={i}>{column}</option>
-                    :<option value={column}>{column}</option>
-                ))}
+                  {columns.map((column,i) => (<option value={column}>{column}</option>))}
               </select>
               </div>
                 <div className='distribution-wrapper'> 
