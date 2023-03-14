@@ -15,12 +15,17 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
   //state to check filtered data
   const [state,setState]=useState({colorBy: "class" ,selectedProjection: "UMAP", filteredIndices: new Set(), filterStatus: false });
 
+  //selected indices for brushing
+  let selectedIndices=new Set();
+  
   //Update state when the other component is brushed
-  function otherBrushed(selectedIndices, source, filterStatus){
-    if (source=='MapperGraph1')
-      setState((prevState)=>({...prevState, filteredIndices: new Set(selectedIndices.flat()), filterStatus:filterStatus}));
+  function otherBrushed(indices, source, filterStatus){
+    if (source == "DistMatrix" && selectedIndices.size>0)
+      birefDataProj.parent.onBrush(selectedIndices, "DataProjection", true);
+    else if (source=='MapperGraph1')
+      setState((prevState)=>({...prevState, filteredIndices: new Set(indices.flat()), filterStatus:filterStatus}));
     else if (source=="MapperGraph2")
-      setState((prevState)=>({...prevState, filteredIndices: new Set(selectedIndices.flat()), filterStatus:filterStatus}));
+      setState((prevState)=>({...prevState, filteredIndices: new Set(indices.flat()), filterStatus:filterStatus}));
 
   } 
   
@@ -29,8 +34,7 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
     otherBrushed: otherBrushed
   };
 
-  //selected indices for brushing
-  let selectedIndices=new Set();
+
 
   //clear plotDataProjection
   const clear_plot = (svgref) => {

@@ -317,6 +317,7 @@ const Mountaineer = ({data}) => {
         birefMapperGraph1.child.otherBrushed(mapper1, "DistMatrix", true);
         birefMapperGraph2.child.otherBrushed(mapper2, "DistMatrix", true);
         birefAttribChart.child.mapperChanged([mapper1, mapper2], "DistMatrix")
+        birefDataProj.child.otherBrushed([], "DistMatrix", "")
 
     }
     
