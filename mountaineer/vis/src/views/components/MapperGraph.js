@@ -33,7 +33,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
   let svgHeightRange,svgWidthRange; 
 
   //Update nodes and links when the other component is brushed
-  function otherBrushed(selectedIndices, status, source){
+  function otherBrushed(selectedIndices, source, status){
     let links=chartGroup.selectAll('.link-mapper-graph');
     let nodes=chartGroup.selectAll('.node-mapper-graph')
     //if status is false, reset the view to default
@@ -248,7 +248,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         let defs = svgref.append("defs");
 
         let linearGradient = defs.append("linearGradient")
-          .attr("id", "linear-gradient");
+          .attr("id", "linear-gradient-mapper"+mapperId);
     
         linearGradient
           .attr("x1", "0%")
@@ -270,7 +270,9 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
           .attr("y",margins.top)
           .attr("width", 10)
           .attr("height", svgHeightRange[1])
-          .style("fill", "url(#linear-gradient)")
+          .style("fill", `url(#linear-gradient-mapper${mapperId})`)
+
+    
         
         yScaleLegend = d3.scaleLinear()
           .range([svgHeightRange[1]+margins.top, margins.top])
@@ -333,6 +335,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
 
           //case where no node is selected, disables filters
           else{
+            otherBrushed(selectedIndices, "MapperGraph"+mapperId, false);
             birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph"+mapperId, false);
           }
         }

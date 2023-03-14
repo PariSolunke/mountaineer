@@ -36,14 +36,8 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix, labels}) => {
 
 
   //render the distance matrix
-  const render_heatmap = ( chartGroup, xScale, yScale, domain ) => {
-    let maxDist=0;
-    distance_matrix.forEach(subArr => {
-        maxDist=Math.max(maxDist,d3.max(subArr))
-    });
-    let colorScale=d3.scaleLinear()
-    .range(['#ffffcc','#b10026'])
-    .domain([0,maxDist])
+  const render_heatmap = ( chartGroup, xScale, yScale, domain, colorScale) => {
+
 
     for(let i=0;i<distance_matrix.length;i++){
       for(let j=i;j<distance_matrix.length;j++){
@@ -74,6 +68,8 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix, labels}) => {
           })
       }
     }
+
+    
   }
 
   const ref = renderD3( 
@@ -84,7 +80,7 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix, labels}) => {
       // margins
       let margins;
       if (labels.length>0)
-        margins = { top: 5, left:60, right:  5, bottom: 50 }
+        margins = { top: 5, left:70, right:  10, bottom: 60 }
       else
         margins = { top: 10, left:20, right:  10, bottom: 20 }
 
@@ -141,9 +137,61 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix, labels}) => {
           .attr("transform", "rotate(-30)");
 
       }
-      
+
+      let maxDist=0;
+      distance_matrix.forEach(subArr => {
+          maxDist=Math.max(maxDist,d3.max(subArr))
+      });
+      let colorScale=d3.scaleLinear()
+        .range(['#ffffcc','#b10026'])
+        .domain([0,maxDist])  
+
+      let defs = svgref.append("defs");
+
+        let linearGradient = defs.append("linearGradient")
+          .attr("id", "linear-gradient-distmatrix");
+    
+        linearGradient
+          .attr("x1", "0%")
+          .attr("y1", "0%")
+          .attr("x2", "100%")
+          .attr("y2", "0%");
+    
+        linearGradient.append("stop")
+          .attr("offset", "0%")
+          .attr("stop-color", "#ffffcc");
+    
+        linearGradient.append("stop")
+          .attr("offset", "100%")
+          .attr("stop-color", "#b10026"); 
+    
+        //Draw the rectangle and fill with gradient
+        svgref.append("rect")
+          .attr("x",margins.left+svgWidthRange[1]/2)
+          .attr("y",margins.top)
+          .attr("width", svgWidthRange[1]/2)
+          .attr("height", 10)
+          .style("fill", "url(#linear-gradient-distmatrix)")
+        
+        let xScaleLegend = d3.scaleLinear()
+          .range([margins.left+svgWidthRange[1]/2, margins.left+ svgWidthRange[1]])
+          .domain([0, maxDist]);
+    
+        svgref.append("g")
+          .attr("class","axis-legend")
+          .attr("transform", `translate(0, ${margins.top+ 10})`)
+          .call(d3.axisBottom(xScaleLegend).ticks(4))
+          .call(g => g.select(".domain").remove());
+
+        svgref.append("text")
+          .attr("class", "x label")
+          .attr("text-anchor", "middle")
+          .attr("x", margins.left+ svgWidthRange[1]*0.75)
+          .attr("y", margins.top + 40)
+          .text("Bottleneck Distance");
+
       //render heatmap
-      render_heatmap( chartGroup, xScale, yScale, domain);
+      render_heatmap( chartGroup, xScale, yScale, domain, colorScale);
       
     });
 

@@ -16,7 +16,7 @@ const AttributionChart = ({column_names , explanations, birefAttribChart, labels
   const  [state, setState]=useState({mapper1:0,mapper2:1, filteredIndices:new Set(), filterStatus:false});
 
   //Update chart when the other component is brushed
-  function otherBrushed(selectedIndices, status, source){
+  function otherBrushed(selectedIndices, source, status){
     if (!status)
       setState((prevState)=>({...prevState, filteredIndices:new Set(), filterStatus:false })) 
     if (source=="MapperGraph1" || source=="MapperGraph2")

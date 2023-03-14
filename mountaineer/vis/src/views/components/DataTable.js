@@ -9,7 +9,7 @@ import  './styles/DataTable.css'
 const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
 
   //state to check filtered data
-  const [state,setState]=useState({selectedTab: 'distribution', selectedFeature:"lens1", filteredIndices: new Set(), filterStatus: false});
+  const [state,setState]=useState({selectedTab: 'table', selectedFeature:"lens1", filteredIndices: new Set(), filterStatus: false});
 
   let tableData=[];
   let distributionValues=[];
@@ -17,7 +17,7 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
   let summary={};
 
   //Update state when the other component is brushed
-  function otherBrushed(selectedIndices,filterStatus, source){
+  function otherBrushed(selectedIndices, source, filterStatus){
     if (source=='MapperGraph1' || source=="MapperGraph2")
       setState((prevState)=>({...prevState, filteredIndices:new Set(selectedIndices.flat()), filterStatus: filterStatus}));
     else if(source=="DataProjection")
@@ -81,6 +81,12 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
   
   return (
     <Tabs id="TabComponent" activeKey={state.selectedTab} justify={true} variant='tabs' onSelect={(k) =>setState((prevState)=>({...prevState, selectedTab: k}))} transition={false}>
+      <Tab eventKey="table" title="Table">
+        { state.selectedTab=='table' &&
+          <PaginatedTable tableData={tableData} columns={columns} lensCount={lensCount} summary={summary}/>
+        }
+      </Tab>
+
       <Tab eventKey="distribution" title="Data Distribution Density">
           {state.selectedTab=='distribution' &&
             <>
@@ -102,12 +108,6 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
             </>
       
           }
-      </Tab>
-
-      <Tab eventKey="table" title="Table">
-        { state.selectedTab=='table' &&
-          <PaginatedTable tableData={tableData} columns={columns} lensCount={lensCount} summary={summary}/>
-        }
       </Tab>
     </Tabs>
   )

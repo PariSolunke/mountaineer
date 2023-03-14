@@ -291,31 +291,31 @@ const Mountaineer = ({data}) => {
     //Whenever brushing interaction occurs in any child component
     const onBrush = (selectedIndices, source, filterStatus) => {
         if (source=="DataProjection"){
-            birefMapperGraph1.child.otherBrushed(selectedIndices, filterStatus, source);
-            birefMapperGraph2.child.otherBrushed(selectedIndices, filterStatus, source);
-            birefDataTable.child.otherBrushed(selectedIndices, filterStatus, source);
-            birefAttribChart.child.otherBrushed(selectedIndices, filterStatus, source)
+            birefMapperGraph1.child.otherBrushed(selectedIndices, source, filterStatus);
+            birefMapperGraph2.child.otherBrushed(selectedIndices, source, filterStatus);
+            birefDataTable.child.otherBrushed(selectedIndices, source, filterStatus);
+            birefAttribChart.child.otherBrushed(selectedIndices, source, filterStatus)
 
 
         }
         else if (source=="MapperGraph1"){
-            birefDataProj.child.otherBrushed(selectedIndices, filterStatus, source);
-            birefDataTable.child.otherBrushed(selectedIndices, filterStatus, source);
-            birefMapperGraph2.child.otherBrushed(selectedIndices, filterStatus, source);
-            birefAttribChart.child.otherBrushed(selectedIndices, filterStatus, source)
+            birefDataProj.child.otherBrushed(selectedIndices, source, filterStatus);
+            birefDataTable.child.otherBrushed(selectedIndices, source, filterStatus);
+            birefMapperGraph2.child.otherBrushed(selectedIndices, source, filterStatus);
+            birefAttribChart.child.otherBrushed(selectedIndices, source, filterStatus)
         }
 
         else if (source=="MapperGraph2"){
-            birefDataProj.child.otherBrushed(selectedIndices, filterStatus, source);
-            birefDataTable.child.otherBrushed(selectedIndices, filterStatus, source);
-            birefMapperGraph1.child.otherBrushed(selectedIndices, filterStatus, source);
-            birefAttribChart.child.otherBrushed(selectedIndices, filterStatus, source)
+            birefDataProj.child.otherBrushed(selectedIndices, source, filterStatus);
+            birefDataTable.child.otherBrushed(selectedIndices, source, filterStatus);
+            birefMapperGraph1.child.otherBrushed(selectedIndices, source, filterStatus);
+            birefAttribChart.child.otherBrushed(selectedIndices, source, filterStatus)
         }
     }
 
     const onMapperSelect = (mapper1, mapper2) =>{
-        birefMapperGraph1.child.otherBrushed(mapper1, true, "DistMatrix");
-        birefMapperGraph2.child.otherBrushed(mapper2, true, "DistMatrix");
+        birefMapperGraph1.child.otherBrushed(mapper1, "DistMatrix", true);
+        birefMapperGraph2.child.otherBrushed(mapper2, "DistMatrix", true);
         birefAttribChart.child.mapperChanged([mapper1, mapper2], "DistMatrix")
 
     }

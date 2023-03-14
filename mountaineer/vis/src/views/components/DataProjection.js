@@ -16,7 +16,7 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
   const [state,setState]=useState({colorBy: "class" ,selectedProjection: "UMAP", filteredIndices: new Set(), filterStatus: false });
 
   //Update state when the other component is brushed
-  function otherBrushed(selectedIndices,filterStatus, source){
+  function otherBrushed(selectedIndices, source, filterStatus){
     if (source=='MapperGraph1')
       setState((prevState)=>({...prevState, filteredIndices: new Set(selectedIndices.flat()), filterStatus:filterStatus}));
     else if (source=="MapperGraph2")
