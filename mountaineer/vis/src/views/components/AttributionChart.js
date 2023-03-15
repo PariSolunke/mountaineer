@@ -45,6 +45,9 @@ const AttributionChart = ({column_names , explanations, birefAttribChart, labels
   let maxVal1, maxVal2
   let summary1={}, summary2={};
 
+  let divisor = state.filteredIndices.size
+  if (divisor == 0)
+    divisor = explanations[state.mapper1].length
   column_names.forEach((column, ci)=>{
     
     summary1[column] = (explanations[state.mapper1].reduce((accumulator, row, i) => {
@@ -56,7 +59,8 @@ const AttributionChart = ({column_names , explanations, birefAttribChart, labels
       }
       else
         return accumulator + row[ci];
-    }, 0))/(explanations[state.mapper1].length-state.filteredIndices.size);
+    }, 0))/divisor;
+    
     if (maxVal1==null)
       maxVal1=Math.abs(summary1[column])
     else 
@@ -71,7 +75,7 @@ const AttributionChart = ({column_names , explanations, birefAttribChart, labels
         }
       else
         return accumulator + row[ci];
-    }, 0))/(explanations[state.mapper2].length-state.filteredIndices.size);
+    }, 0))/divisor;
 
     if (maxVal2==null)
       maxVal2=Math.abs(summary2[column])

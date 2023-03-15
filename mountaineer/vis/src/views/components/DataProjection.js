@@ -14,7 +14,6 @@ import * as d3 from 'd3';
 import * as alasql from 'alasql';
 
 const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => {
-  console.log("Projection Re-render")
   //state to check filtered data
   const [state,setState]=useState({colorBy: "class" ,selectedProjection: "UMAP", filteredIndices: new Set(), filterStatus: false });
 
@@ -166,7 +165,7 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
 
         //on drawing of lasso
         function lasso_end(){
-
+          document.getElementById("sqlCondition").value='';
           selectedIndices.clear()          
           let nodesSelected=lassoBrush.selectedItems()["_groups"][0];
 

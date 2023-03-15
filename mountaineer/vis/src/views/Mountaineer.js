@@ -397,6 +397,14 @@ const Mountaineer = ({data}) => {
         }
     })
     
+
+    let globalSummary={};
+    columns.forEach((column, ci)=>{     
+        globalSummary[column] = (dataframe.reduce((accumulator, row) => {
+          return accumulator + row[column];
+        }, 0))/dataframe.length; 
+      })
+
     return (
         <div className='main-wrapper'>
             <div className='viz-wrapper'>
@@ -415,7 +423,7 @@ const Mountaineer = ({data}) => {
                     <DistanceMatrix distance_matrix={data.distance_matrix} birefDistMatrix={birefDistMatrix} labels={data.labels}/>
                 </div>
                 <div className='datatable-container'>
-                    <DataTable dataframe={dataframe} birefDataTable={birefDataTable} columns={columns} lensCount={data.lenses.length} />
+                    <DataTable dataframe={dataframe} birefDataTable={birefDataTable} columns={columns} lensCount={data.lenses.length} globalSummary={globalSummary} />
                 </div>
                 <div className='attributions-container'>
                     <AttributionChart column_names={data.column_names} explanations={data.explanation_list} birefAttribChart={birefAttribChart} labels={data.labels}/>

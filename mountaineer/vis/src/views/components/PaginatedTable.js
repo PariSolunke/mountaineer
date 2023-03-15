@@ -3,12 +3,12 @@ import { Table } from 'react-bootstrap';
 import './styles/PaginatedTable.css'
 import Pagination from './Pagination.js';
 
-const PaginatedTable = ({tableData, columns, lensCount, summary}) => {
+const PaginatedTable = ({tableData, columns, lensCount, filteredSummary, globalSummary, filterStatus}) => {
     
     
     const [state,setState]=useState({currentPage:1, sort:"none"})
 
-    let pageSize=6;
+    let pageSize=5;
     let startIndex=(state.currentPage-1)*pageSize;
     let displayData=tableData.slice(startIndex,startIndex+pageSize);
 
@@ -21,7 +21,7 @@ const PaginatedTable = ({tableData, columns, lensCount, summary}) => {
         <Table responsive striped>
           <thead>
           <tr>
-          <th style={{width:"30px"}}>#</th>
+          <th style={{width:"50px"}}>#</th>
             {columns.map(column => {
                 return (
                     <th>{column}</th>
@@ -45,9 +45,16 @@ const PaginatedTable = ({tableData, columns, lensCount, summary}) => {
               );})
         }
         {
+          filterStatus &&
           <tr style={{background:"#c3ebca"}}>
-            <td>Avg</td>
-            {columns.map((column)=>{  return( <td>{summary[column].toFixed(4)}</td>);})}
+            <td>FilteredAvg</td>
+            {columns.map((column)=>{  return( <td style={filteredSummary[column]>globalSummary[column]? {fontWeight: 950} : {fontWeight: 50} }> {filteredSummary[column].toFixed(4)}</td>);})}
+          </tr>
+        }
+        {
+          <tr style={{background:"#c3ebca"}}>
+            <td>GlobalAvg</td>
+            {columns.map((column)=>{  return( <td style={filterStatus? (filteredSummary[column]<globalSummary[column] ? {fontWeight: 950} : {fontWeight: 50}) : {}}>{globalSummary[column].toFixed(4)}</td>);})}
           </tr>
         }
         

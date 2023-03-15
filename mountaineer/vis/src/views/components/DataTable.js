@@ -6,7 +6,7 @@ import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import  './styles/DataTable.css'
 
-const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
+const DataTable = ({dataframe, birefDataTable, columns, lensCount, globalSummary}) => {
 
   //state to check filtered data
   const [state,setState]=useState({selectedTab: 'table', selectedFeature:"lens1", filteredIndices: new Set(), filterStatus: false});
@@ -14,8 +14,7 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
   let tableData=[];
   let distributionValues=[];
   let globalMax,globalMin;
-  let summary={};
-
+  let filteredSummary={};
   //Update state when the other component is brushed
   function otherBrushed(selectedIndices, source, filterStatus){
     if (source=='MapperGraph1' || source=="MapperGraph2")
@@ -37,9 +36,9 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
     else
       tableData=dataframe.filter((e,i)=>{return state.filteredIndices.has(i) })
 
-    //summary for filtered data  
+    //filteredSummary for filtered data  
     columns.forEach((column, ci)=>{     
-      summary[column] = (tableData.reduce((accumulator, row) => {
+      filteredSummary[column] = (tableData.reduce((accumulator, row) => {
         return accumulator + row[column];
       }, 0))/tableData.length; 
     })
@@ -76,7 +75,7 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount}) => {
     <Tabs id="TabComponent" activeKey={state.selectedTab} justify={true} variant='tabs' onSelect={(k) =>setState((prevState)=>({...prevState, selectedTab: k}))} transition={false}>
       <Tab eventKey="table" title="Table">
         { state.selectedTab=='table' &&
-          <PaginatedTable tableData={tableData} columns={columns} lensCount={lensCount} summary={summary}/>
+          <PaginatedTable tableData={tableData} columns={columns} lensCount={lensCount} filteredSummary={filteredSummary} globalSummary={globalSummary} filterStatus={state.filterStatus}/>
         }
       </Tab>
 
