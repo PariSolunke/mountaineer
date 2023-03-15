@@ -359,15 +359,6 @@ const Mountaineer = ({data}) => {
     }
 
     var birefAttribChart = {};
-    
-    //combining data, y and lenses into a dataframe
-    let dataframe=data.dataframe.map((obj,i) =>{ 
-        obj = { ...obj, y: data.y[i]}
-        data.lenses.forEach((lens,j) => {
-            obj[("lens"+(j+1))]= lens[i];            
-        });
-        return obj; 
-    })
 
     //generating column names if not provided
     let columns=[]
@@ -381,7 +372,7 @@ const Mountaineer = ({data}) => {
             let newKey = columns[counter] 
             delete Object.assign(obj, {[newKey]: obj[counter] })[counter];
         }
-        obj = { ...obj, y: data.y[i]}
+        obj = { ...obj, y: data.y[i], rowIndex:i}
         data.lenses.forEach((lens,j) => {
             obj[("lens"+(j+1))]= lens[i];            
         });
@@ -392,8 +383,7 @@ const Mountaineer = ({data}) => {
     data.lenses.forEach((lens,index) => {
         columns.unshift("lens"+(index+1));  
     });
-    console.log(dataframe)
-    console.log(columns)
+
     let minElements, maxElements;
 
     data.mapper_outputs.forEach((mapper)=>{    

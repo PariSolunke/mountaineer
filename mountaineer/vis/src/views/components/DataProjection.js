@@ -21,11 +21,22 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
   //selected indices for brushing
   let selectedIndices=new Set();
   let res = alasql('SELECT * FROM ?',[dataframe])
-  //console.log(res);
+  console.log("sql:",res);
+  console.log(alasql('SELECT * FROM ? WHERE no_times_pregnant>5 AND bmi>30',[dataframe]));
+    
+  try {
+    console.log(alasql('SELECT * FROM ? WHERE no>5 AND bmi>30',[dataframe]));
+    } catch (error) {
+      //alert("SQL Error - please check syntax or column names");
+      console.log(error)
+    } 
+
   //Update state when the other component is brushed
   function otherBrushed(indices, source, filterStatus){
     if (source == "DistMatrix" && selectedIndices.size>0)
       birefDataProj.parent.onBrush(selectedIndices, "DataProjection", true);
+    else if (source == "DistMatrix" && state.filterStatus==true)
+      setState((prevState)=>({...prevState, filteredIndices: new Set(), filterStatus:false}));
     else if (source=='MapperGraph1')
       setState((prevState)=>({...prevState, filteredIndices: new Set(indices.flat()), filterStatus:filterStatus}));
     else if (source=="MapperGraph2")
@@ -182,9 +193,11 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
           }
           //case where no nodes are selectet - reset filters and inform parent
           else{
-            lassoBrush.items()
-            .attr("class","node-input-projection");
             birefDataProj.parent.onBrush(selectedIndices, "DataProjection", false);
+            if (state.filterStatus)
+              setState((prevState)=>({...prevState, filteredIndices: new Set(), filterStatus:false}))
+            else
+              lassoBrush.items().attr("class","node-input-projection");
           }
 
         }
@@ -207,10 +220,16 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
 }
 
   const changeProjection = (event) =>{
+    if(selectedIndices.size>0){
+      birefDataProj.parent.onBrush(new Set(), "DataProjection", false);
+    } 
     setState((prevState)=>({...prevState, selectedProjection:event.target.value}));
   }
 
   const changeProjColor = (event) =>{
+    if(selectedIndices.size>0){
+      birefDataProj.parent.onBrush(new Set(), "DataProjection", false);
+    }
     setState((prevState)=>({...prevState, colorBy:event.target.value}));
   } 
   

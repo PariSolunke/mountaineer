@@ -37,7 +37,10 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
     let links=chartGroup.selectAll('.link-mapper-graph');
     let nodes=chartGroup.selectAll('.node-mapper-graph')
     //if status is false, reset the view to default
-    if(!status){
+    if(source=="DistMatrix" || status==false){
+      if (source=="DistMatrix")
+        setState((prevState)=>({...prevState, selectedMapper:parseInt(selectedIndices), nodeColorBy:nodeColorBy, nodeColorAgg:nodeColorAgg}));
+
       links.attr("class","link-mapper-graph link-mapper-graph-default");
       nodes.attr("class","node-mapper-graph");
       changeNodeColor("resetFilter");
@@ -56,13 +59,10 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         .call(d3.axisRight(yScaleLegend).ticks(10))
         .call(g => g.select(".domain").remove());
     }
-
-    else if (source=="DistMatrix"){
-      setState((prevState)=>({...prevState, selectedMapper:parseInt(selectedIndices), nodeColorBy:nodeColorBy, nodeColorAgg:nodeColorAgg}));
-    }
-
+    
     else 
     {
+      links.attr("class","link-mapper-graph link-mapper-graph-default");
       let filteredIndices= new Set();
       if (source=="DataProjection")
         selectedIndices.forEach(item => filteredIndices.add(item))
