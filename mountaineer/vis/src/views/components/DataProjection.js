@@ -25,14 +25,21 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe, clas
 
   //Update state when the other component is brushed
   function otherBrushed(indices, source, filterStatus){
+    
     if (source == "DistMatrix" && selectedIndices.size>0)
       birefDataProj.parent.onBrush(selectedIndices, "DataProjection", true);
-    else if (source == "DistMatrix" && state.filterStatus==true)
+    else if (source == "DistMatrix" && state.filterStatus==true){
+      document.getElementById("sqlCondition").value='';
       setState((prevState)=>({...prevState, filteredIndices: new Set(), filterStatus:false}));
-    else if (source=='MapperGraph1')
+    }
+    else if (source=='MapperGraph1'){
+      document.getElementById("sqlCondition").value='';
       setState((prevState)=>({...prevState, filteredIndices: new Set(indices.flat()), filterStatus:filterStatus}));
-    else if (source=="MapperGraph2")
+    }
+    else if (source=="MapperGraph2"){
+      document.getElementById("sqlCondition").value='';
       setState((prevState)=>({...prevState, filteredIndices: new Set(indices.flat()), filterStatus:filterStatus}));
+    }
 
   } 
   
