@@ -19,17 +19,10 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
   const [state,setState]=useState({colorBy: "class" ,selectedProjection: "UMAP", filteredIndices: new Set(), filterStatus: false });
 
   //selected indices for brushing
+  let chartGroup;
   let selectedIndices=new Set();
-  let res = alasql('SELECT * FROM ?',[dataframe])
-  console.log("sql:",res);
-  console.log(alasql('SELECT * FROM ? WHERE no_times_pregnant>5 AND bmi>30',[dataframe]));
-    
-  try {
-    console.log(alasql('SELECT * FROM ? WHERE no>5 AND bmi>30',[dataframe]));
-    } catch (error) {
-      //alert("SQL Error - please check syntax or column names");
-      console.log(error)
-    } 
+  
+
 
   //Update state when the other component is brushed
   function otherBrushed(indices, source, filterStatus){
@@ -98,7 +91,7 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
   }
 
   const ref = renderD3( 
-    (svgref) => {
+      (svgref) => {
 
         //clear the plot 
         clear_plot(svgref);
@@ -112,7 +105,7 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
         }
         
         //appending group to svgref
-        const chartGroup = svgref
+        chartGroup = svgref
             .append("g")
             .attr("transform", `translate(${margins.left},${margins.top})`);
 
@@ -191,7 +184,7 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
             birefDataProj.parent.onBrush(selectedIndices, "DataProjection", true);
 
           }
-          //case where no nodes are selectet - reset filters and inform parent
+          //case where no nodes are selected - reset filters and inform parent
           else{
             birefDataProj.parent.onBrush(selectedIndices, "DataProjection", false);
             if (state.filterStatus)
@@ -199,7 +192,6 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
             else
               lassoBrush.items().attr("class","node-input-projection");
           }
-
         }
     });
 
@@ -231,6 +223,43 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
       birefDataProj.parent.onBrush(new Set(), "DataProjection", false);
     }
     setState((prevState)=>({...prevState, colorBy:event.target.value}));
+  }
+  
+  const handleSQLSubmit = (event) =>{
+  
+    let result;
+    let sqlError=false;
+      
+    try{
+      let textInput= document.getElementById("sqlCondition").value;
+      let query = "SELECT * FROM ? WHERE " + textInput;
+      result = alasql(query,[dataframe]);
+    } 
+    catch(error){
+        sqlError = true;
+        alert("SQL Error - please check syntax or column names");
+    }
+    if (!sqlError){
+      selectedIndices.clear()
+      if (result.length>0){
+        result.forEach((row)=>{
+          selectedIndices.add(row.rowIndex)
+        })
+        let nodes=chartGroup.selectAll('.node-input-projection')["_groups"][0];
+            //add nodes to selected indices set and send this to parent
+        nodes.forEach((node,i) =>{
+          if(selectedIndices.has(i))
+            node.setAttribute('class', 'node-input-projection node-input-projection-selected') 
+          else
+            node.setAttribute('class', 'node-input-projection node-input-projection-unselected')           
+        });
+        birefDataProj.parent.onBrush(selectedIndices, "DataProjection", true);      
+      }
+      else
+        alert("No matches for given SQL conditions");
+    }  
+
+
   } 
   
   return (
@@ -254,6 +283,13 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
       </div>
       <div className='projection-svg-container'>
         <svg ref={ref}></svg>
+      </div>
+      <div className='sql-form'>
+          <label for="sqlCondition">
+            SELECT * FROM DATA WHERE 
+          </label>
+          <input id="sqlCondition" type="text" placeholder="Enter SQL Condition/s for custom filtering"/>
+          <input type="button" value="Submit" onClick={handleSQLSubmit} />
       </div>
     </>
   )
