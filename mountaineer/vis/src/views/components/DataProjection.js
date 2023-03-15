@@ -13,7 +13,7 @@ import * as d3 from 'd3';
 //alasql
 import * as alasql from 'alasql';
 
-const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => {
+const DataProjection = ({input_projection, birefDataProj, lasso, dataframe, class_labels}) => {
   //state to check filtered data
   const [state,setState]=useState({colorBy: "class" ,selectedProjection: "UMAP", filteredIndices: new Set(), filterStatus: false });
 
@@ -137,8 +137,8 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe}) => 
         svgref.append("circle").attr("cx",xLocation).attr("cy",10).attr("r", 6).style("fill", "#2b83ba")
         svgref.append("circle").attr("cx",xLocation).attr("cy",35).attr("r", 6).style("fill", "#d7191c")
         if (state.colorBy=="class"){
-          svgref.append("text").attr("x", xLocation+15).attr("y", 10).text("Non Diabetic").style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
-          svgref.append("text").attr("x", xLocation+15).attr("y", 35).text("Diabetic").style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
+          svgref.append("text").attr("x", xLocation+15).attr("y", 10).text(class_labels[0]).style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
+          svgref.append("text").attr("x", xLocation+15).attr("y", 35).text(class_labels[1]).style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")
         }
         else{
           svgref.append("text").attr("x", xLocation+15).attr("y", 10).text("Correct Prediciton").style("font-size", "13px").attr("alignment-baseline","middle").style("fill","black")

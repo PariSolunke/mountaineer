@@ -31,7 +31,7 @@ class Mountaineer:
         with open('./mountaineer/vis/dist/mountaineer.js') as f:
             self.visapp = f.read()
 
-    def visualize(self, X, y, mappers, lenses, explanation_list, column_names=None, projection_method='TSNE', labels=[]):
+    def visualize(self, X, y, mappers, lenses, explanation_list, column_names=None, projection_method='TSNE', expl_labels=[], class_labels={1:'Class 1', 0:'Class 2'}):
         self.mapper_outputs=[]
         self.lenses=copy.deepcopy(lenses)
         overlaps=[]
@@ -91,7 +91,8 @@ class Mountaineer:
             'column_names': column_names.tolist(),
             'distance_matrix':distance_matrix,
             'explanation_list':explanation_list,
-            'labels':labels
+            'expl_labels':expl_labels,
+            'class_labels':class_labels
         }
 
         #Execute and send data to the frontend

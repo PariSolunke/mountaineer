@@ -12,7 +12,7 @@ import * as d3 from 'd3';
 
 
 
-const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lensCount, lasso, minElements, maxElements, mapperId, labels}) => {
+const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lensCount, lasso, minElements, maxElements, mapperId, expl_labels}) => {
 
   //state to check filtered data
   const [state,setState]=useState({selectedMapper:mapperId-1, nodeColorBy:"lens1", nodeColorAgg:"mean"});
@@ -470,8 +470,8 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
           <select value={state.selectedMapper} id="mapperSelect"  onChange={changeSelectedMapper}>
               {
               mapper_outputs.map((mapper,i) => (
-                labels.length>0?
-                <option value={i}>{labels[i]}</option>
+                expl_labels.length>0?
+                <option value={i}>{expl_labels[i]}</option>
                 :
                 <option value={i}>Expl{" "+(i+1)}</option>
                 ))}

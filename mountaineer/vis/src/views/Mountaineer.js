@@ -404,29 +404,30 @@ const Mountaineer = ({data}) => {
           return accumulator + row[column];
         }, 0))/dataframe.length; 
       })
+      
 
     return (
         <div className='main-wrapper'>
             <div className='viz-wrapper'>
                 <div className='data-projection-container'>
-                    <DataProjection input_projection={data.input_projection} birefDataProj={birefDataProj} lasso={lasso} dataframe={dataframe}/>
+                    <DataProjection input_projection={data.input_projection} birefDataProj={birefDataProj} lasso={lasso} dataframe={dataframe} class_labels= {data.class_labels}/>
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph1} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={1} labels={data.labels}/> 
+                    <MapperGraph mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph1} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={1} expl_labels={data.expl_labels}/> 
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph2} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={2} labels={data.labels}/> 
+                    <MapperGraph mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph2} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={2} expl_labels={data.expl_labels}/> 
                 </div>
             </div>
             <div className='datatable-wrapper'>
                 <div className='distance-matrix-container'>
-                    <DistanceMatrix distance_matrix={data.distance_matrix} birefDistMatrix={birefDistMatrix} labels={data.labels}/>
+                    <DistanceMatrix distance_matrix={data.distance_matrix} birefDistMatrix={birefDistMatrix} expl_labels={data.expl_labels}/>
                 </div>
                 <div className='datatable-container'>
                     <DataTable dataframe={dataframe} birefDataTable={birefDataTable} columns={columns} lensCount={data.lenses.length} globalSummary={globalSummary} />
                 </div>
                 <div className='attributions-container'>
-                    <AttributionChart column_names={data.column_names} explanations={data.explanation_list} birefAttribChart={birefAttribChart} labels={data.labels}/>
+                    <AttributionChart column_names={data.column_names} explanations={data.explanation_list} birefAttribChart={birefAttribChart} expl_labels={data.expl_labels}/>
                 </div>
 
                 

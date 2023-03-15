@@ -10,7 +10,7 @@ import './styles/DistanceMatrix.css'
 // d3
 import * as d3 from 'd3';
 
-const DistanceMatrix = ({distance_matrix , birefDistMatrix, labels}) => {
+const DistanceMatrix = ({distance_matrix , birefDistMatrix, expl_labels}) => {
 
   const [state,setState]=useState({selected1:0,selected2:1})
   //Update state when the other component is brushed
@@ -79,7 +79,7 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix, labels}) => {
 
       // margins
       let margins;
-      if (labels.length>0)
+      if (expl_labels.length>0)
         margins = { top: 5, left:70, right:  10, bottom: 60 }
       else
         margins = { top: 10, left:20, right:  10, bottom: 20 }
@@ -97,8 +97,8 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix, labels}) => {
 
       //finding the data domain and the scale
       let domain;
-      if (labels.length>0)
-        domain = labels
+      if (expl_labels.length>0)
+        domain = expl_labels
       else
         domain = Array.from({length: distance_matrix.length}, (_, i) => i + 1);
 
@@ -108,7 +108,7 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix, labels}) => {
       const yScale = d3.scaleBand().domain(domain).range([svgHeightRange[1]-matrixSize,svgHeightRange[1]]).padding(0.01);
         
 
-      if (labels.length==0){
+      if (expl_labels.length==0){
         chartGroup.append("g")
             .attr("class","chart-axes")
             .attr("transform", `translate(0, ${svgHeightRange[1]})`)
