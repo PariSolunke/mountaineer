@@ -9,11 +9,10 @@ import  './styles/DataTable.css'
 const DataTable = ({dataframe, birefDataTable, columns, lensCount, globalSummary}) => {
 
   //state to check filtered data
-  const [state,setState]=useState({selectedTab: 'table', selectedFeature:"lens1", filteredIndices: new Set(), filterStatus: false});
+  const [state,setState]=useState({selectedTab: 'table', filteredIndices: new Set(), filterStatus: false});
 
   let tableData=[];
-  let distributionValues=[];
-  let globalMax,globalMin;
+  let distributionValues={};
   let filteredSummary={};
   //Update state when the other component is brushed
   function otherBrushed(selectedIndices, source, filterStatus){
@@ -45,31 +44,34 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount, globalSummary
   }
 
   else if (state.selectedTab=="distribution"){
-    dataframe.forEach(( row, i) =>{
-      let featureVal=row[state.selectedFeature].toFixed(6);
-      distributionValues.push({ featureVal: featureVal, dist:'global', y:row['y'], lens1:row['lens1']});
-      
-      if(state.filteredIndices.has(i))
-        distributionValues.push({ featureVal: featureVal, dist:'filter1',y:row['y'], lens1:row['lens1']});
-      
-      if(globalMax===undefined){
-        globalMax=featureVal;
-        globalMin=featureVal;
-      }
 
-      else{
-        globalMax=Math.max(featureVal,globalMax)
-        globalMin=Math.min(featureVal,globalMin)
-      }
+    columns.forEach((column)=>{
+      distributionValues[column]={globalMax:0 ,globalMin:0, distribution:[]}
+      let globalMax,globalMin;
 
+      dataframe.forEach(( row, i) =>{
+        let featureVal= Math.round(row[column]*1000000)/1000000;
+        distributionValues[column].distribution.push({ featureVal: featureVal, dist:'global', y:row['y'], lens1:row['lens1']});
+        
+        if(state.filteredIndices.has(i))
+        distributionValues[column].distribution.push({ featureVal: featureVal, dist:'filter1',y:row['y'], lens1:row['lens1']});
+        
+        if(globalMax===undefined){
+          globalMax=featureVal;
+          globalMin=featureVal;
+        }
+
+        else{
+          globalMax=Math.max(featureVal,globalMax)
+          globalMin=Math.min(featureVal,globalMin)
+        }
+      })
+      distributionValues[column].globalMax=globalMax
+      distributionValues[column].globalMin=globalMin
     })
-
     
   }
 
-  const changeSelectedFeature = (event) => {
-    setState((prevState)=>({...prevState, selectedFeature:event.target.value}));
-  };
   
   return (
     <Tabs id="TabComponent" activeKey={state.selectedTab} justify={true} variant='tabs' onSelect={(k) =>setState((prevState)=>({...prevState, selectedTab: k}))} transition={false}>
@@ -81,20 +83,9 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount, globalSummary
 
       <Tab eventKey="distribution" title="Data Distribution Density">
           {state.selectedTab=='distribution' &&
-            <>
-              <div style={{textAlign:'left', paddingLeft:'3px', marginTop:'4px' }}>
-                <label htmlFor='selectFeature'>Select Feature:&nbsp;</label>
-                <select id='selectFeature' value={state.selectedFeature} onChange={changeSelectedFeature}>
-                  {columns.map((column,i) => (<option value={column}>{column}</option>))}
-              </select>
-              </div>
-                <div className='distribution-wrapper'> 
-                <div className='density-container'>
-                  <FeatureDistributionDensity distributionValues={distributionValues} globalMax={globalMax} globalMin={globalMin} />
-               </div>
-              </div>
-            </>
-      
+            <div className='density-container'>
+              <FeatureDistributionDensity distributionValues={distributionValues} filterStatus={state.filterStatus} columns={columns}/>
+            </div>
           }
       </Tab>
     </Tabs>

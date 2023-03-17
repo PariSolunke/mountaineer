@@ -4,15 +4,10 @@
 }
 
 
-.distribution-wrapper{
-  display: grid;
-  grid-template-columns: 1fr;
-  height: 360px;
-  overflow-y: hidden;
-}
-
 .density-container{
-  height: 340px;
+  height: 360px;
+  overflow-y: scroll;
+
 }
 
 .nav {

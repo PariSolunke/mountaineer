@@ -87,15 +87,18 @@ const AttributionChart = ({column_names , explanations, birefAttribChart, expl_l
 let scaleSummary1=d3.scaleLinear().domain([-maxVal1,maxVal1]).range([-5,5])
 let scaleSummary2=d3.scaleLinear().domain([-maxVal2,maxVal2]).range([-5,5])
 
-let graphData1=[]
+let graphData1=[], graphData2=[], featureMags=[];
+
 for (let [key, value] of Object.entries(summary1)) {
+  featureMags.push({ feature:key, absValue:Math.abs(scaleSummary1(value)) + Math.abs(scaleSummary2(summary2[key]))} )
   graphData1.push({feature:key, value: scaleSummary1(value)})
+  graphData2.push({feature:key, value: scaleSummary2(summary2[key])})
 }
 
-let graphData2=[]
-for (let [key, value] of Object.entries(summary2)) {
-  graphData2.push({feature:key, value: scaleSummary2(value)})
-}
+featureMags.sort((a,b) => b.absValue - a.absValue);
+let columnOrder = featureMags.map(d=>d.feature)
+
+
   //clear plot
   const clear_plot = (svgref) => {
     svgref.selectAll('*').remove();
@@ -133,7 +136,7 @@ for (let [key, value] of Object.entries(summary2)) {
             .attr("class","chart-axes")
             .call(d3.axisTop(xScale));
 
-        const yScale = d3.scaleBand().domain(column_names).range(svgHeightRange);
+        const yScale = d3.scaleBand().domain(columnOrder).range(svgHeightRange);
 
         chartGroup
           .append('g')

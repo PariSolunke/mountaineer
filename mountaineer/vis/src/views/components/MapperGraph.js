@@ -295,6 +295,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         //lasso handlers
         //While lasso is being drawn
         function lasso_draw(){
+          
           svgref.selectAll('.lasso').classed("MapperLasso"+mapperId,true)
           lassoBrush.items()
           .attr("class","node-mapper-graph node-mapper-graph-unselected");
@@ -302,8 +303,11 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
 
         //after lasso is drawn
         function lasso_end(){
+
+          otherBrushed(selectedIndices, "MapperGraph"+mapperId, false);
+
           let selectedIndices= []
-  
+          
           //reset class of nodes and links
           lassoBrush.items().attr("class","node-mapper-graph");
           let links=chartGroup.selectAll('.link-mapper-graph');
@@ -334,10 +338,9 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
           }
 
           //case where no node is selected, disables filters
-          else{
-            otherBrushed(selectedIndices, "MapperGraph"+mapperId, false);
+          else
             birefMapperGraph.parent.onBrush(selectedIndices, "MapperGraph"+mapperId, false);
-          }
+          
         }
     });
 

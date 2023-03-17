@@ -4,8 +4,11 @@ import * as d3 from 'd3';
 import  './styles/FeatureDistributionDensity.css'
 
 
-const FeatureDistributionDensity = ({distributionValues, globalMax, globalMin}) => {
-
+const FeatureDistributionDensity = ({distributionValues, filterStatus, columns}) => {
+  
+  console.log(distributionValues)
+  
+  
   //clear plot
   const clear_plot = (svgref) => {
     svgref.selectAll('*').remove();
@@ -32,108 +35,156 @@ const FeatureDistributionDensity = ({distributionValues, globalMax, globalMin}) 
 
     // margins
     const margins = {
-        top: 10,
-        left:35,
-        right: 10,
-        bottom: 25
+        top: 0,
+        left:15,
+        right: 15,
+        bottom: 35
     }
-    
-    //appending group to svgref
-    const chartGroup = svgref
-        .append("g")
-        .attr("transform", `translate(${margins.left},${margins.top})`);
 
-    
-    // svg dimensions
-    const svgWidthRange = [0, d3.selectAll('.density-container').node().getBoundingClientRect().width - margins.left - margins.right];
-    const svgHeightRange = [0, d3.selectAll('.density-container').node().getBoundingClientRect().height -2 - margins.top - margins.bottom];
+    let containerWidth = d3.selectAll('.density-container').node().getBoundingClientRect().width;
+    let containerHeight = d3.selectAll('.density-container').node().getBoundingClientRect().height;
     svgref.node().style.width=d3.selectAll('.density-container').node().getBoundingClientRect().width;
-    svgref.node().style.height=d3.selectAll('.density-container').node().getBoundingClientRect().height-2;
+    if (columns.length % 2 == 0)
+      svgref.node().style.height=containerHeight/2 * columns.length/2 + 30;
+    else
+      svgref.node().style.height=containerHeight/2 * (columns.length+1)/2 + 30;
 
-    // X and Y Scales
 
-    const xScale = d3.scaleLinear()
-      .domain([globalMin-0.1*(globalMax-globalMin), globalMax+0.1*(globalMax-globalMin)])
-      .range(svgWidthRange);
 
-    chartGroup.append("g")
-      .attr("class","chart-axes")
-      .attr("transform", `translate(0, ${svgHeightRange[1]})`)
-      .call(d3.axisBottom(xScale).tickSizeOuter(0));
+    /*
+    //appending group to svgref
+    
+
   
+    */
 
+    
 
+    let densities = []
+
+    let xScales = {}
+    let yScales = {}
     // Compute kernel density estimation
-    let kdeBandwidth= (globalMax-globalMin) * 0.05
-    const kde = kernelDensityEstimator(kernelEpanechnikov(kdeBandwidth), xScale.ticks(60))
+    columns.forEach((column) => {
+    
+    let globalMax =  distributionValues[column].globalMax
+    let globalMin =  distributionValues[column].globalMin
+    
+    let xScale = d3.scaleLinear()
+      .domain([globalMin-0.1*(globalMax-globalMin), globalMax+0.1*(globalMax-globalMin)])
+      .range([margins.left,containerWidth/2-margins.right]);
 
-    const density1 =  kde( distributionValues
+    let kdeBandwidth= (globalMax-globalMin) * 0.05
+    let kde = kernelDensityEstimator(kernelEpanechnikov(kdeBandwidth), xScale.ticks(60))
+
+    let density1 =  kde( distributionValues[column].distribution
       .filter( function(d){return d.dist == "global"} )
-      .map(function(d){  return d.featureVal; }) )
-    const density2 =  kde( distributionValues
+      .map(function(d){  return d.featureVal; }))
+    
+    let density2
+
+    if(filterStatus){
+     density2 =  kde( distributionValues[column].distribution
       .filter( function(d){return d.dist == "filter1"} )
       .map(function(d){  return d.featureVal; }) )
-  
-    let filtered=true
+    }
+    
 
-    if(density2[0][1]==null)
-        filtered=false
     let yMax=0;
+    let densityDiff=0
     for (let i=0; i< density1.length; i++){
-      if (!filtered){
+      if (!filterStatus)
         yMax=Math.max(density1[i][1], yMax);
-      }
-      else
+      else{
+        densityDiff += Math.abs(density1[i][1] + density2[i][1] )
         yMax=d3.max([density1[i][1], density2[i][1] ,yMax]);
+      }
     }
+    
+    
 
-    const yScale = d3.scaleLinear()
-      .domain([0, yMax+0.1])
-      .range([svgHeightRange[1], svgHeightRange[0]]);
+    let yScale = d3.scaleLinear()
+      .domain([0, yMax*1.2])
+      .range([containerHeight/2-margins.bottom, margins.top]);
 
-    /*chartGroup.append("g")
-      .attr("class","chart-axes")
-      .call(d3.axisLeft(yScale).ticks(0));
-    */
-  // Plot the area
-    chartGroup.append("path")
-    .datum(density1)
-    .attr("fill", "#69b3a2")
-    .attr("opacity", ".6")
-    .attr("stroke", "#000")
-    .attr("stroke-width", 1)
-    .attr("stroke-linejoin", "round")
-    .attr("d",  d3.line()
-      .curve(d3.curveBasis)
-        .x(function(d) { return xScale(d[0]); })
-        .y(function(d) { return yScale(d[1]); })
-    );
+    densities.push({feature:column, density1:density1, density2:density2, densityDiff:densityDiff})  
+    xScales[column]=xScale
+    yScales[column]=yScale
+    })
+    console.log(densities)
+    console.log(xScales)
+    console.log(yScales)
+    if(filterStatus)
+      densities.sort((a,b)=> b.densityDiff-a.densityDiff)
+    densities.forEach((element, index)=>{
 
-    let xLocation= 70/100*svgWidthRange[1];
-    chartGroup.append("circle").attr("cx",xLocation).attr("cy",15).attr("r", 6).style("fill", "#69b3a2")
-    chartGroup.append("text").attr("x", xLocation+20).attr("y", 15).text("Global Prob. Density").style("font-size", "15px").attr("alignment-baseline","middle").style("fill","black")
+      let xCoord,yCoord;
+      if (index%2==0){;
+        xCoord = 0;
+        yCoord = index/2 * containerHeight/2;
+      }
+      else{
+        xCoord = containerWidth/2;
+        yCoord = (index-1)/2 * containerHeight/2;
+      }
+      let chartGroup = svgref
+        .append("g")
+        .attr("transform", `translate(${xCoord},${15 + yCoord})`);
 
-    if(filtered){
-    // Plot the area
-    chartGroup.append("path")
-      .datum(density2)
-      .attr("fill", "#404080")
-      .attr("opacity", ".6")
-      .attr("stroke", "#000")
-      .attr("stroke-width", 1)
-      .attr("stroke-linejoin", "round")
-      .attr("d",  d3.line()
-        .curve(d3.curveBasis)
-          .x(function(d) { return xScale(d[0]); })
-          .y(function(d) { return yScale(d[1]); })
-      );
+      chartGroup.append("path")
+        .datum(element.density1)
+        .attr("fill", "#69b3a2")
+        .attr("opacity", ".6")
+        .attr("stroke", "#000")
+        .attr("stroke-width", 1)
+        .attr("stroke-linejoin", "round")
+        .attr("d",  d3.line()
+          .curve(d3.curveBasis)
+            .x(function(d) { return xScales[element.feature](d[0]); })
+            .y(function(d) { return yScales[element.feature](d[1]); })
+        );
+      
+      if(filterStatus){
+        chartGroup.append("path")
+          .datum(element.density2)
+          .attr("fill", "#404080")
+          .attr("opacity", ".6")
+          .attr("stroke", "#000")
+          .attr("stroke-width", 1)
+          .attr("stroke-linejoin", "round")
+          .attr("d",  d3.line()
+            .curve(d3.curveBasis)
+              .x(function(d) { return xScales[element.feature](d[0]); })
+              .y(function(d) { return yScales[element.feature](d[1]); })
+          );
+      }
 
-      chartGroup.append("circle").attr("cx",xLocation).attr("cy",40).attr("r", 6).style("fill", "#404080")
-      chartGroup.append("text").attr("x", xLocation+20).attr("y", 40).text("Filtered Prob. Density").style("font-size", "15px").attr("alignment-baseline","middle").style("fill","black")
+      chartGroup.append("g")
+        .attr("class","chart-axes")
+        .attr("transform", `translate(0, ${yScales[element.feature].range()[0]})`)
+        .call(d3.axisBottom(xScales[element.feature]).tickSizeOuter(0));
+
+      chartGroup.append("text")
+        .attr("class", "x label")
+        .attr("text-anchor", "middle")
+        .attr("font-size", "13px")
+        .attr("x", containerWidth/4)
+        .attr("y", yScales[element.feature].range()[0] + margins.bottom)
+        .text(element.feature);
+
+    })
+
+
+    svgref.append("circle").attr("cx",containerWidth * 0.15).attr("cy",15).attr("r", 6).style("fill", "#69b3a2")
+    svgref.append("text").attr("x", containerWidth * 0.15 + 16).attr("y", 20).text("Global Prob. Density").style("font-size", "13px").attr("text-anchor","start").style("fill","black")
+
+    if(filterStatus){
+      svgref.append("circle").attr("cx",containerWidth * 0.65).attr("cy",15).attr("r", 6).style("fill", "#404080")
+      svgref.append("text").attr("x", containerWidth * 0.65 + 16).attr("y", 20).text("Filtered Prob. Density").style("font-size", "13px").attr("text-anchor","start").style("fill","black")
     }
-        
+      
   });
-
+  
   return (
     <>      
       <svg ref={ref}></svg>
