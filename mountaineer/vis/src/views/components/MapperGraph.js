@@ -288,19 +288,9 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         let lassoBrush=lasso()
         .items(chartGroup.selectAll('.node-mapper-graph'))
         .targetArea(svgref)
-        .on("draw",lasso_draw)
         .on("end",lasso_end);
         svgref.call(lassoBrush);
-        
-        //lasso handlers
-        //While lasso is being drawn
-        function lasso_draw(){
-          
-          svgref.selectAll('.lasso').classed("MapperLasso"+mapperId,true)
-          lassoBrush.items()
-          .attr("class","node-mapper-graph node-mapper-graph-unselected");
-        }
-
+ 
         //after lasso is drawn
         function lasso_end(){
 
