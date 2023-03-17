@@ -31,9 +31,9 @@ class Mountaineer:
         with open('./mountaineer/vis/dist/mountaineer.js') as f:
             self.visapp = f.read()
 
-    def visualize(self, X, y, mappers, lenses, explanation_list, column_names=None, projection_method='TSNE', expl_labels=[], class_labels={1:'Class 1', 0:'Class 2'}):
+    def visualize(self, X, y, lens, explanation_list, mappers, column_names=None, expl_labels=[], class_labels={1:'Class 1', 0:'Class 2'}):
         self.mapper_outputs=[]
-        self.lenses=copy.deepcopy(lenses)
+        self.lens=copy.deepcopy(lens)
         overlaps=[]
         output_lenses=[]
 
@@ -77,8 +77,8 @@ class Mountaineer:
             overlaps.append(overlap)
 
         #append lenses as list to the output object
-        for lens in self.lenses:
-            output_lenses.append(lens.tolist())
+        
+        output_lens=lens.tolist()
 
         #setting the input data dictionary for the frontend
         input_data = {
@@ -86,7 +86,7 @@ class Mountaineer:
             'mapper_outputs': self.mapper_outputs,
             'overlaps': overlaps,
             'dataframe':X.tolist(),
-            'lenses': output_lenses,
+            'lens': output_lens,
             'y': y.tolist(),
             'column_names': column_names.tolist(),
             'distance_matrix':distance_matrix,

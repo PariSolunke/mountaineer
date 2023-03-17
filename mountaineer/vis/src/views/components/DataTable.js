@@ -6,7 +6,7 @@ import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import  './styles/DataTable.css'
 
-const DataTable = ({dataframe, birefDataTable, columns, lensCount, globalSummary}) => {
+const DataTable = ({dataframe, birefDataTable, columns, globalSummary}) => {
 
   //state to check filtered data
   const [state,setState]=useState({selectedTab: 'table', filteredIndices: new Set(), filterStatus: false});
@@ -77,7 +77,7 @@ const DataTable = ({dataframe, birefDataTable, columns, lensCount, globalSummary
     <Tabs id="TabComponent" activeKey={state.selectedTab} justify={true} variant='tabs' onSelect={(k) =>setState((prevState)=>({...prevState, selectedTab: k}))} transition={false}>
       <Tab eventKey="table" title="Table">
         { state.selectedTab=='table' &&
-          <PaginatedTable tableData={tableData} columns={columns} lensCount={lensCount} filteredSummary={filteredSummary} globalSummary={globalSummary} filterStatus={state.filterStatus}/>
+          <PaginatedTable tableData={tableData} columns={columns} filteredSummary={filteredSummary} globalSummary={globalSummary} filterStatus={state.filterStatus}/>
         }
       </Tab>
 

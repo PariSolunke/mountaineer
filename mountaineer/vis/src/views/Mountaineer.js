@@ -372,17 +372,13 @@ const Mountaineer = ({data}) => {
             let newKey = columns[counter] 
             delete Object.assign(obj, {[newKey]: obj[counter] })[counter];
         }
-        obj = { ...obj, y: data.y[i], rowIndex:i}
-        data.lenses.forEach((lens,j) => {
-            obj[("lens"+(j+1))]= lens[i];            
-        });
+        obj = { ...obj, y: data.y[i], pred_prob:data.lens[i] ,rowIndex:i}
         return obj; 
     })
 
     columns.unshift("y");
-    data.lenses.forEach((lens,index) => {
-        columns.unshift("lens"+(index+1));  
-    });
+    columns.unshift("pred_prob");  
+   
 
     let minElements, maxElements;
 
@@ -413,10 +409,10 @@ const Mountaineer = ({data}) => {
                     <DataProjection input_projection={data.input_projection} birefDataProj={birefDataProj} lasso={lasso} dataframe={dataframe} class_labels= {data.class_labels}/>
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph1} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={1} expl_labels={data.expl_labels}/> 
+                    <MapperGraph mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph1} dataframe={dataframe} columns={columns} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={1} expl_labels={data.expl_labels}/> 
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph2} dataframe={dataframe} columns={columns} lensCount={data.lenses.length} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={2} expl_labels={data.expl_labels}/> 
+                    <MapperGraph mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph2} dataframe={dataframe} columns={columns} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={2} expl_labels={data.expl_labels}/> 
                 </div>
             </div>
             <div className='datatable-wrapper'>
@@ -424,7 +420,7 @@ const Mountaineer = ({data}) => {
                     <DistanceMatrix distance_matrix={data.distance_matrix} birefDistMatrix={birefDistMatrix} expl_labels={data.expl_labels}/>
                 </div>
                 <div className='datatable-container'>
-                    <DataTable dataframe={dataframe} birefDataTable={birefDataTable} columns={columns} lensCount={data.lenses.length} globalSummary={globalSummary} />
+                    <DataTable dataframe={dataframe} birefDataTable={birefDataTable} columns={columns} globalSummary={globalSummary} />
                 </div>
                 <div className='attributions-container'>
                     <AttributionChart column_names={data.column_names} explanations={data.explanation_list} birefAttribChart={birefAttribChart} expl_labels={data.expl_labels}/>

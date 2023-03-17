@@ -12,10 +12,10 @@ import * as d3 from 'd3';
 
 
 
-const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lensCount, lasso, minElements, maxElements, mapperId, expl_labels}) => {
+const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lasso, minElements, maxElements, mapperId, expl_labels}) => {
 
   //state to check filtered data
-  const [state,setState]=useState({selectedMapper:mapperId-1, nodeColorBy:"lens1", nodeColorAgg:"mean"});
+  const [state,setState]=useState({selectedMapper:mapperId-1, nodeColorBy:"pred_prob", nodeColorAgg:"mean"});
   let chartGroup, colorScale, yScaleLegend, globalRef;
   let nodeColorVals={}
   let nodeColorBy=state.nodeColorBy;

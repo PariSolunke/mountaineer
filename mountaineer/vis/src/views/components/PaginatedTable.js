@@ -3,7 +3,7 @@ import { Table } from 'react-bootstrap';
 import './styles/PaginatedTable.css'
 import Pagination from './Pagination.js';
 
-const PaginatedTable = ({tableData, columns, lensCount, filteredSummary, globalSummary, filterStatus}) => {
+const PaginatedTable = ({tableData, columns, filteredSummary, globalSummary, filterStatus}) => {
     
     
     const [state,setState]=useState({currentPage:1, sort:"none"})
