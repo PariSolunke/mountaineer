@@ -460,7 +460,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
       <div id={"mapper-selection-container"+mapperId} className='mapper-selection-container'>
         <div>
           <label htmlFor="mapperSelect">Mapper:&nbsp;</label>
-          <select value={state.selectedMapper} id="mapperSelect"  onChange={changeSelectedMapper}>
+          <select style={{width:'75px'}} value={state.selectedMapper} id="mapperSelect"  onChange={changeSelectedMapper}>
               {
               mapper_outputs.map((mapper,i) => (
                 expl_labels.length>0?
@@ -471,8 +471,8 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
           </select>
         </div>
         <div>
-          <label htmlFor='nodeColorBy'>Node Color:&nbsp;</label>
-          <select id="nodeColorBy" onChange={changeNodeColor}>
+          <label htmlFor='nodeColorBy'>Color By:&nbsp;</label>
+          <select style={{width:'75px'}} id="nodeColorBy" onChange={changeNodeColor}>
               {columns.map((column,i) => (
                   <option selected={column==nodeColorBy?true:false} value={column}>{column}</option>
                 ))}
@@ -480,7 +480,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         </div>
         <div>
           <label htmlFor="nodeColorAgg">Aggregation:&nbsp;</label>
-          <select id="nodeColorAgg" onChange={changeNodeColor}>
+          <select style={{width:'75px'}} id="nodeColorAgg" onChange={changeNodeColor}>
             <option selected={nodeColorAgg=="mean"?true:false} value="mean">Mean</option>
             <option selected={nodeColorAgg=="median"?true:false} value="median">Median</option>
             <option selected={nodeColorAgg=="sd"?true:false} value="sd">Standard Deviation</option>

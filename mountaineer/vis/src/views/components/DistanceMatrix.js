@@ -50,7 +50,7 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix, expl_labels}) => {
           .attr("height", yScale.bandwidth() )
           .style("fill", ()=>{
             if (i==j)
-              return "#98eb98"
+              return "#808080"
             else
               return colorScale(distance_matrix[i][j])})
           .classed("curSelection", ()=>{
@@ -80,7 +80,7 @@ const DistanceMatrix = ({distance_matrix , birefDistMatrix, expl_labels}) => {
       // margins
       let margins;
       if (expl_labels.length>0)
-        margins = { top: 5, left:70, right:  10, bottom: 60 }
+        margins = { top: 5, left:90, right:  10, bottom: 85 }
       else
         margins = { top: 10, left:20, right:  10, bottom: 20 }
 
