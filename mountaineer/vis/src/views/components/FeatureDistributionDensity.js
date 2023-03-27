@@ -96,7 +96,7 @@ const FeatureDistributionDensity = ({distributionValues, filterStatus, columns})
       if (!filterStatus)
         yMax=Math.max(density1[i][1], yMax);
       else{
-        densityDiff += Math.abs(density1[i][1] + density2[i][1] )
+        densityDiff += Math.abs(density1[i][1] - density2[i][1] )
         yMax=d3.max([density1[i][1], density2[i][1] ,yMax]);
       }
     }
