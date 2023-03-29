@@ -4,11 +4,8 @@ import * as d3 from 'd3';
 import  './styles/FeatureDistributionDensity.css'
 
 
-const FeatureDistributionDensity = ({distributionValues, filterStatus, columns}) => {
-  
-  console.log(distributionValues)
-  
-  
+const FeatureDistributionDensity = ({distributionValues, filterStatus, columns}) => {  
+
   //clear plot
   const clear_plot = (svgref) => {
     svgref.selectAll('*').remove();
@@ -111,9 +108,7 @@ const FeatureDistributionDensity = ({distributionValues, filterStatus, columns})
     xScales[column]=xScale
     yScales[column]=yScale
     })
-    console.log(densities)
-    console.log(xScales)
-    console.log(yScales)
+
     if(filterStatus)
       densities.sort((a,b)=> b.densityDiff-a.densityDiff)
     densities.forEach((element, index)=>{

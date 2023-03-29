@@ -76,7 +76,7 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe, clas
           })
           .attr("fill",(d, i)=>{
             if (state.colorBy=='predictionAccuracy'){
-              if ( (dataframe[i]["lens1"]<0.5 && dataframe[i]["y"]>0.5) || (dataframe[i]["lens1"]>=0.5 && dataframe[i]["y"]<0.5)) 
+              if ( (dataframe[i]["pred_prob"]<0.5 && dataframe[i]["y"]>0.5) || (dataframe[i]["pred_prob"]>=0.5 && dataframe[i]["y"]<0.5)) 
                 return "#d7191c"
               else
                 return "#2b83ba"

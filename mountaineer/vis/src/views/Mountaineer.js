@@ -186,8 +186,8 @@ const Mountaineer = ({data}) => {
                 });
         
                 // Clear lasso
-                //dyn_path.attr("d",null);
-                //close_path.attr("d",null);
+                dyn_path.attr("d",null);
+                close_path.attr("d",null);
                 origin_node.attr("display","none");
         
                 // Run user defined end function
