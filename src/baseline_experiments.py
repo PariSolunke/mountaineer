@@ -209,7 +209,7 @@ def get_correct_predictions(model, X_test, X_test_tens, Y_test, averaging='binar
     y_pred_label = torch.round(torch.sigmoid(predictions)) if averaging == 'binary' else torch.max(predictions.data, 1)[1]
 
     xs = np.asarray(X_test, dtype=np.float32)
-    ys = np.asarray(Y_test, dtype=np.int) if averaging == 'binary' else np.asarray(Y_test, dtype=np.int) - 1
+    ys = np.asarray(Y_test, dtype=int) if averaging == 'binary' else np.asarray(Y_test, dtype=int) - 1
 
     for x, prediction, y in zip(enumerate(xs), y_pred_label, ys):
         if prediction == y:
