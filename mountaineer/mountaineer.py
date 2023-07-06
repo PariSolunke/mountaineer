@@ -3,7 +3,7 @@ import glob
 from notebookjs import execute_js
 from sklearn.manifold import TSNE
 from .util import remove_duplicated_links, remove_graph_duplicates
-from gale import bottleneck_distance
+from gale import bottleneck_distance, mapper_to_networkx
 import umap
 import os
 import copy
@@ -61,18 +61,34 @@ class Mountaineer:
                 distance_matrix[j][i]=curDist
                 j+=1
 
-            curMapper= copy.deepcopy(mapper)
-            overlap=defaultdict(dict)
-            #remove duplicated nodes from the mapper output
-            self.mapper_outputs.append(remove_graph_duplicates(curMapper))
-            #remove duplicated links
-            self.mapper_outputs[i]=remove_duplicated_links(self.mapper_outputs[i])
+            #curMapper= copy.deepcopy(mapper)
             
+            #remove duplicated nodes from the mapper output
+            #self.mapper_outputs.append(remove_graph_duplicates(curMapper))
+            #remove duplicated links
+            #self.mapper_outputs[i]=remove_duplicated_links(self.mapper_outputs[i])
+            G = mapper_to_networkx(mapper)
+            mapper_obj = {}
+            nodes_dict = defaultdict(list)
+            for node, data in mapper.node_info_.items():
+                indices = data['indices'].tolist()
+                nodes_dict[str(node)].extend(indices)
+                
+            edges_dict = defaultdict(list)
+
+            for edge in G.edges:
+                source, target = str(edge[0]), str(edge[1])
+                edges_dict[source].append(target)
+
+            mapper_obj['links'] = edges_dict
+            mapper_obj['nodes'] = nodes_dict
+            self.mapper_outputs.append(mapper_obj)
             #find the overlap for each connected node
-            for node1,link_nodes in self.mapper_outputs[i]['links'].items():
+            overlap=defaultdict(dict)
+            for node1,link_nodes in edges_dict.items():
                 for node2 in link_nodes:
-                    node1_set=set(self.mapper_outputs[i]['nodes'][node1])
-                    node2_set=set(self.mapper_outputs[i]['nodes'][node2])
+                    node1_set=set(nodes_dict[node1])
+                    node2_set=set(nodes_dict[node2])
                     overlap[node1][node2]= len(node1_set.intersection(node2_set))/len(node1_set.union(node2_set))
             overlaps.append(overlap)
 
