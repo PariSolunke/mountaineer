@@ -126,6 +126,8 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe, clas
         let selectedProjection, dataRange;
         if (state.selectedProjection=="UMAP")
           selectedProjection = input_projection['UMAP']
+        else if(state.selectedProjection=="PCA")
+          selectedProjection = input_projection['PCA']
         else
           selectedProjection = input_projection['TSNE']
         dataRange=calculate_data_range(selectedProjection);
@@ -265,7 +267,7 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe, clas
           <select value={state.selectedProjection} id="projectionSelect"  onChange={changeProjection}>
             <option value="UMAP">UMAP</option>
             <option value="TSNE">TSNE</option>
-
+            <option value="PCA">PCA</option>
           </select>
         </div>
         <div>

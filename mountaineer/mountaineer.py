@@ -7,6 +7,7 @@ from gale import bottleneck_distance, mapper_to_networkx
 import umap
 import os
 import copy
+from sklearn.decomposition import PCA
 
 try:
     import importlib.resources as pkg_resources
@@ -44,8 +45,7 @@ class Mountaineer:
 
         #Use TSNE/UMAP to get a 2d projection of the input data
         self.input_projection['UMAP']=umap.UMAP(random_state=42).fit_transform(X).tolist()
-
-        
+        self.input_projection['PCA']=PCA(n_components=2).fit_transform(X).tolist()
         self.input_projection['TSNE']=TSNE(n_components=2,random_state=42).fit_transform(X).tolist()
 
         distance_matrix = [[0 for i in range(len(mappers))] for j in range(len(mappers))]
