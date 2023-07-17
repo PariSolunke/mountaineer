@@ -401,8 +401,6 @@ const Mountaineer = ({data}) => {
         }, 0))/dataframe.length; 
       })
       
-    console.log(data.mapper_outputs)
-    console.log(data.kk_layouts)
     return (
         <div className='main-wrapper'>
             <div className='viz-wrapper'>

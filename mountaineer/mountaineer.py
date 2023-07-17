@@ -26,7 +26,6 @@ from notebookjs import execute_js
 class Mountaineer:
     input_projection={}
     mapper_outputs=[]
-    lenses=[]
     kk_layouts=[]
     def __init__(self) -> None:
                 
@@ -37,6 +36,7 @@ class Mountaineer:
     def visualize(self, X, y, lens, explanation_list, mappers, column_names=None, expl_labels=[], class_labels={1:'Class 1', 0:'Class 2'}, kamada_layout=False):
         self.mapper_outputs=[]
         self.lens=copy.deepcopy(lens)
+        self.kk_layouts=[]
         overlaps=[]
 
         ## setting callbacks
