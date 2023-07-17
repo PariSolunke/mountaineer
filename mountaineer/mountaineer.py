@@ -7,6 +7,7 @@ from gale import bottleneck_distance, mapper_to_networkx
 import umap
 import os
 import copy
+import networkx as nx
 from sklearn.decomposition import PCA
 
 try:
@@ -26,17 +27,17 @@ class Mountaineer:
     input_projection={}
     mapper_outputs=[]
     lenses=[]
+    kk_layouts=[]
     def __init__(self) -> None:
                 
         self.visapp = None
         with open('./mountaineer/vis/dist/mountaineer.js') as f:
             self.visapp = f.read()
 
-    def visualize(self, X, y, lens, explanation_list, mappers, column_names=None, expl_labels=[], class_labels={1:'Class 1', 0:'Class 2'}):
+    def visualize(self, X, y, lens, explanation_list, mappers, column_names=None, expl_labels=[], class_labels={1:'Class 1', 0:'Class 2'}, kamada_layout=False):
         self.mapper_outputs=[]
         self.lens=copy.deepcopy(lens)
         overlaps=[]
-        output_lenses=[]
 
         ## setting callbacks
         callbacks = {
@@ -68,14 +69,20 @@ class Mountaineer:
             #remove duplicated links
             #self.mapper_outputs[i]=remove_duplicated_links(self.mapper_outputs[i])
             G = mapper_to_networkx(mapper)
+            kk_layout = nx.kamada_kawai_layout(G)
+            kk_object={}
             mapper_obj = {}
             nodes_dict = defaultdict(list)
             for node, data in mapper.node_info_.items():
+                if node in kk_layout:
+                    kk_object[str(node)] = kk_layout[node].tolist()
+                else:
+                    if kamada_layout:
+                        continue
                 indices = data['indices'].tolist()
                 nodes_dict[str(node)].extend(indices)
-                
-            edges_dict = defaultdict(list)
 
+            edges_dict = defaultdict(list)
             for edge in G.edges:
                 source, target = str(edge[0]), str(edge[1])
                 edges_dict[source].append(target)
@@ -83,6 +90,7 @@ class Mountaineer:
             mapper_obj['links'] = edges_dict
             mapper_obj['nodes'] = nodes_dict
             self.mapper_outputs.append(mapper_obj)
+            self.kk_layouts.append(kk_object)
             #find the overlap for each connected node
             overlap=defaultdict(dict)
             for node1,link_nodes in edges_dict.items():
@@ -108,7 +116,9 @@ class Mountaineer:
             'distance_matrix':distance_matrix,
             'explanation_list':explanation_list,
             'expl_labels':expl_labels,
-            'class_labels':class_labels
+            'class_labels':class_labels,
+            'kk_layouts': self.kk_layouts,
+            'kk_flag': kamada_layout
         }
 
         #Execute and send data to the frontend

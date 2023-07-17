@@ -12,7 +12,7 @@ import * as d3 from 'd3';
 
 
 
-const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lasso, minElements, maxElements, mapperId, expl_labels}) => {
+const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, columns, lasso, minElements, maxElements, mapperId, expl_labels, kk_layouts, kk_flag}) => {
 
   //state to check filtered data
   const [state,setState]=useState({selectedMapper:mapperId-1, nodeColorBy:"pred_prob", nodeColorAgg:"mean"});
@@ -20,6 +20,7 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
   let nodeColorVals={}
   let nodeColorBy=state.nodeColorBy;
   let nodeColorAgg=state.nodeColorAgg;
+  let kk_layout=kk_layouts[state.selectedMapper]
   let mapper_output=mapper_outputs[state.selectedMapper];
   let overlap=overlaps[state.selectedMapper];
   let nodeNames=Object.keys(mapper_output.nodes);
@@ -115,8 +116,10 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
     
     
     //force layout graph
-    
-    let simulation =d3.forceSimulation(nodes)
+    let simulation;
+
+    if(kk_flag == false){
+    simulation =d3.forceSimulation(nodes)
       .on('tick',onTick)
       .force("link", d3.forceLink()                              
         .id(function(d) { return d.id; })                     
@@ -129,7 +132,25 @@ const MapperGraph = ({mapper_outputs, overlaps, birefMapperGraph, dataframe, col
         //.force("x", d3.forceX(function(d){return xScale(d.xAvg)}))
         //.force("y", d3.forceY(function(d){return yScale(d.yAvg)}))
         .force("center", d3.forceCenter(svgWidthRange[1]/2,svgHeightRange[1]/2).strength(1.1) )
-        .force("collide", d3.forceCollide().strength(0.8).radius(21).iterations(1));
+        .force("collide", d3.forceCollide().strength(0.8).radius(21).iterations(1));    
+    }
+
+    else{
+      let xScale=d3.scaleLinear().domain([-1.2,1.2]).range([margins.left,svgWidthRange[1]])
+      let yScale=d3.scaleLinear().domain([-1.2,1.2]).range([margins.top,svgHeightRange[1]])
+      
+      simulation =d3.forceSimulation(nodes)
+      .on('tick',onTick)
+      .force("link", d3.forceLink()                              
+        .id(function(d) { return d.id; })                     
+        .links(links)
+        .strength(0)
+        ) 
+        .force("x", d3.forceX(function(d){ return xScale(kk_layout[d['id']][0])}))
+        .force("y", d3.forceY(function(d){return yScale(kk_layout[d['id']][1])}))
+        .force("collide", d3.forceCollide().strength(1).radius(15).iterations(1)); 
+
+    }
       
     //links
     let link=chartGroup

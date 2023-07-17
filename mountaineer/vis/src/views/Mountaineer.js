@@ -401,7 +401,8 @@ const Mountaineer = ({data}) => {
         }, 0))/dataframe.length; 
       })
       
-
+    console.log(data.mapper_outputs)
+    console.log(data.kk_layouts)
     return (
         <div className='main-wrapper'>
             <div className='viz-wrapper'>
@@ -409,10 +410,10 @@ const Mountaineer = ({data}) => {
                     <DataProjection input_projection={data.input_projection} birefDataProj={birefDataProj} lasso={lasso} dataframe={dataframe} class_labels= {data.class_labels}/>
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph1} dataframe={dataframe} columns={columns} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={1} expl_labels={data.expl_labels}/> 
+                    <MapperGraph mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph1} dataframe={dataframe} columns={columns} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={1} expl_labels={data.expl_labels} kk_layouts={data.kk_layouts} kk_flag={data.kk_flag}/> 
                 </div>
                 <div className='mapper-graph-container'>
-                    <MapperGraph mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph2} dataframe={dataframe} columns={columns} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={2} expl_labels={data.expl_labels}/> 
+                    <MapperGraph mapper_outputs={data.mapper_outputs} overlaps={data.overlaps} birefMapperGraph={birefMapperGraph2} dataframe={dataframe} columns={columns} lasso={lasso} minElements={minElements} maxElements={maxElements} mapperId={2} expl_labels={data.expl_labels} kk_layouts={data.kk_layouts} kk_flag={data.kk_flag}/> 
                 </div>
             </div>
             <div className='datatable-wrapper'>
