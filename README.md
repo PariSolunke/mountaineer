@@ -13,6 +13,14 @@ Just do
 conda env create -n mountaineer -f requirements.yml
 ```
 
+Then go to mountaineer/vis/ and run
+
+```shell
+npm run build
+```
+
+Also, clone the following repo (https://github.com/viguardieiro/gale)[https://github.com/viguardieiro/gale].
+
 ### Usage
 
 ```python
