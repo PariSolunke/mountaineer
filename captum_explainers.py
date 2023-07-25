@@ -28,12 +28,12 @@ def captum_ks(x, target_class, n_perturb, model_f):
     return attr
 
 #smoothgrad
-def captum_sg(x, target_class, n_perturb, model_f):
+def captum_sg(x, target_class, n_perturb, model_f, stdevs=0.1):
     if target_class is None:
         target_class = model_f(x).data.max(1)[1].item()
     model_f.zero_grad()
     method = NoiseTunnel(Saliency(model_f))
-    attr = method.attribute(inputs=x, nt_type='smoothgrad', target=target_class, nt_samples=n_perturb, abs=False, stdevs=0.1)
+    attr = method.attribute(inputs=x, nt_type='smoothgrad', target=target_class, nt_samples=n_perturb, abs=False, stdevs=stdevs)
     return attr
 
 #integrated gradients
