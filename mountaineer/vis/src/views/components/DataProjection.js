@@ -13,7 +13,7 @@ import * as d3 from 'd3';
 //alasql
 import * as alasql from 'alasql';
 
-const DataProjection = ({input_projection, birefDataProj, lasso, dataframe, class_labels}) => {
+const DataProjection = ({input_projection, birefDataProj, lasso, dataframe, class_labels, model_comparison}) => {
   //state to check filtered data
   const [state,setState]=useState({colorBy: "class" ,selectedProjection: "UMAP", filteredIndices: new Set(), filterStatus: false });
 
@@ -76,7 +76,7 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe, clas
           })
           .attr("fill",(d, i)=>{
             if (state.colorBy=='predictionAccuracy'){
-              if ( (dataframe[i]["pred_prob"]<0.5 && dataframe[i]["y"]>0.5) || (dataframe[i]["pred_prob"]>=0.5 && dataframe[i]["y"]<0.5)) 
+              if ( (dataframe[i]["prob_1"]<0.5 && dataframe[i]["y"]>0.5) || (dataframe[i]["prob_1"]>=0.5 && dataframe[i]["y"]<0.5)) 
                 return "#d7191c"
               else
                 return "#2b83ba"
@@ -274,7 +274,9 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe, clas
           <label htmlFor='projNodeColorBy'>Node Color:&nbsp;</label>
           <select value={state.colorBy} id="projNodeColorBy" onChange={changeProjColor}>
             <option value="class">Class</option>
+            { model_comparison == false &&
             <option value="predictionAccuracy">Accuracy</option>
+            }
           </select>
         </div>
       </div>
