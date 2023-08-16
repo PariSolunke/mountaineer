@@ -366,19 +366,41 @@ const Mountaineer = ({data}) => {
       columns=Array.from({length: Object.keys(data.dataframe[0]).length}, (_, i) => {return "Feature"+(i + 1)});
     else
       columns=JSON.parse(JSON.stringify(data.column_names))
+    let dataframe;
 
-    let dataframe=data.dataframe.map((obj,i) =>{
+    if (data.model_comparison == true){
+        dataframe=data.dataframe.map((obj,i) =>{
+            for (let counter=0; counter< Object.keys(data.dataframe[0]).length; counter++){
+                let newKey = columns[counter] 
+                delete Object.assign(obj, {[newKey]: obj[counter] })[counter];
+            }
+            obj = { ...obj, y: data.y[i], rowIndex:i}
+
+            data.lens.forEach((lens, j)=>{
+                let n=j+1
+                obj["prob_"+n] = lens[i]
+            })
+            return obj; 
+            })
+
+            columns.unshift("y");
+            for (let j=data.lens.length; j>0; j--){
+                columns.unshift("prob_"+j);  
+            }
+    }
+
+    else {    
+        dataframe=data.dataframe.map((obj,i) =>{
         for (let counter=0; counter< Object.keys(data.dataframe[0]).length; counter++){
             let newKey = columns[counter] 
             delete Object.assign(obj, {[newKey]: obj[counter] })[counter];
         }
-        obj = { ...obj, y: data.y[i], pred_prob:data.lens[i] ,rowIndex:i}
+        obj = { ...obj, y: data.y[i], prob_1:data.lens[i] ,rowIndex:i}
         return obj; 
-    })
-
-    columns.unshift("y");
-    columns.unshift("pred_prob");  
-   
+        })
+        columns.unshift("y");
+        columns.unshift("prob_1");  
+    }
 
     let minElements, maxElements;
 
