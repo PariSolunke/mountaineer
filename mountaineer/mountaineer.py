@@ -33,7 +33,7 @@ class Mountaineer:
         with open('./mountaineer/vis/dist/mountaineer.js') as f:
             self.visapp = f.read()
 
-    def visualize(self, X, y, lens, explanation_list, mappers, column_names=None, expl_labels=[], class_labels={1:'Class 1', 0:'Class 2'}, kamada_layout=False, model_comparison = False):
+    def visualize(self, X, y, lens, explanation_list, mappers, column_names=None, expl_labels=[], class_labels={1:'Class 1', 0:'Class 2'}, kamada_layout=False, model_comparison = False, model_names= []):
         self.mapper_outputs=[]
         self.lens=copy.deepcopy(lens)
         self.kk_layouts=[]
@@ -124,7 +124,8 @@ class Mountaineer:
             'class_labels':class_labels,
             'kk_layouts': self.kk_layouts,
             'kk_flag': kamada_layout,
-            'model_comparison':model_comparison
+            'model_comparison':model_comparison,
+            'model_names': model_names
         }
 
         #Execute and send data to the frontend
