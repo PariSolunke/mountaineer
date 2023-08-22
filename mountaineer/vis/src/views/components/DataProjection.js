@@ -34,10 +34,12 @@ const DataProjection = ({input_projection, birefDataProj, lasso, dataframe, clas
     }
     else if (source=='MapperGraph1'){
       document.getElementById("sqlCondition").value='';
+      selectedIndices.clear()
       setState((prevState)=>({...prevState, filteredIndices: new Set(indices.flat()), filterStatus:filterStatus}));
     }
     else if (source=="MapperGraph2"){
       document.getElementById("sqlCondition").value='';
+      selectedIndices.clear()          
       setState((prevState)=>({...prevState, filteredIndices: new Set(indices.flat()), filterStatus:filterStatus}));
     }
 

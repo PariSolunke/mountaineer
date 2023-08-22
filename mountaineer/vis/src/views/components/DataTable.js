@@ -17,9 +17,12 @@ const DataTable = ({dataframe, birefDataTable, columns, globalSummary}) => {
   //Update state when the other component is brushed
   function otherBrushed(selectedIndices, source, filterStatus){
     if (source=='MapperGraph1' || source=="MapperGraph2")
-      setState((prevState)=>({...prevState, filteredIndices:new Set(selectedIndices.flat()), filterStatus: filterStatus}));
+      setState((prevState)=>({...prevState, filteredIndices:new Set(selectedIndices.flat()), filterStatus: filterStatus, dataProjBrushed:false}));
     else if(source=="DataProjection")
-      setState((prevState)=>({...prevState, filteredIndices:new Set(selectedIndices), filterStatus: filterStatus}));
+      setState((prevState)=>({...prevState, filteredIndices:new Set(selectedIndices), filterStatus: filterStatus, dataProjBrushed:filterStatus}));
+
+    else if (source=='DistMatrix' && state.dataProjBrushed==false)
+      setState((prevState)=>({...prevState, filteredIndices:new Set(), filterStatus: false}));
 
   } 
   

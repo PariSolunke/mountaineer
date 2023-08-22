@@ -13,22 +13,27 @@ import { filter, max } from 'd3';
 
 const AttributionChart = ({column_names , explanations, birefAttribChart, expl_labels}) => {
 
-  const  [state, setState]=useState({mapper1:0,mapper2:1, filteredIndices:new Set(), filterStatus:false});
+  const  [state, setState]=useState({mapper1:0,mapper2:1, filteredIndices:new Set(), filterStatus:false, dataProjBrushed:false});
 
   //Update chart when the other component is brushed
   function otherBrushed(selectedIndices, source, status){
     if (!status)
-      setState((prevState)=>({...prevState, filteredIndices:new Set(), filterStatus:false })) 
+      setState((prevState)=>({...prevState, filteredIndices:new Set(), filterStatus:false, dataProjBrushed: false })) 
     if (source=="MapperGraph1" || source=="MapperGraph2")
-     setState((prevState)=>({...prevState, filteredIndices:new Set(selectedIndices.flat()), filterStatus:status })) 
+     setState((prevState)=>({...prevState, filteredIndices:new Set(selectedIndices.flat()), filterStatus:status, dataProjBrushed:false })) 
     else if (source=="DataProjection")
-      setState({...state, filteredIndices:new Set(selectedIndices), filterStatus:status }) 
+      setState({...state, filteredIndices:new Set(selectedIndices), filterStatus:status , dataProjBrushed: true}) 
 
   } 
 
   function mapperChanged(newMapper, source){
-    if (source =="DistMatrix")
-      setState((prevState)=>({...prevState, mapper1:newMapper[0], mapper2:newMapper[1]})) 
+    if (source =="DistMatrix"){
+      if (state.dataProjBrushed)
+        setState((prevState)=>({...prevState, mapper1:newMapper[0], mapper2:newMapper[1]}))
+
+      else
+        setState((prevState)=>({...prevState, mapper1:newMapper[0], mapper2:newMapper[1], filteredIndices:new Set(), filterStatus:false}))
+    } 
     else if (source=="MapperGraph1")
       setState((prevState)=>({...prevState, mapper1:newMapper})) 
     else if (source=="MapperGraph2")

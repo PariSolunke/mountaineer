@@ -318,7 +318,7 @@ const Mountaineer = ({data}) => {
         birefMapperGraph2.child.otherBrushed(mapper2, "DistMatrix", true);
         birefAttribChart.child.mapperChanged([mapper1, mapper2], "DistMatrix")
         birefDataProj.child.otherBrushed([], "DistMatrix", "")
-
+        birefDataTable.child.otherBrushed([], "DistMatrix", "");
     }
     
     const onMapperChange = (newMapper, source) =>{
@@ -377,7 +377,6 @@ const Mountaineer = ({data}) => {
             }
             obj = { ...obj, y: data.y[i], rowIndex:i}
 
-            console.log(data.model_names)
             if (data.model_names.length==0){
                 data.lens.forEach((lens, j)=>{
                     let n=j+1
