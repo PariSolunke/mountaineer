@@ -415,6 +415,7 @@ const Mountaineer = ({data}) => {
         })
         columns.unshift("y");
         columns.unshift("prob_1");  
+        initial_name="prob_1"
     }
 
     let minElements, maxElements;
