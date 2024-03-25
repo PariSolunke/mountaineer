@@ -13,13 +13,10 @@ Just do
 conda env create -n mountaineer -f requirements.yml
 ```
 
-Then go to mountaineer/vis/ and run
-
+Further, clone the following repo [https://github.com/viguardieiro/gale](https://github.com/viguardieiro/gale).
 ```shell
-npm run build
+git clone https://github.com/viguardieiro/gale
 ```
-
-Also, clone the following repo [https://github.com/viguardieiro/gale](https://github.com/viguardieiro/gale).
 
 ### Usage
 
@@ -29,3 +26,6 @@ import mountaineer as mnt
 
 v = mnt.visualize(...)
 ```
+
+The project root has notebooks with our experiments. You can use the loaded tool within Heloc Explanations.ipynb file directly to explore our experiments. 
+
